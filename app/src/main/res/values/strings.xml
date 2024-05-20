@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PacApps</string>
+    <string name="welcome">"Bienvenidos a Paco Peluquero\'s"</string>
+    <string name="since">"Estilizando desde 2010"</string>
+</resources>
