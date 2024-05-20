@@ -1,4 +1,4 @@
-package com.jmgtumat.pacapps.uiclases.main
+package com.jmgtumat.pacapps.main
 
 //import com.jmgtumat.pacapps.ui.theme.crema
 import android.content.res.Configuration

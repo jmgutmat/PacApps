@@ -1,5 +1,4 @@
-package com.jmgtumat.pacapps.uiclases.main
-
+package com.jmgtumat.pacapps.uiclases.services
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,19 +18,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import com.jmgtumat.pacapps.navigation.AppScreens
+import com.jmgtumat.pacapps.data.Servicio
+import com.jmgtumat.pacapps.viewmodels.ServicioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun ServiceSelectionScreen(
+    viewModel: ServicioViewModel,
+    onServiceSelected: (Servicio) -> Unit,
+    onNavigateToAddService: () -> Unit
+) {
+    val servicios by viewModel.servicios.observeAsState(initial = emptyList())
+
     Scaffold(
         topBar = {
             LargeTopAppBar(
-                title = { Text("PAC Apps") },
+                title = { Text("Select Service") },
                 colors = TopAppBarDefaults.largeTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
@@ -39,8 +45,11 @@ fun MainScreen(navController: NavHostController) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {}) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
+            FloatingActionButton(onClick = onNavigateToAddService) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add Service"
+                )
             }
         },
         floatingActionButtonPosition = FabPosition.End
@@ -49,23 +58,16 @@ fun MainScreen(navController: NavHostController) {
             modifier = Modifier
                 .padding(padding)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            MainScreenButton(text = "View Clients", onClick = {
-                navController.navigate(AppScreens.ViewClientsScreen.route)
-            })
-            MainScreenButton(text = "View Employees", onClick = {
-                navController.navigate(AppScreens.ViewEmployeesScreen.route)
-            })
-            // ... botones para otras pantallas
+            servicios.forEach { servicio ->
+                Button(
+                    onClick = { onServiceSelected(servicio) },
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Text(text = servicio.nombre)
+                }
+            }
         }
-    }
-}
-
-@Composable
-fun MainScreenButton(text: String, onClick: () -> Unit) {
-    Button(onClick = onClick) {
-        Text(text)
     }
 }

@@ -2,7 +2,6 @@ package com.jmgtumat.pacapps.uiclases.clients
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,9 +17,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.preference.forEach
 import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 
@@ -31,7 +31,9 @@ fun ViewClientsScreen(
     onNavigateToAddClient: () -> Unit,
     onNavigateToEditClient: (Cliente) -> Unit
 ) {
-    val clientes by viewModel.clientes.collectAsState(initial = emptyList())
+    val clientes by viewModel.clientes.observeAsState(initial = emptyList())
+    val loading by viewModel.loading.observeAsState(initial = false)
+    val error by viewModel.error.observeAsState()
 
     Scaffold(
         topBar = {
@@ -53,17 +55,29 @@ fun ViewClientsScreen(
         },
         floatingActionButtonPosition = FabPosition.End
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            clientes.forEach { cliente ->
-                ClientItem(
-                    cliente = cliente,
-                    onClick = { onNavigateToEditClient(cliente) }
-                )
+        when {
+            loading -> {
+                // Show a loading indicator
+                Text("Loading...")
+            }
+            error != null -> {
+                // Show error message
+                Text("Error: $error")
+            }
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .padding(padding)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    clientes.forEach { cliente ->
+                        ClientItem(
+                            cliente = cliente,
+                            onClick = { onNavigateToEditClient(cliente) }
+                        )
+                    }
+                }
             }
         }
     }

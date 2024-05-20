@@ -3,6 +3,7 @@ package com.jmgutmat.pacapps.repository
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.jmgtumat.pacapps.data.Cliente
+import kotlinx.coroutines.tasks.await
 
 class ClienteRepository {
 
@@ -14,10 +15,17 @@ class ClienteRepository {
         return listOf() // Replace with actual data retrieval
     }
 
-    fun addCliente(cliente: Cliente) {
-        // Implement logic to add a new cliente to Firebase Realtime Database
-        // For example, using a push() operation
-        database.push().setValue(cliente)
+    suspend fun getNextId(): Int {
+        val snapshot = database.orderByKey().limitToLast(1).get().await()
+        val lastKey = snapshot.children.firstOrNull()?.key
+        val lastId = lastKey?.toIntOrNull() ?: 0
+        return lastId + 1
+    }
+
+    suspend fun addCliente(cliente: Cliente) {
+        val nextId = getNextId()
+        val clienteConId = cliente.copy(id = nextId.toString())
+        database.child(nextId.toString()).setValue(clienteConId)
     }
 
     fun updateCliente(cliente: Cliente) {

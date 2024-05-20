@@ -1,4 +1,4 @@
-package com.jmgutmat.pacapps.repository
+package com.jmgtumat.pacapps.repository
 
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -21,4 +21,14 @@ class EmpleadoRepository {
     }
 
     fun updateEmpleado(empleado: Empleado) {
-// Implement logic to update an existing empleado in Firebase Real
+        // Implement logic to update an existing empleado in Firebase Realtime Database
+        // For example, using a setValue() operation
+        database.child(empleado.id).setValue(empleado)
+    }
+
+    fun deleteEmpleado(empleadoId: String) {
+        // Implement logic to delete an empleado from Firebase Realtime Database
+        // For example, using a removeValue() operation
+        database.child(empleadoId).removeValue()
+    }
+}

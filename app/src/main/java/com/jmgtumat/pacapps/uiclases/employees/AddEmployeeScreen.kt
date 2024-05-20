@@ -20,7 +20,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -33,26 +33,9 @@ fun AddEmployeeScreen(
     viewModel: EmpleadoViewModel,
     onNavigateBack: () -> Unit
 ) {
-    var nombre by rememberSaveable {
-        mutableStateOf(
-            ""
-        )
-    }
-    var puesto by rememberSaveable {
-        mutableStateOf(
-            ""
-        )
-    }
-    var telefono by rememberSaveable {
-        mutableStateOf(
-            ""
-        )
-    }
-    var email by rememberSaveable {
-        mutableStateOf(
-            ""
-        )
-    }
+    var nombre by remember { mutableStateOf("") }
+    var apellidos by remember { mutableStateOf("") }
+    var cargo by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -82,26 +65,30 @@ fun AddEmployeeScreen(
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
-                label = { Text("Name") }
+                label = { Text("First Name") }
             )
             OutlinedTextField(
-                value = puesto,
-                onValueChange = { puesto = it },
+                value = apellidos,
+                onValueChange = { apellidos = it },
+                label = { Text("Last Name") }
+            )
+            OutlinedTextField(
+                value = cargo,
+                onValueChange = { cargo = it },
                 label = { Text("Position") }
-            )
-            OutlinedTextField(
-                value = telefono,
-                onValueChange = { telefono = it },
-                label = { Text("Phone") }
-            )
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") }
             )
             Button(
                 onClick = {
-                    viewModel.insertEmpleado(Empleado(0, nombre, puesto, telefono, email))
+                    viewModel.insertEmpleado(
+                        Empleado(
+                            id = "",
+                            nombre = nombre,
+                            apellidos = apellidos,
+                            cargo = cargo,
+                            horarioDisponible = emptyList(),
+                            citasAsignadas = emptyList()
+                        )
+                    )
                     onNavigateBack()
                 }
             ) {

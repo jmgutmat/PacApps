@@ -1,8 +1,8 @@
 package com.jmgtumat.pacapps.uiclases.employees
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,19 +30,11 @@ fun EmployeeItem(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = empleado.nombre,
+                text = "${empleado.nombre} ${empleado.apellidos}",
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = empleado.puesto,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = empleado.telefono,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = empleado.email,
+                text = empleado.cargo,
                 style = MaterialTheme.typography.bodyMedium
             )
         }

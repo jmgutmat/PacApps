@@ -1,8 +1,10 @@
-package com.jmgtumat.pacapps.uiclases.main
+// MainActivity.kt
+package com.jmgtumat.pacapps.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.navigation.compose.rememberNavController
 import com.jmgtumat.pacapps.navigation.AppNavigation
 import com.jmgtumat.pacapps.ui.theme.PacAppsTheme
 
@@ -11,11 +13,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PacAppsTheme {
-                AppNavigation()
+                val navController = rememberNavController()
+                AppNavigation(navController)
             }
         }
     }
 }
-
-
 

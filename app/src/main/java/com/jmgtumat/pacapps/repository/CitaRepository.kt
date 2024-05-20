@@ -1,31 +1,46 @@
-package com.jmgutmat.pacapps.repository
-
+import androidx.lifecycle.LiveData
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.jmgtumat.pacapps.data.Cita
 
 class CitaRepository {
 
-    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
+    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("citas")
 
-    fun getCitas(): List<Cita> {
-        // Implement logic to fetch citas from Firebase Realtime Database
-        // For example, using a ValueEventListener
-        return listOf() // Replace with actual data retrieval
+    suspend fun insertarCita(cita: Cita) {
+        database.push().setValue(cita)
     }
 
-    fun addCita(cita: Cita) {
-        // Implement logic to add a new cita to Firebase Realtime Database
-        // For example, using a push() operation
+    suspend fun actualizarCita(cita: Cita) {
+        database.child(cita.id).setValue(cita)
     }
 
-    fun updateCita(cita: Cita) {
-        // Implement logic to update an existing cita in Firebase Realtime Database
-        // For example, using a setValue() operation
+    suspend fun eliminarCita(citaId: String) {
+        database.child(citaId).removeValue()
     }
 
-    fun deleteCita(citaId: String) {
-        // Implement logic to delete a cita from Firebase Realtime Database
-        // For example, using a removeValue() operation
+    // Función para obtener las citas de un cliente
+    fun getCitasCliente(clienteId: String): LiveData<List<Cita>> {
+        // Implementar lógica para obtener las citas del cliente de la base de datos
+    }
+
+    // Función para obtener las citas de un empleado
+    fun getCitasEmpleado(empleadoId: String): LiveData<List<Cita>> {
+        // Implementar lógica para obtener las citas del empleado de la base de datos
+    }
+
+    // Función para cancelar una cita
+    suspend fun cancelarCita(citaId: String) {
+        // Implementar lógica para cancelar la cita en la base de datos
+    }
+
+    // Función para obtener las fechas disponibles para un servicio
+    suspend fun getFechasDisponibles(servicioId: String): List<Long> {
+        // Implementar lógica para obtener las fechas disponibles para un servicio
+    }
+
+    // Función para obtener las horas disponibles para un servicio en una fecha específica
+    suspend fun getHorasDisponibles(servicioId: String, fechaSeleccionada: Long): List<String> {
+        // Implementar lógica para obtener las horas disponibles para un servicio en una fecha específica
     }
 }

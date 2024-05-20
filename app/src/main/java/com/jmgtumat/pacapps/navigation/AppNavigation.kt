@@ -1,39 +1,45 @@
 package com.jmgtumat.pacapps.navigation
 
-import androidx.navigation.NavGraphBuilder
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.jmgtumat.pacapps.uiclases.clients.AddClientScreen
+import com.jmgtumat.pacapps.uiclases.clients.ViewClientsScreen
+import com.jmgtumat.pacapps.uiclases.employees.AddEmployeeScreen
+import com.jmgtumat.pacapps.uiclases.employees.ViewEmployeesScreen
+import com.jmgtumat.pacapps.main.MainScreen
+import com.jmgtumat.pacapps.main.SplashScreen
+import com.jmgtumat.pacapps.uiclases.services.AddServiceScreen
+import com.jmgtumat.pacapps.uiclases.services.ViewServicesScreen
 
-fun NavGraphBuilder.addNavigationGraph(navController: NavHostController) {
-    composable(AppScreens.SplashScreen.route) {
-        navController.navigate(AppScreens.SplashScreen.route)
-    }
-
-    composable(AppScreens.MainScreen.route) {
-        navController.navigate(AppScreens.MainScreen.route)
-    }
-    // Add composables for other screens here
-    composable(AppScreens.AddClientScreen.route) {
-        navController.navigate(AppScreens.AddClientScreen.route)
-    }
-
-    composable(AppScreens.ViewClientsScreen.route) {
-        navController.navigate(AppScreens.ViewClientsScreen.route)
-    }
-
-    composable(AppScreens.AddEmployeeScreen.route) {
-        navController.navigate(AppScreens.AddEmployeeScreen.route)
-    }
-
-    composable(AppScreens.ViewEmployeesScreen.route) {
-        navController.navigate(AppScreens.ViewEmployeesScreen.route)
-    }
-
-    composable(AppScreens.AddServiceScreen.route) {
-        navController.navigate(AppScreens.AddServiceScreen.route)
-    }
-
-    composable(AppScreens.ViewServicesScreen.route) {
-        navController.navigate(AppScreens.ViewServicesScreen.route)
+@Composable
+fun AppNavigation(navController: NavHostController) {
+    NavHost(navController, startDestination = AppScreens.SplashScreen.route) {
+        composable(AppScreens.SplashScreen.route) {
+            SplashScreen(navController)
+        }
+        composable(AppScreens.MainScreen.route) {
+            MainScreen(navController)
+        }
+        composable(AppScreens.AddClientScreen.route) {
+            AddClientScreen(navController, viewModel(), onNavigateBack = {})
+        }
+        composable(AppScreens.ViewClientsScreen.route) {
+            ViewClientsScreen()
+        }
+        composable(AppScreens.AddEmployeeScreen.route) {
+            AddEmployeeScreen()
+        }
+        composable(AppScreens.ViewEmployeesScreen.route) {
+            ViewEmployeesScreen()
+        }
+        composable(AppScreens.AddServiceScreen.route) {
+            AddServiceScreen()
+        }
+        composable(AppScreens.ViewServicesScreen.route) {
+            ViewServicesScreen()
+        }
     }
 }

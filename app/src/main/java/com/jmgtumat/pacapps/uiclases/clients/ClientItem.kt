@@ -1,8 +1,8 @@
 package com.jmgtumat.pacapps.uiclases.clients
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,21 +30,18 @@ fun ClientItem(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = cliente.nombre,
+                text = "Nombre: ${cliente.nombre} ${cliente.apellidos}",
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = cliente.direccion,
+                text = "Teléfono: ${cliente.telefono}",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = cliente.telefono,
+                text = "Correo Electrónico: ${cliente.correoElectronico}",
                 style = MaterialTheme.typography.bodyMedium
             )
-            Text(
-                text = cliente.email,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            // Aquí puedes agregar más información del cliente si lo deseas
         }
     }
 }

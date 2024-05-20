@@ -24,35 +24,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.jmgtumat.pacapps.data.Cliente
-import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddClientScreen(
-    viewModel: ClienteViewModel,
+    viewModel: NavHostController,
     onNavigateBack: () -> Unit
 ) {
-    var nombre by rememberSaveable {
-        mutableStateOf(
-            ""
-        )
-    }
-    var direccion by rememberSaveable {
-        mutableStateOf(
-            ""
-        )
-    }
-    var telefono by rememberSaveable {
-        mutableStateOf(
-            ""
-        )
-    }
-    var email by rememberSaveable {
-        mutableStateOf(
-            ""
-        )
-    }
+    var nombre by rememberSaveable { mutableStateOf("") }
+    var apellidos by rememberSaveable { mutableStateOf("") }
+    var telefono by rememberSaveable { mutableStateOf("") }
+    var correoElectronico by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -82,30 +66,38 @@ fun AddClientScreen(
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
-                label = { Text("Name") }
+                label = { Text("Nombre") }
             )
             OutlinedTextField(
-                value = direccion,
-                onValueChange = { direccion = it },
-                label = { Text("Address") }
+                value = apellidos,
+                onValueChange = { apellidos = it },
+                label = { Text("Apellidos") }
             )
             OutlinedTextField(
                 value = telefono,
                 onValueChange = { telefono = it },
-                label = { Text("Phone") }
+                label = { Text("Teléfono") }
             )
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") }
+                value = correoElectronico,
+                onValueChange = { correoElectronico = it },
+                label = { Text("Correo Electrónico") }
             )
             Button(
                 onClick = {
-                    viewModel.insertCliente(Cliente(0, nombre, direccion, telefono, email))
+                    val cliente = Cliente(
+                        id = "", // El ID se generará automáticamente
+                        nombre = nombre,
+                        apellidos = apellidos,
+                        telefono = telefono,
+                        correoElectronico = correoElectronico,
+                        historialCitas = emptyList() // Ajusta esto según sea necesario
+                    )
+                    viewModel.insertCliente(cliente)
                     onNavigateBack()
                 }
             ) {
-                Text("Save")
+                Text("Guardar")
             }
         }
     }
