@@ -1,5 +1,5 @@
-// ManageAppointmentsScreen.kt
-package com.jmgtumat.pacapps.uiclases.appointments
+// ManageClientsScreen.kt
+package com.jmgtumat.pacapps.uiclases.clients
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,37 +14,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.jmgtumat.pacapps.data.Cita
+import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.uiclases.employees.EmployeeDashboard
-import com.jmgtumat.pacapps.viewmodels.CitaViewModel
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 
 @Composable
-fun ManageAppointmentsScreen(
+fun ManageClientsScreen(
     navController: NavController,
-    empleadoId: String,
-    citaViewModel: CitaViewModel = viewModel(),
-    onEditAppointment: (Cita) -> Unit
+    clienteViewModel: ClienteViewModel = viewModel(),
+    onEditClient: (Cliente) -> Unit
 ) {
-    val citas by citaViewModel.getCitasEmpleado(empleadoId).observeAsState(emptyList())
-    val loading by citaViewModel.loading.observeAsState(false)
-    val error by citaViewModel.error.observeAsState(null)
+    val clientes by clienteViewModel.clientes.observeAsState(emptyList())
+    val loading by clienteViewModel.loading.observeAsState(false)
+    val error by clienteViewModel.error.observeAsState(null)
 
     EmployeeDashboard(
-        currentSection = "Manage Appointments",
+        currentSection = "Manage Clients",
         navController = navController
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             if (loading) {
-                Text(text = "Loading appointments...")
+                Text(text = "Loading clients...")
             } else if (error != null) {
                 Text(text = "Error: $error")
             } else {
-                if (citas.isEmpty()) {
-                    Text(text = "No appointments available.")
+                if (clientes.isEmpty()) {
+                    Text(text = "No clients available.")
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        items(citas) { cita ->
-                            AppointmentItem(cita = cita, onEditAppointment = onEditAppointment)
+                        items(clientes) { cliente ->
+                            ClientItem(cliente = cliente, onClick = { onEditClient(cliente) })
                         }
                     }
                 }

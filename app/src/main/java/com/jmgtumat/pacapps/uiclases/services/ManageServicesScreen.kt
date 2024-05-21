@@ -1,5 +1,5 @@
-// ManageAppointmentsScreen.kt
-package com.jmgtumat.pacapps.uiclases.appointments
+// ManageServicesScreen.kt
+package com.jmgtumat.pacapps.uiclases.services
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,37 +14,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.jmgtumat.pacapps.data.Cita
+import com.jmgtumat.pacapps.data.Servicio
 import com.jmgtumat.pacapps.uiclases.employees.EmployeeDashboard
-import com.jmgtumat.pacapps.viewmodels.CitaViewModel
+import com.jmgtumat.pacapps.viewmodels.ServicioViewModel
 
 @Composable
-fun ManageAppointmentsScreen(
+fun ManageServicesScreen(
     navController: NavController,
-    empleadoId: String,
-    citaViewModel: CitaViewModel = viewModel(),
-    onEditAppointment: (Cita) -> Unit
+    servicioViewModel: ServicioViewModel = viewModel(),
+    onEditService: (Servicio) -> Unit
 ) {
-    val citas by citaViewModel.getCitasEmpleado(empleadoId).observeAsState(emptyList())
-    val loading by citaViewModel.loading.observeAsState(false)
-    val error by citaViewModel.error.observeAsState(null)
+    val servicios by servicioViewModel.servicios.observeAsState(emptyList())
+    val loading by servicioViewModel.loading.observeAsState(false)
+    val error by servicioViewModel.error.observeAsState(null)
 
     EmployeeDashboard(
-        currentSection = "Manage Appointments",
+        currentSection = "Manage Services",
         navController = navController
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             if (loading) {
-                Text(text = "Loading appointments...")
+                Text(text = "Loading services...")
             } else if (error != null) {
                 Text(text = "Error: $error")
             } else {
-                if (citas.isEmpty()) {
-                    Text(text = "No appointments available.")
+                if (servicios.isEmpty()) {
+                    Text(text = "No services available.")
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        items(citas) { cita ->
-                            AppointmentItem(cita = cita, onEditAppointment = onEditAppointment)
+                        items(servicios) { servicio ->
+                            ServiceItem(servicio = servicio, onClick = { onEditService(servicio) })
                         }
                     }
                 }
