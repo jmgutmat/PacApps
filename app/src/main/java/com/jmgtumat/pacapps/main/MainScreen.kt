@@ -1,6 +1,5 @@
 package com.jmgtumat.pacapps.main
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,22 +20,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.jmgtumat.pacapps.R.drawable.ic_facebook
 import com.jmgtumat.pacapps.R.drawable.ic_google
 import com.jmgtumat.pacapps.R.drawable.inicio
 import com.jmgtumat.pacapps.navigation.AppScreens
+import com.jmgtumat.pacapps.util.AuthManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
-    val context = LocalContext.current
+fun MainScreen(navController: NavHostController, launchGoogleSignIn: () -> Unit) {
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
+    val authManager = remember { AuthManager(navController) }
 
     Scaffold {
         Column(
@@ -81,8 +79,10 @@ fun MainScreen(navController: NavHostController) {
             // Botón de iniciar sesión
             Button(
                 onClick = {
-                    // Lógica de inicio de sesión
-                    Toast.makeText(context, "Iniciar sesión con ${emailState.value} y ${passwordState.value}", Toast.LENGTH_SHORT).show()
+                    authManager.signInWithEmailAndPassword(
+                        email = emailState.value,
+                        password = passwordState.value
+                    )
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -92,18 +92,17 @@ fun MainScreen(navController: NavHostController) {
             // Botón de registrarse
             OutlinedButton(
                 onClick = {
-                    // Lógica de registro
+                    navController.navigate(AppScreens.RegisterScreen.route)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Registrarse")
             }
 
-            // Botones de inicio de sesión con Google y Facebook usando recursos de íconos
+            // Botón de inicio de sesión con Google
             Button(
                 onClick = {
-                    // Lógica de inicio de sesión con Google
-                    Toast.makeText(context, "Iniciar sesión con Google", Toast.LENGTH_SHORT).show()
+                    launchGoogleSignIn()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -114,52 +113,6 @@ fun MainScreen(navController: NavHostController) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Iniciar sesión con Google")
-            }
-
-            Button(
-                onClick = {
-                    // Lógica de inicio de sesión con Facebook
-                    Toast.makeText(context, "Iniciar sesión con Facebook", Toast.LENGTH_SHORT).show()
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Image(
-                    painter = painterResource(id = ic_facebook),
-                    contentDescription = "Facebook Icon",
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Iniciar sesión con Facebook")
-            }
-
-            // Botón para ver servicios
-            OutlinedButton(
-                onClick = {
-                    navController.navigate(AppScreens.ViewServicesScreen.route)
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Ver Servicios")
-            }
-
-            // Botón para ver la dirección
-            OutlinedButton(
-                onClick = {
-                    // Navegar a la pantalla de dirección
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Dirección")
-            }
-
-            // Botón para contacto
-            OutlinedButton(
-                onClick = {
-                    // Navegar a la pantalla de contacto
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Contacto")
             }
         }
     }

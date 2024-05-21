@@ -10,6 +10,7 @@ sealed class AppScreens(val route: String) {
     //ClientScreens
     object AddClientScreen : AppScreens("/add_client_screen")
     object ClientScreen : AppScreens("/client_screen")
+    object RegisterScreen : AppScreens("register_screen")
     object ViewClientsScreen : AppScreens("/view_clients_screen")
 
     //EmployeesScreens
@@ -28,7 +29,12 @@ sealed class AppScreens(val route: String) {
     object SelectTimeScreen : AppScreens("/select_time_screen")
     object ConfirmAppointmentScreen : AppScreens("/confirm_appointment_screen")
 
-
+    //ManageScreens
+    object ManageAppointmentsScreen : AppScreens("/manage_appointments_screen")
+    object ManageEmployeesScreen : AppScreens("/manage_employees_screen")
+    object ManageServicesScreen : AppScreens("/manage_services_screen")
+    object ManageClientsScreen : AppScreens("/manage_clients_screen")
+    object ReportsScreen : AppScreens("/reports_screen")
 
     companion object {
         fun getRouteForScreen(navController: NavHostController, screen: AppScreens) {
