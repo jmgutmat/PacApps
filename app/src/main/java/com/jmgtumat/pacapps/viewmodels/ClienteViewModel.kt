@@ -1,12 +1,11 @@
 package com.jmgtumat.pacapps.viewmodels
 
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jmgtumat.pacapps.data.Cliente
-import com.jmgutmat.pacapps.repository.ClienteRepository
+import com.jmgtumat.pacapps.repository.ClienteRepository
 import kotlinx.coroutines.launch
 
 class ClienteViewModel(private val clienteRepository: ClienteRepository) : ViewModel() {
@@ -50,5 +49,25 @@ class ClienteViewModel(private val clienteRepository: ClienteRepository) : ViewM
         }
     }
 
-    // Other methods for updating, deleting, and getting clientes
+    fun updateCliente(cliente: Cliente) {
+        viewModelScope.launch {
+            try {
+                clienteRepository.updateCliente(cliente)
+                fetchClientes() // Refresh the client list after updating a client
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
+
+    fun deleteCliente(clienteId: String) {
+        viewModelScope.launch {
+            try {
+                clienteRepository.deleteCliente(clienteId)
+                fetchClientes() // Refresh the client list after deleting a client
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
 }

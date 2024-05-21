@@ -1,4 +1,4 @@
-package com.jmgutmat.pacapps.repository
+package com.jmgtumat.pacapps.repository
 
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -9,34 +9,23 @@ class ClienteRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("clientes")
 
-    fun getClientes(): List<Cliente> {
-        // Implement logic to fetch clientes from Firebase Realtime Database
-        // For example, using a ValueEventListener
-        return listOf() // Replace with actual data retrieval
-    }
-
-    suspend fun getNextId(): Int {
-        val snapshot = database.orderByKey().limitToLast(1).get().await()
-        val lastKey = snapshot.children.firstOrNull()?.key
-        val lastId = lastKey?.toIntOrNull() ?: 0
-        return lastId + 1
+    suspend fun getClientes(): List<Cliente> {
+        val snapshot = database.get().await()
+        val clientes = snapshot.children.map { it.getValue(Cliente::class.java)!! }
+        return clientes
     }
 
     suspend fun addCliente(cliente: Cliente) {
-        val nextId = getNextId()
-        val clienteConId = cliente.copy(id = nextId.toString())
-        database.child(nextId.toString()).setValue(clienteConId)
+        val newClienteRef = database.push()
+        val clienteConId = cliente.copy(id = newClienteRef.key!!)
+        newClienteRef.setValue(clienteConId).await()
     }
 
-    fun updateCliente(cliente: Cliente) {
-        // Implement logic to update an existing cliente in Firebase Realtime Database
-        // For example, using a setValue() operation
-        database.child(cliente.id).setValue(cliente)
+    suspend fun updateCliente(cliente: Cliente) {
+        database.child(cliente.id).setValue(cliente).await()
     }
 
-    fun deleteCliente(clienteId: String) {
-        // Implement logic to delete a cliente from Firebase Realtime Database
-        // For example, using a removeValue() operation
-        database.child(clienteId).removeValue()
+    suspend fun deleteCliente(clienteId: String) {
+        database.child(clienteId).removeValue().await()
     }
 }

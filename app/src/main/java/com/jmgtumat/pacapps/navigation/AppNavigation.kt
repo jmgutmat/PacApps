@@ -21,10 +21,10 @@ fun AppNavigation(navController: NavHostController) {
             SplashScreen(navController)
         }
         composable(AppScreens.MainScreen.route) {
-            MainScreen(navController, launchGoogleSignIn)
+            MainScreen(navController)
         }
         composable(AppScreens.AddClientScreen.route) {
-            AddClientScreen(navController, viewModel(), onNavigateBack = {})
+            AddClientScreen(navController, viewModel())
         }
         composable(AppScreens.ViewClientsScreen.route) {
             ViewClientsScreen()

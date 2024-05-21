@@ -41,7 +41,7 @@ fun ClientItem(
                 text = "Correo Electrónico: ${cliente.correoElectronico}",
                 style = MaterialTheme.typography.bodyMedium
             )
-            // Aquí puedes agregar más información del cliente si lo deseas
+            // Additional client information can be added here
         }
     }
 }
