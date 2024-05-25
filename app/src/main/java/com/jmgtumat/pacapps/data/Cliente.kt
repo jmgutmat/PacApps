@@ -1,10 +1,11 @@
 package com.jmgtumat.pacapps.data
 
 data class Cliente(
-    val id: String = "", // Modificado para que el ID pueda generarse automáticamente
-    val nombre: String,
-    val apellidos: String,
-    val telefono: String,
-    val correoElectronico: String,
-    val historialCitas: List<Cita>
-)
+    override val id: String = "",
+    override val nombre: String = "",
+    override val apellidos: String = "",
+    override val telefono: String = "",
+    override val correoElectronico: String = "",
+    val historialCitas: List<Cita> = emptyList(),
+    override val rol: UserRole = UserRole.CLIENTE
+) : User(id, nombre, apellidos, telefono, correoElectronico, rol)

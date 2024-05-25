@@ -30,3 +30,16 @@ fun getDefaultDateInMillis(): Long {
     cal.set(year, month, date)
     return cal.timeInMillis
 }
+
+fun Calendar.getDayOfWeekString(): String {
+    return when (this.get(Calendar.DAY_OF_WEEK)) {
+        Calendar.SUNDAY -> "domingo"
+        Calendar.MONDAY -> "lunes"
+        Calendar.TUESDAY -> "martes"
+        Calendar.WEDNESDAY -> "miércoles"
+        Calendar.THURSDAY -> "jueves"
+        Calendar.FRIDAY -> "viernes"
+        Calendar.SATURDAY -> "sábado"
+        else -> throw IllegalArgumentException("Invalid day of week")
+    }
+}

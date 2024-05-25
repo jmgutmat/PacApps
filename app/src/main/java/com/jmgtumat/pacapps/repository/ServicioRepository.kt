@@ -3,34 +3,28 @@ package com.jmgtumat.pacapps.repository
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.jmgtumat.pacapps.data.Servicio
-import java.util.UUID
+import kotlinx.coroutines.tasks.await
 
 class ServicioRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("servicios")
 
-    fun getServicios(): List<Servicio> {
-        // Implementa la lógica para recuperar servicios de la base de datos
-        // Por ejemplo, usando un ValueEventListener
-        return listOf() // Reemplaza esto con la recuperación real de datos
+    suspend fun getServicios(): List<Servicio> {
+        val snapshot = database.get().await()
+        return snapshot.children.map { it.getValue(Servicio::class.java)!! }
     }
 
-    fun addServicio(servicio: Servicio) {
-        // Genera un ID único manualmente usando UUID
-        val servicioId = UUID.randomUUID().toString()
-        servicio.id = servicioId
-        database.child(servicioId).setValue(servicio)
+    suspend fun addServicio(servicio: Servicio) {
+        val newServicioRef = database.push()
+        val servicioConId = servicio.copy(id = newServicioRef.key!!)
+        newServicioRef.setValue(servicioConId).await()
     }
 
-    fun updateServicio(servicio: Servicio) {
-        // Implementa la lógica para actualizar un servicio existente en la base de datos
-        // Por ejemplo, usando una operación setValue()
-        database.child(servicio.id).setValue(servicio)
+    suspend fun updateServicio(servicio: Servicio) {
+        database.child(servicio.id).setValue(servicio).await()
     }
 
-    fun deleteServicio(servicioId: String) {
-        // Implementa la lógica para eliminar un servicio de la base de datos
-        // Por ejemplo, usando una operación removeValue()
-        database.child(servicioId).removeValue()
+    suspend fun deleteServicio(servicioId: String) {
+        database.child(servicioId).removeValue().await()
     }
 }

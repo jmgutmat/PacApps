@@ -1,97 +1,144 @@
 package com.jmgtumat.pacapps.main
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.jmgtumat.pacapps.util.AuthManager
+import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavHostController
 
 @Composable
-fun MainScreen(authManager: AuthManager) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
-
-    val signInWithGoogleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        authManager.handleSignInWithGoogleResult(result.data)
-    }
-
-    val keyboardController = LocalSoftwareKeyboardController.current
+fun MainScreen(navController: NavHostController) {
+    var showDialog by remember { mutableStateOf(false) }
+    var isLogin by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Other UI components...
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Correo Electrónico") },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
-        )
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Contraseña") },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+        Text(
+            text = "Bienvenido a la App",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(vertical = 16.dp)
         )
 
         Button(
             onClick = {
-                authManager.signInWithEmail(email, password,
-                    onSuccess = {
-                        // Handle successful login
-                    },
-                    onError = { error ->
-                        errorMessage = error
-                    }
-                )
+                isLogin = true
+                showDialog = true
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp)
+                .padding(vertical = 8.dp)
         ) {
             Text("Iniciar Sesión")
         }
+
         Button(
             onClick = {
-                authManager.signInWithGoogle(signInWithGoogleLauncher)
+                isLogin = false
+                showDialog = true
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp)
+                .padding(vertical = 8.dp)
         ) {
-            Text("Iniciar Sesión con Google")
+            Text("Registrarse")
         }
 
-        // Display error message, if any
-        if (errorMessage.isNotBlank()) {
-            Text(errorMessage, modifier = Modifier.padding(vertical = 8.dp))
+        if (showDialog) {
+            SelectionDialog(
+                isLogin = isLogin,
+                onDismiss = { showDialog = false },
+                onSelectOption = { option ->
+                    when (option) {
+                        "Correo" -> {
+                            if (isLogin) {
+                                navController.navigate("loginWithEmail")
+                            } else {
+                                navController.navigate("registerWithEmail")
+                            }
+                        }
+                        "Google" -> {
+                            if (isLogin) {
+                                navController.navigate("loginWithGoogle")
+                            } else {
+                                navController.navigate("registerWithGoogle")
+                            }
+                        }
+                    }
+                    showDialog = false
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun SelectionDialog(
+    isLogin: Boolean,
+    onDismiss: () -> Unit,
+    onSelectOption: (String) -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = if (isLogin) "Iniciar Sesión" else "Registrarse",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Button(
+                    onClick = { onSelectOption("Correo") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text(if (isLogin) "Con Correo" else "Registrar con Correo")
+                }
+
+                Button(
+                    onClick = { onSelectOption("Google") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text(if (isLogin) "Con Google" else "Registrar con Google")
+                }
+
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("Cancelar")
+                }
+            }
         }
     }
 }

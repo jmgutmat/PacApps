@@ -68,6 +68,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
     implementation("com.android.car.ui:car-ui-lib:2.6.0")
     implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
+    implementation("androidx.wear.compose:compose-material:1.3.1")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.7")
     implementation("com.android.tools.compose:compose-preview-renderer:0.0.1-alpha01")
@@ -77,7 +78,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
     implementation("com.google.firebase:firebase-database-ktx:21.0.0")
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.android.gms:play-services-auth:21.1.1")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 
     // Facebook SDK
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
@@ -85,15 +86,7 @@ dependencies {
     // Material
     implementation("com.google.android.material:material:1.12.0")
 
-    // Testing
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.05.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    // MPAndroidChart
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
-
-
-//    implementation("com.google.api-client:google-api-client-android:2.0.15")
-//    implementation("com.google.apis:google-api-services-calendar:v3:1.33.1")
 

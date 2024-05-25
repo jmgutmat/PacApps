@@ -11,8 +11,7 @@ class ClienteRepository {
 
     suspend fun getClientes(): List<Cliente> {
         val snapshot = database.get().await()
-        val clientes = snapshot.children.map { it.getValue(Cliente::class.java)!! }
-        return clientes
+        return snapshot.children.map { it.getValue(Cliente::class.java)!! }
     }
 
     suspend fun addCliente(cliente: Cliente) {
