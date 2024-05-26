@@ -1,4 +1,4 @@
-package com.jmgtumat.pacapps.employeemod
+package com.jmgtumat.pacapps.employeemod.clients
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,14 +24,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.jmgtumat.pacapps.data.Empleado
-import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
+import com.jmgtumat.pacapps.data.Cliente
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 
 @Composable
-fun EmployeeItem(
-    empleado: Empleado,
-    empleadoViewModel: EmpleadoViewModel,
-    navController: NavController // Agregamos el parámetro NavController
+fun ClientItem(
+    cliente: Cliente,
+    clienteViewModel: ClienteViewModel,
+    navController: NavController
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -49,28 +49,26 @@ fun EmployeeItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "${empleado.nombre} ${empleado.apellidos}",
+                    text = "${cliente.nombre} ${cliente.apellidos}",
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
-                    text = "Teléfono: ${empleado.telefono}",
+                    text = "Teléfono: ${cliente.telefono}",
                     style = MaterialTheme.typography.headlineSmall
                 )
             }
             if (expanded) {
                 Text(
-                    text = "Correo Electrónico: ${empleado.correoElectronico}",
+                    text = "Correo Electrónico: ${cliente.correoElectronico}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                // Más información del empleado puede agregarse aquí
-                // Botones para modificar, eliminar y ver horario de trabajo del empleado
                 Row(
                     horizontalArrangement = Arrangement.End,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    ModifyEmployeeButton(empleado, empleadoViewModel)
-                    DeleteEmployeeButton(empleado, empleadoViewModel)
-                    EmployeeHistoryButton(navController, empleado.id)
+                    ViewHistoryButton(cliente, navController)
+                    ModifyClientButton(cliente, clienteViewModel)
+                    DeleteClientButton(cliente, clienteViewModel)
                 }
             }
         }
@@ -78,8 +76,10 @@ fun EmployeeItem(
 }
 
 
+
+
 @Composable
-fun AddEmployeeButton(navController: NavController, empleadoViewModel: EmpleadoViewModel) {
+fun AddClientButton(navController: NavController, clienteViewModel: ClienteViewModel) {
     var showDialog by remember { mutableStateOf(false) }
 
     FloatingActionButton(
@@ -88,21 +88,21 @@ fun AddEmployeeButton(navController: NavController, empleadoViewModel: EmpleadoV
     ) {
         Icon(
             imageVector = Icons.Default.Add,
-            contentDescription = "Nuevo Empleado",
+            contentDescription = "Nuevo Cliente",
             tint = MaterialTheme.colorScheme.onSurface
         )
     }
 
     if (showDialog) {
-        AddEmployeeDialog(empleadoViewModel = empleadoViewModel) {
+        AddClientDialog(clienteViewModel = clienteViewModel) {
             showDialog = false
         }
     }
 }
 
 @Composable
-fun AddEmployeeDialog(
-    empleadoViewModel: EmpleadoViewModel,
+fun AddClientDialog(
+    clienteViewModel: ClienteViewModel,
     onDismiss: () -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
@@ -112,7 +112,7 @@ fun AddEmployeeDialog(
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text("Añadir Nuevo Empleado") },
+        title = { Text("Añadir Nuevo Cliente") },
         text = {
             Column {
                 TextField(
@@ -140,15 +140,13 @@ fun AddEmployeeDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val newEmployee = Empleado(
+                    val newClient = Cliente(
                         nombre = nombre,
                         apellidos = apellidos,
                         telefono = telefono,
-                        correoElectronico = correoElectronico,
-                        horariosTrabajo = emptyMap(),
-                        citasAsignadas = emptyList()
+                        correoElectronico = correoElectronico
                     )
-                    empleadoViewModel.insertEmpleado(newEmployee)
+                    clienteViewModel.insertCliente(newClient)
                     onDismiss()
                 }
             ) {
@@ -165,9 +163,23 @@ fun AddEmployeeDialog(
 
 
 @Composable
-fun ModifyEmployeeButton(
-    empleado: Empleado,
-    empleadoViewModel: EmpleadoViewModel
+fun filterClientes(clientes: List<Cliente>, query: String): List<Cliente> {
+    return if (query.isEmpty()) {
+        clientes
+    } else {
+        clientes.filter { cliente ->
+            cliente.nombre.contains(query, ignoreCase = true) ||
+                    cliente.apellidos.contains(query, ignoreCase = true) ||
+                    cliente.telefono.contains(query, ignoreCase = true) ||
+                    cliente.correoElectronico.contains(query, ignoreCase = true)
+        }
+    }
+}
+
+@Composable
+fun ModifyClientButton(
+    cliente: Cliente,
+    clienteViewModel: ClienteViewModel
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -176,26 +188,26 @@ fun ModifyEmployeeButton(
     }
 
     if (showDialog) {
-        ModifyEmployeeDialog(empleado = empleado, empleadoViewModel = empleadoViewModel) {
+        ModifyClientDialog(cliente = cliente, clienteViewModel = clienteViewModel) {
             showDialog = false
         }
     }
 }
 
 @Composable
-fun ModifyEmployeeDialog(
-    empleado: Empleado,
-    empleadoViewModel: EmpleadoViewModel,
+fun ModifyClientDialog(
+    cliente: Cliente,
+    clienteViewModel: ClienteViewModel,
     onDismiss: () -> Unit
 ) {
-    var nombre by remember { mutableStateOf(empleado.nombre) }
-    var apellidos by remember { mutableStateOf(empleado.apellidos) }
-    var telefono by remember { mutableStateOf(empleado.telefono) }
-    var correoElectronico by remember { mutableStateOf(empleado.correoElectronico) }
+    var nombre by remember { mutableStateOf(cliente.nombre) }
+    var apellidos by remember { mutableStateOf(cliente.apellidos) }
+    var telefono by remember { mutableStateOf(cliente.telefono) }
+    var correoElectronico by remember { mutableStateOf(cliente.correoElectronico) }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text("Modificar Empleado") },
+        title = { Text("Modificar Cliente") },
         text = {
             Column {
                 TextField(
@@ -223,13 +235,13 @@ fun ModifyEmployeeDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val updatedEmployee = empleado.copy(
+                    val updatedClient = cliente.copy(
                         nombre = nombre,
                         apellidos = apellidos,
                         telefono = telefono,
                         correoElectronico = correoElectronico
                     )
-                    empleadoViewModel.updateEmpleado(updatedEmployee)
+                    clienteViewModel.updateCliente(updatedClient)
                     onDismiss()
                 }
             ) {
@@ -245,9 +257,9 @@ fun ModifyEmployeeDialog(
 }
 
 @Composable
-fun DeleteEmployeeButton(
-    empleado: Empleado,
-    empleadoViewModel: EmpleadoViewModel
+fun DeleteClientButton(
+    cliente: Cliente,
+    clienteViewModel: ClienteViewModel
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -256,33 +268,33 @@ fun DeleteEmployeeButton(
     }
 
     if (showDialog) {
-        DeleteEmployeeDialog(empleado = empleado, empleadoViewModel = empleadoViewModel) {
+        DeleteClientDialog(cliente = cliente, clienteViewModel = clienteViewModel) {
             showDialog = false
         }
     }
 }
 
 @Composable
-fun DeleteEmployeeDialog(
-    empleado: Empleado,
-    empleadoViewModel: EmpleadoViewModel,
+fun DeleteClientDialog(
+    cliente: Cliente,
+    clienteViewModel: ClienteViewModel,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text("Eliminar Empleado") },
+        title = { Text("Eliminar Cliente") },
         text = {
             Column {
-                Text("Nombre: ${empleado.nombre}")
-                Text("Apellidos: ${empleado.apellidos}")
-                Text("Teléfono: ${empleado.telefono}")
-                Text("Correo Electrónico: ${empleado.correoElectronico}")
+                Text("Nombre: ${cliente.nombre}")
+                Text("Apellidos: ${cliente.apellidos}")
+                Text("Teléfono: ${cliente.telefono}")
+                Text("Correo Electrónico: ${cliente.correoElectronico}")
             }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    empleadoViewModel.deleteEmpleado(empleado.id)
+                    clienteViewModel.deleteCliente(cliente.id)
                     onDismiss()
                 }
             ) {
@@ -297,17 +309,12 @@ fun DeleteEmployeeDialog(
     )
 }
 
-
 @Composable
-fun EmployeeHistoryButton(navController: NavController, empleadoId: String) {
-    Button(
-        onClick = {
-            navController.navigate("employee_history/$empleadoId")
-        },
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-    ) {
-        Text("Ver Historial de Citas")
+fun ViewHistoryButton(
+    cliente: Cliente,
+    navController: NavController
+) {
+    Button(onClick = { navController.navigate("history/${cliente.id}") }) {
+        Text("Ver Historial")
     }
 }

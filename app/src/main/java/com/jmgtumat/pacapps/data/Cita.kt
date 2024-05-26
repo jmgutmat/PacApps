@@ -8,7 +8,7 @@ data class Cita(
     val fecha: Long, // Fecha de la cita en milisegundos (sin la hora exacta)
     val horaInicio: Long, // Hora de inicio de la cita en milisegundos
     val duracion: Int, // Duración de la cita en minutos
-    val estado: CitaEstado,
+    var estado: CitaEstado,
     val notas: String? = null
 )
 

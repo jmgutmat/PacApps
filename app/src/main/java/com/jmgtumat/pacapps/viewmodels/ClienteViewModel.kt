@@ -7,7 +7,6 @@ import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.data.Empleado
 import com.jmgtumat.pacapps.data.Servicio
-import com.jmgtumat.pacapps.repository.CitaRepository
 import com.jmgtumat.pacapps.repository.ClienteRepository
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import com.jmgtumat.pacapps.repository.ServicioRepository
@@ -16,7 +15,6 @@ import kotlinx.coroutines.launch
 class ClienteViewModel(
     private val clienteRepository: ClienteRepository,
     private val servicioRepository: ServicioRepository,
-    private val citaRepository: CitaRepository,
     private val empleadoRepository: EmpleadoRepository
 ) : BaseViewModel() {
 
@@ -26,11 +24,12 @@ class ClienteViewModel(
     private val _servicios = MutableLiveData<List<Servicio>>()
     val servicios: LiveData<List<Servicio>> get() = _servicios
 
-    private val _citas = MutableLiveData<List<Cita>>()
-    val citas: LiveData<List<Cita>> get() = _citas
-
     private val _empleados = MutableLiveData<List<Empleado>>()
     val empleados: LiveData<List<Empleado>> get() = _empleados
+
+    private val _historialCitas = MutableLiveData<List<Cita>>()
+    val historialCitas: LiveData<List<Cita>> get() = _historialCitas
+
 
     init {
         fetchClientes()
@@ -110,39 +109,14 @@ class ClienteViewModel(
         }
     }
 
-    fun insertCita(cita: Cita) {
-        viewModelScope.launch {
-            try {
-                citaRepository.addCita(cita)
-                fetchCitas()
-            } catch (e: Exception) {
-                setError(e.message)
-            }
-        }
-    }
-
-    private fun fetchCitas() {
+    fun fetchHistorialCitas(clienteId: String) {
         viewModelScope.launch {
             setLoading()
             try {
-                val fetchedCitas = citaRepository.getCitas()
-                _citas.value = fetchedCitas
+                // Aquí recuperamos el historial de citas del cliente
+                val fetchedHistorialCitas = clienteRepository.getHistorialCitas(clienteId)
+                _historialCitas.value = fetchedHistorialCitas
                 setSuccess()
-            } catch (e: Exception) {
-                setError(e.message)
-            }
-        }
-    }
-
-    suspend fun getCitaById(citaId: String): Cita {
-        return citaRepository.getCitaById(citaId)
-    }
-
-    fun getCitasByDateRange(startDate: Long, endDate: Long, onResult: (List<Cita>) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val citas = citaRepository.getCitasByDateRange(startDate, endDate)
-                onResult(citas)
             } catch (e: Exception) {
                 setError(e.message)
             }

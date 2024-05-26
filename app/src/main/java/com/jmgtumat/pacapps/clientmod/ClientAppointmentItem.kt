@@ -1,13 +1,9 @@
-package com.jmgtumat.pacapps.uiclases.appointments
+package com.jmgtumat.pacapps.clientmod
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +21,9 @@ import com.jmgtumat.pacapps.util.formatDateNew
 import com.jmgtumat.pacapps.util.formatTimeNew
 
 @Composable
-fun CitaItem(cita: Cita, onModify: (() -> Unit)? = null, onCancel: (() -> Unit)? = null) {
+fun ClientAppointmentItem(
+    cita: Cita
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Card(
@@ -39,26 +37,12 @@ fun CitaItem(cita: Cita, onModify: (() -> Unit)? = null, onCancel: (() -> Unit)?
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "Servicio: ${cita.servicioId}", style = MaterialTheme.typography.titleLarge)
-            Text(text = "Empleado: ${cita.empleadoId}", style = MaterialTheme.typography.bodyLarge)
             Text(text = "Fecha: ${formatDateNew(cita.fecha)}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Hora: ${formatTimeNew(cita.horaInicio)}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Estado: ${cita.estado}", style = MaterialTheme.typography.bodyMedium)
 
             if (expanded) {
-                Text(text = "Notas: ${cita.notas ?: "N/A"}", style = MaterialTheme.typography.bodySmall)
-                Row {
-                    onModify?.let {
-                        Button(onClick = it) {
-                            Text("Modificar")
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    onCancel?.let {
-                        Button(onClick = it) {
-                            Text("Cancelar")
-                        }
-                    }
-                }
+                Text(text = "Empleado: ${cita.empleadoId}", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Hora: ${formatTimeNew(cita.horaInicio)}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Estado: ${cita.estado}", style = MaterialTheme.typography.bodyMedium)
             }
         }
     }

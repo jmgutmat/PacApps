@@ -5,7 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.jmgtumat.pacapps.clientmod.HistoryScreen
+import com.jmgtumat.pacapps.clientmod.ClientmodHistoryScreen
 import com.jmgtumat.pacapps.data.UserRole
 import com.jmgtumat.pacapps.uiclases.clients.AddClientScreen
 import com.jmgtumat.pacapps.uiclases.clients.ViewClientsScreen
@@ -33,7 +33,7 @@ fun AppNavigation(navController: NavHostController) {
             ViewClientsScreen()
         }
         composable(AppScreens.HistoryScreen.route) {
-            HistoryScreen()
+            ClientmodHistoryScreen()
         }
         composable(AppScreens.AddEmployeeScreen.route) {
             AddEmployeeScreen()

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.jmgtumat.pacapps.data.Cita
+import com.jmgtumat.pacapps.data.CitaEstado
 import com.jmgtumat.pacapps.repository.CitaRepository
 import kotlinx.coroutines.launch
 
@@ -61,4 +62,36 @@ class CitaViewModel(private val citaRepository: CitaRepository) : BaseViewModel(
             }
         }
     }
+
+    suspend fun getCitaById(citaId: String): Cita {
+        return citaRepository.getCitaById(citaId)
+    }
+
+    fun getCitasByDateRange(startDate: Long, endDate: Long): List<Cita> {
+        val citas = _citas.value ?: emptyList()
+        return citas.filter { it.fecha in startDate..endDate }
+    }
+
+    fun confirmarCita(citaId: String) {
+        viewModelScope.launch {
+            try {
+                val cita = getCitaById(citaId)
+                cita.estado = CitaEstado.CONFIRMADA
+                updateCita(cita)
+            } catch (e: Exception) {
+                setError(e.message)
+            }
+        }
+    }
+
+    fun cancelarCita(citaId: String) {
+        viewModelScope.launch {
+            try {
+                deleteCita(citaId)
+            } catch (e: Exception) {
+                setError(e.message)
+            }
+        }
+    }
+
 }

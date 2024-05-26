@@ -17,23 +17,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.jmgtumat.pacapps.viewmodels.CitaViewModel
-import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
-import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
-import com.jmgtumat.pacapps.viewmodels.ServicioViewModel
+import com.jmgtumat.pacapps.viewmodels.AppViewModel
 
 @Composable
 fun EmpleadoDashboard(
     navController: NavHostController = rememberNavController(),
-    citaViewModel: CitaViewModel = viewModel(),
-    clienteViewModel: ClienteViewModel = viewModel(),
-    empleadoViewModel: EmpleadoViewModel = viewModel(),
-    servicioViewModel: ServicioViewModel = viewModel(),
+    appViewModel: AppViewModel = viewModel(),
     content: @Composable (PaddingValues) -> Unit // Cambiamos la firma para aceptar un @Composable como parámetro
 ) {
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController)
+            BottomNavigationBar(navController, appViewModel)
         }
     ) { innerPadding ->
         content(innerPadding) // Llamamos al @Composable content y pasamos el innerPadding
@@ -41,7 +35,7 @@ fun EmpleadoDashboard(
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
+fun BottomNavigationBar(navController: NavHostController, appViewModel: AppViewModel) {
     val items = listOf(
         EmpleadoScreen.Citas,
         EmpleadoScreen.Clientes,
@@ -69,6 +63,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         }
     }
 }
+
 
 enum class EmpleadoScreen(val route: String, val icon: ImageVector, val title: String) {
     Citas("citas", Icons.AutoMirrored.Filled.Assignment, "Citas"),

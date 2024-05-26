@@ -1,4 +1,4 @@
-package com.jmgtumat.pacapps.employeemod
+package com.jmgtumat.pacapps.employeemod.appointments
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
@@ -7,21 +7,21 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
 import com.jmgtumat.pacapps.util.getCitasEnHorarioTrabajo
 import com.jmgtumat.pacapps.util.getDayOfWeekString
-import com.jmgtumat.pacapps.viewmodels.CitaViewModel
-import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
+import com.jmgtumat.pacapps.viewmodels.AppViewModel
 import java.util.Calendar
 
 @Composable
 fun ManageAppointmentsScreen(
-    navController: NavController,
-    citaViewModel: CitaViewModel,
-    empleadoViewModel: EmpleadoViewModel
+    navController: NavHostController,
+    appViewModel: AppViewModel = viewModel()
 ) {
-    val citas by citaViewModel.citas.observeAsState(emptyList())
-    val empleados by empleadoViewModel.empleados.observeAsState(emptyList())
+    val citas by appViewModel.citaViewModel.citas.observeAsState(emptyList())
+    val empleados by appViewModel.empleadoViewModel.empleados.observeAsState(emptyList())
     val empleado = empleados.firstOrNull() ?: return // Obtener el primer empleado
 
     var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
@@ -32,8 +32,8 @@ fun ManageAppointmentsScreen(
     }
 
     EmpleadoDashboard(
-        citaViewModel = citaViewModel,
-        empleadoViewModel = empleadoViewModel
+        navController = navController,
+        appViewModel = appViewModel
     ) {
         Column {
             DatePicker(selectedDate) { date ->
@@ -46,14 +46,21 @@ fun ManageAppointmentsScreen(
                 val updatedHorariosTrabajo = empleado.horariosTrabajo.toMutableMap().apply {
                     put(selectedDate.getDayOfWeekString(), updatedHorarios)
                 }
-                empleadoViewModel.updateEmpleado(empleado.copy(horariosTrabajo = updatedHorariosTrabajo))
+                appViewModel.empleadoViewModel.updateEmpleado(empleado.copy(horariosTrabajo = updatedHorariosTrabajo))
             }
 
             AddAppointmentButton(navController)
 
             val citasEnHorarioTrabajo = getCitasEnHorarioTrabajo(citas, empleado, selectedDate)
-            HorarioCompletoConCitas(citasEnHorarioTrabajo)
+            HorarioCompletoConCitas(
+                citas = citasEnHorarioTrabajo,
+                onConfirmCita = { citaId ->
+                    appViewModel.citaViewModel.confirmarCita(citaId)
+                },
+                onCancelCita = { citaId ->
+                    appViewModel.citaViewModel.cancelarCita(citaId)
+                }
+            )
         }
     }
 }
-

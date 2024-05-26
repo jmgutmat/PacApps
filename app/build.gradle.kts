@@ -69,6 +69,8 @@ dependencies {
     implementation("com.android.car.ui:car-ui-lib:2.6.0")
     implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
     implementation("androidx.wear.compose:compose-material:1.3.1")
+    implementation("androidx.test:monitor:1.6.1")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.7")
     implementation("com.android.tools.compose:compose-preview-renderer:0.0.1-alpha01")

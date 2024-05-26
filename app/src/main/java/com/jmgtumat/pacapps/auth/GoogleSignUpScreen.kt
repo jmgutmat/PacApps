@@ -1,4 +1,4 @@
-package com.jmgtumat.pacapps.uiclases.auth
+package com.jmgtumat.pacapps.auth
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button

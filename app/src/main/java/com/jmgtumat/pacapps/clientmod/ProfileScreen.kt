@@ -16,16 +16,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.util.validateProfileInput
-import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
+import com.jmgtumat.pacapps.viewmodels.AppViewModel
 
 @Composable
-fun ProfileScreen(viewModel: ClienteViewModel = viewModel()) {
-    val clienteList by viewModel.clientes.observeAsState(emptyList())
+fun ProfileScreen(navController: NavHostController, viewModel: AppViewModel = viewModel()) {
+    val clienteList by viewModel.clienteViewModel.clientes.observeAsState(emptyList())
     val currentCliente = clienteList.firstOrNull() ?: Cliente()
 
     var nombre by remember { mutableStateOf(currentCliente.nombre) }
@@ -36,64 +36,60 @@ fun ProfileScreen(viewModel: ClienteViewModel = viewModel()) {
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = { nombre = it },
-            label = { Text("Nombre") }
-        )
+    ClienteDashboard(navController = navController, viewModel = viewModel) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            OutlinedTextField(
+                value = nombre,
+                onValueChange = { nombre = it },
+                label = { Text("Nombre") }
+            )
 
-        OutlinedTextField(
-            value = apellidos,
-            onValueChange = { apellidos = it },
-            label = { Text("Apellidos") }
-        )
+            OutlinedTextField(
+                value = apellidos,
+                onValueChange = { apellidos = it },
+                label = { Text("Apellidos") }
+            )
 
-        OutlinedTextField(
-            value = telefono,
-            onValueChange = { telefono = it },
-            label = { Text("Teléfono") }
-        )
+            OutlinedTextField(
+                value = telefono,
+                onValueChange = { telefono = it },
+                label = { Text("Teléfono") }
+            )
 
-        OutlinedTextField(
-            value = correoElectronico,
-            onValueChange = { correoElectronico = it },
-            label = { Text("Correo electrónico") }
-        )
+            OutlinedTextField(
+                value = correoElectronico,
+                onValueChange = { correoElectronico = it },
+                label = { Text("Correo electrónico") }
+            )
 
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Contraseña") },
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Button(onClick = {
-            val isValid = validateProfileInput(nombre, apellidos, telefono, correoElectronico, password)
-            if (isValid.isValid) {
-                val updatedCliente = currentCliente.copy(
-                    nombre = nombre,
-                    apellidos = apellidos,
-                    telefono = telefono,
-                    correoElectronico = correoElectronico
-                )
-                viewModel.updateCliente(updatedCliente)
-            } else {
-                showError = true
-                errorMessage = isValid.errorMessage
+            Button(onClick = {
+                val isValid = validateProfileInput(nombre, apellidos, telefono, correoElectronico, password)
+                if (isValid.isValid) {
+                    val updatedCliente = currentCliente.copy(
+                        nombre = nombre,
+                        apellidos = apellidos,
+                        telefono = telefono,
+                        correoElectronico = correoElectronico
+                    )
+                    viewModel.clienteViewModel.updateCliente(updatedCliente)
+                } else {
+                    showError = true
+                    errorMessage = isValid.errorMessage
+                }
+            }) {
+                Text("Actualizar Datos")
             }
-        }) {
-            Text("Actualizar Datos")
-        }
 
-        if (showError) {
-            Text(errorMessage, color = Color.Red)
+            if (showError) {
+                Text(errorMessage, color = Color.Red)
+            }
         }
     }
 }

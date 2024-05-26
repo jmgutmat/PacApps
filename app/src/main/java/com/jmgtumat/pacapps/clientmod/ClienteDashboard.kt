@@ -1,6 +1,7 @@
 package com.jmgtumat.pacapps.clientmod
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -19,10 +20,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.jmgtumat.pacapps.navigation.AppNavigation
-import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
+import com.jmgtumat.pacapps.viewmodels.AppViewModel
 
 @Composable
-fun ClienteDashboard(navController: NavHostController = rememberNavController(), viewModel: ClienteViewModel = viewModel()) {
+fun ClienteDashboard(
+    navController: NavHostController = rememberNavController(),
+    viewModel: AppViewModel = viewModel(),
+    content: @Composable (PaddingValues) -> Unit
+) {
     Scaffold(
         bottomBar = {
             BottomNavigationBar(navController)
@@ -34,6 +39,7 @@ fun ClienteDashboard(navController: NavHostController = rememberNavController(),
                 .padding(innerPadding)
         ) {
             AppNavigation(navController)
+            content(innerPadding)
         }
     }
 }

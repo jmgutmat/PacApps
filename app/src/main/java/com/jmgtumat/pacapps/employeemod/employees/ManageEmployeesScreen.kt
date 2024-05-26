@@ -1,4 +1,4 @@
-package com.jmgtumat.pacapps.employeemod
+package com.jmgtumat.pacapps.employeemod.employees
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,20 +14,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
 import com.jmgtumat.pacapps.util.SearchBar
-import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
+import com.jmgtumat.pacapps.viewmodels.AppViewModel
 
 @Composable
 fun ManageEmployeesScreen(
     navController: NavHostController,
-    empleadoViewModel: EmpleadoViewModel = viewModel()
+    appViewModel: AppViewModel = viewModel()
 ) {
-    val empleados by empleadoViewModel.empleados.observeAsState(emptyList())
+    val empleados by appViewModel.empleadoViewModel.empleados.observeAsState(emptyList())
     var searchQuery by remember { mutableStateOf("") }
 
     EmpleadoDashboard(
         navController = navController,
-        empleadoViewModel = empleadoViewModel
+        appViewModel = appViewModel
     ) { innerPadding ->
         Column(modifier = Modifier
             .fillMaxSize()
@@ -46,11 +47,11 @@ fun ManageEmployeesScreen(
                             it.telefono.contains(searchQuery, ignoreCase = true) ||
                             it.correoElectronico.contains(searchQuery, ignoreCase = true)
                 }) { empleado ->
-                    EmployeeItem(empleado, empleadoViewModel, navController)
+                    EmployeeItem(empleado, appViewModel.empleadoViewModel, navController)
                 }
             }
 
-            AddEmployeeButton(navController, empleadoViewModel)
+            AddEmployeeButton(navController, appViewModel.empleadoViewModel)
         }
     }
 }

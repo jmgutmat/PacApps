@@ -1,4 +1,4 @@
-package com.jmgtumat.pacapps.employeemod
+package com.jmgtumat.pacapps.employeemod.services
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

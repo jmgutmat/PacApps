@@ -1,4 +1,4 @@
-package com.jmgtumat.pacapps.employeemod
+package com.jmgtumat.pacapps.employeemod.appointments
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
@@ -36,7 +36,6 @@ import androidx.navigation.NavController
 import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.HorariosPorDia
 import com.jmgtumat.pacapps.data.Intervalo
-import com.jmgtumat.pacapps.uiclases.appointments.CitaItem
 import java.util.Calendar
 
 @Composable
@@ -157,17 +156,23 @@ fun AddAppointmentButton(navController: NavController) {
 }
 
 @Composable
-fun HorarioCompletoConCitas(citas: List<Cita>) {
+fun HorarioCompletoConCitas(
+    citas: List<Cita>,
+    onConfirmCita: (String) -> Unit,
+    onCancelCita: (String) -> Unit
+) {
     val scrollState = rememberScrollState()
     Column(modifier = Modifier.verticalScroll(scrollState)) {
         for (hour in 0..23) {
-            HourBlock(hour, citas)
+            HourBlock(hour, citas, onConfirmCita, onCancelCita)
         }
     }
 }
 
+
+
 @Composable
-fun HourBlock(hour: Int, citas: List<Cita>) {
+fun HourBlock(hour: Int, citas: List<Cita>, onCancelCita: (String) -> Unit, onConfirmCita: (String) -> Unit) {
     val hourStart = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, hour)
         set(Calendar.MINUTE, 0)
@@ -203,7 +208,15 @@ fun HourBlock(hour: Int, citas: List<Cita>) {
 
         Column(modifier = Modifier.fillMaxSize()) {
             citasInThisHour.forEach { cita ->
-                CitaItem(cita)
+                EmployeeAppointmentItem(
+                    cita = cita,
+                    onCancel = {
+                        onCancelCita(cita.id)
+                    },
+                    onConfirm = {
+                        onConfirmCita(cita.id)
+                    }
+                )
             }
         }
 

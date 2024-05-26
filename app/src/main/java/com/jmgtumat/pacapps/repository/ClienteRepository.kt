@@ -2,12 +2,15 @@ package com.jmgtumat.pacapps.repository
 
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.Cliente
 import kotlinx.coroutines.tasks.await
 
 class ClienteRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("clientes")
+    private val citasDatabase: DatabaseReference = FirebaseDatabase.getInstance().reference.child("citas")
+
 
     suspend fun getClientes(): List<Cliente> {
         val snapshot = database.get().await()
@@ -26,5 +29,19 @@ class ClienteRepository {
 
     suspend fun deleteCliente(clienteId: String) {
         database.child(clienteId).removeValue().await()
+    }
+
+    suspend fun getHistorialCitas(clienteId: String): List<Cita> {
+        val clienteCitasSnapshot = database.child(clienteId).child("historialCitas").get().await()
+        val citaIds = clienteCitasSnapshot.children.map { it.getValue(String::class.java)!! }
+        val citas = mutableListOf<Cita>()
+
+        citaIds.forEach { citaId ->
+            val citaSnapshot = citasDatabase.child(citaId).get().await()
+            val cita = citaSnapshot.getValue(Cita::class.java)
+            cita?.let { citas.add(it) }
+        }
+
+        return citas
     }
 }
