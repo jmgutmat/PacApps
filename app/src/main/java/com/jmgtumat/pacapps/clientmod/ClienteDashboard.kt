@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -38,7 +39,7 @@ fun ClienteDashboard(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            AppNavigation(navController)
+            AppNavigation(navController,)
             content(innerPadding)
         }
     }
@@ -49,7 +50,8 @@ fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         ClienteScreen.Profile,
         ClienteScreen.History,
-        ClienteScreen.NewAppointment
+        ClienteScreen.NewAppointment,
+        ClienteScreen.Home
     )
 
     NavigationBar {
@@ -57,7 +59,7 @@ fun BottomNavigationBar(navController: NavHostController) {
             NavigationBarItem(
                 icon = { Icon(screen.icon, contentDescription = null) },
                 label = { Text(screen.title) },
-                selected = false,
+                selected = navController.currentDestination?.route == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {
                         popUpTo(navController.graph.startDestinationId) {
@@ -72,8 +74,10 @@ fun BottomNavigationBar(navController: NavHostController) {
     }
 }
 
+
 enum class ClienteScreen(val route: String, val icon: ImageVector, val title: String) {
     Profile("profile", Icons.Default.Person, "Perfil"),
     History("history", Icons.Default.History, "Historial"),
-    NewAppointment("new_appointment", Icons.Default.Add, "Nueva Cita")
+    NewAppointment("new_appointment", Icons.Default.Add, "Nueva Cita"),
+    Home("home", Icons.Default.Home, "Inicio")
 }

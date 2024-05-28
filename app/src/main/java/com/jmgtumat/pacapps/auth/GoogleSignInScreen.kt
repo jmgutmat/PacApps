@@ -8,12 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import com.jmgtumat.pacapps.data.UserRole
+import androidx.navigation.NavHostController
+import com.jmgtumat.pacapps.navigation.redirectToRoleBasedScreen
 import com.jmgtumat.pacapps.util.validateInputFields
 import com.jmgtumat.pacapps.viewmodels.GoogleSignInViewModel
 
 @Composable
-fun GoogleSignInScreen(viewModel: GoogleSignInViewModel, redirectToRoleScreen: (UserRole) -> Unit) {
+fun GoogleSignInScreen(viewModel: GoogleSignInViewModel, navController: NavHostController) {
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
     val showError = remember { mutableStateOf(false) }
@@ -38,7 +39,9 @@ fun GoogleSignInScreen(viewModel: GoogleSignInViewModel, redirectToRoleScreen: (
             if (validationResult.isValid) {
                 viewModel.signInWithGoogle("YOUR_ID_TOKEN") { user ->
                     user?.let {
-                        redirectToRoleScreen(it.rol)
+                        redirectToRoleBasedScreen(navController, it.id) { userId, callback ->
+                            viewModel.fetchUserRole(userId, callback)
+                        }
                     }
                 }
             } else {

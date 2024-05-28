@@ -2,6 +2,8 @@ package com.jmgtumat.pacapps.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.jmgtumat.pacapps.data.Empleado
 import com.jmgtumat.pacapps.data.HorarioDisponible
@@ -85,5 +87,14 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
                 setError(e.message)
             }
         }
+    }
+}
+
+class EmpleadoViewModelFactory(private val empleadoRepository: EmpleadoRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(EmpleadoViewModel::class.java)) {
+            return EmpleadoViewModel(empleadoRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

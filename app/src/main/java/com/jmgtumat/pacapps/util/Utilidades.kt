@@ -5,22 +5,43 @@ import com.jmgtumat.pacapps.data.Empleado
 import java.util.Calendar
 import java.util.Locale
 
+private fun getCitaHour(time: String): Long {
+    val parts = time.split(":")
+    return if (parts.size == 2) {
+        val hour = parts[0].toLongOrNull() ?: 0L
+        val minute = parts[1].toLongOrNull() ?: 0L
+        hour * 60 + minute
+    } else {
+        0L
+    }
+}
+
 fun getCitasEnHorarioTrabajo(citas: List<Cita>, empleado: Empleado, selectedDate: Calendar): List<Cita> {
     val dayOfWeek = selectedDate.get(Calendar.DAY_OF_WEEK)
     val dayString = getDayString(dayOfWeek)
     val horariosTrabajo = empleado.horariosTrabajo[dayString] ?: return emptyList()
 
+    val intervaloManana = horariosTrabajo.manana
+    val intervaloTarde = horariosTrabajo.tarde
+
     return citas.filter { cita ->
-        val citaDate = Calendar.getInstance().apply { timeInMillis = cita.fecha }
-        val citaDayOfWeek = citaDate.get(Calendar.DAY_OF_WEEK)
-        citaDayOfWeek == dayOfWeek && horariosTrabajo.any { intervalo ->
-            val citaHour = getCitaHour(cita.horaInicio).toInt()
-            val intervaloStartHour = intervalo.horaInicio.split(":")[0].toInt()
-            val intervaloEndHour = intervalo.horaFin.split(":")[0].toInt()
-            citaHour in intervaloStartHour..intervaloEndHour
-        }
+        val citaCalendar = Calendar.getInstance().apply { timeInMillis = cita.horaInicio }
+        val citaHour = getCitaHour(formatTimeNew(cita.horaInicio)).toLong()
+
+        val mananaStartHour = getCitaHour(intervaloManana.horaInicio)
+        val mananaEndHour = getCitaHour(intervaloManana.horaFin)
+        val tardeStartHour = getCitaHour(intervaloTarde.horaInicio)
+        val tardeEndHour = getCitaHour(intervaloTarde.horaFin)
+
+        val isMorning = citaHour in mananaStartHour..mananaEndHour
+        val isAfternoon = citaHour in tardeStartHour..tardeEndHour
+
+        citaCalendar.get(Calendar.DAY_OF_WEEK) == dayOfWeek && (isMorning || isAfternoon)
     }
 }
+
+
+
 
 fun getDayString(dayOfWeek: Int): String {
     return when (dayOfWeek) {

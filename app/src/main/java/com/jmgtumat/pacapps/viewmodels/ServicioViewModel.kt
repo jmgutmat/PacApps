@@ -2,6 +2,8 @@ package com.jmgtumat.pacapps.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.jmgtumat.pacapps.data.Servicio
 import com.jmgtumat.pacapps.repository.ServicioRepository
@@ -60,5 +62,14 @@ class ServicioViewModel(private val servicioRepository: ServicioRepository) : Ba
                 setError(e.message)
             }
         }
+    }
+}
+
+class ServicioViewModelFactory(private val servicioRepository: ServicioRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ServicioViewModel::class.java)) {
+            return ServicioViewModel(servicioRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

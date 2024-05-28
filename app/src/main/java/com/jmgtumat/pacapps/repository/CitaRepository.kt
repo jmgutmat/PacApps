@@ -4,6 +4,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.jmgtumat.pacapps.data.Cita
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 
 class CitaRepository {
 
@@ -12,6 +13,16 @@ class CitaRepository {
     suspend fun getCitas(): List<Cita> {
         val snapshot = database.get().await()
         return snapshot.children.map { it.getValue(Cita::class.java)!! }
+    }
+
+    suspend fun getCitasByDate(dateInMillis: Long): List<Cita> {
+        val snapshot = database.get().await()
+        return snapshot.children.mapNotNull { it.getValue(Cita::class.java) }.filter {
+            val calendar = Calendar.getInstance().apply { timeInMillis = it.fecha }
+            val selectedCalendar = Calendar.getInstance().apply { timeInMillis = dateInMillis }
+            calendar.get(Calendar.YEAR) == selectedCalendar.get(Calendar.YEAR) &&
+                    calendar.get(Calendar.DAY_OF_YEAR) == selectedCalendar.get(Calendar.DAY_OF_YEAR)
+        }
     }
 
     suspend fun addCita(cita: Cita) {

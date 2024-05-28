@@ -112,7 +112,7 @@ fun NewAppointmentScreen(navController: NavHostController, viewModel: AppViewMod
                             )
                         )
                         showConfirmationDialog = false
-                        navController.navigate(AppScreens.ClientScreen.route) // Navegar de vuelta a la pantalla de inicio del cliente
+                        navController.navigate(AppScreens.ClientHomeScreen.route) // Navegar de vuelta a la pantalla de inicio del cliente
                     },
                     onDismiss = { showConfirmationDialog = false }
                 )

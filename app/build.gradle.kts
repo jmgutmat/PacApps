@@ -2,6 +2,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.android.application")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -57,6 +58,8 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-android:2.8.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.6.7")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
 
     // Compose
     implementation(platform("androidx.compose:compose-bom:2024.05.00"))
@@ -73,14 +76,14 @@ dependencies {
     implementation("androidx.test.ext:junit-ktx:1.1.5")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.7")
-    implementation("com.android.tools.compose:compose-preview-renderer:0.0.1-alpha01")
 
     // Firebase y Google Services
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
     implementation("com.google.firebase:firebase-database-ktx:21.0.0")
-    implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation ("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics:19.0.0")
 
     // Facebook SDK
     implementation("com.facebook.android:facebook-android-sdk:latest.release")

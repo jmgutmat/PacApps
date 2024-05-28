@@ -6,6 +6,7 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@drawable/icono_negro"
         android:label="@string/app_name"
         android:roundIcon="@drawable/icono_negro"

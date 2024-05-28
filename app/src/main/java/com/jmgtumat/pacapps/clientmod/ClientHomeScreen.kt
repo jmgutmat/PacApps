@@ -27,7 +27,8 @@ import com.jmgtumat.pacapps.util.formatTimeNew
 import com.jmgtumat.pacapps.viewmodels.AppViewModel
 
 @Composable
-fun HomeScreen(navController: NavHostController, viewModel: AppViewModel = viewModel()) {
+fun ClientHomeScreen(navController: NavHostController) {
+    val viewModel: AppViewModel = viewModel()
     val clienteList by viewModel.clienteViewModel.clientes.observeAsState(emptyList())
     val currentCliente = clienteList.firstOrNull() ?: Cliente()
     var pendingCita by remember { mutableStateOf<Cita?>(null) }

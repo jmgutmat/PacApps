@@ -66,9 +66,10 @@ fun EmailSignInScreen(viewModel: EmailSignInViewModel, navController: NavHostCon
     LaunchedEffect(viewModel.user) {
         viewModel.user.collect { firebaseUser ->
             firebaseUser?.let {
-                redirectToRoleBasedScreen(navController, it.uid, viewModel)
+                redirectToRoleBasedScreen(navController, it.uid) { userId, callback ->
+                    viewModel.fetchUserRole(userId, callback)
+                }
             }
         }
     }
 }
-

@@ -15,12 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import com.jmgtumat.pacapps.data.Cliente
+import androidx.navigation.NavHostController
+import com.jmgtumat.pacapps.navigation.redirectToRoleBasedScreen
 import com.jmgtumat.pacapps.util.validateInputFields
 import com.jmgtumat.pacapps.viewmodels.EmailSignUpViewModel
 
 @Composable
-fun EmailSignUpScreen(viewModel: EmailSignUpViewModel) {
+fun EmailSignUpScreen(viewModel: EmailSignUpViewModel, navController: NavHostController) {
     var nombre by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
@@ -68,15 +69,18 @@ fun EmailSignUpScreen(viewModel: EmailSignUpViewModel) {
         Button(onClick = {
             val validationResult = validateInputFields(correoElectronico, password)
             if (validationResult.isValid) {
-                val cliente = Cliente(
-                    nombre = nombre,
-                    apellidos = apellidos,
-                    telefono = telefono,
-                    correoElectronico = correoElectronico,
-                    historialCitas = emptyList()  // Inicia el historial de citas vacío
-                )
-
-                viewModel.signUpWithEmailAndPassword(cliente, password)
+                viewModel.signUpWithEmailAndPassword(nombre, apellidos, telefono, correoElectronico, password) { firebaseUser ->
+                    firebaseUser?.let {
+                        viewModel.fetchUserRole(it.uid) { role ->
+                            redirectToRoleBasedScreen(navController, it.uid) { userId, callback ->
+                                callback(role)
+                            }
+                        }
+                    } ?: run {
+                        showError = true
+                        errorMessage = "Error signing up"
+                    }
+                }
             } else {
                 showError = true
                 errorMessage = validationResult.errorMessage
@@ -90,4 +94,3 @@ fun EmailSignUpScreen(viewModel: EmailSignUpViewModel) {
         }
     }
 }
-

@@ -2,6 +2,8 @@ package com.jmgtumat.pacapps.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.CitaEstado
@@ -22,6 +24,19 @@ class CitaViewModel(private val citaRepository: CitaRepository) : BaseViewModel(
             setLoading()
             try {
                 val fetchedCitas = citaRepository.getCitas()
+                _citas.value = fetchedCitas
+                setSuccess()
+            } catch (e: Exception) {
+                setError(e.message)
+            }
+        }
+    }
+
+    fun fetchCitasByDate(dateInMillis: Long) {
+        viewModelScope.launch {
+            setLoading()
+            try {
+                val fetchedCitas = citaRepository.getCitasByDate(dateInMillis)
                 _citas.value = fetchedCitas
                 setSuccess()
             } catch (e: Exception) {
@@ -95,3 +110,13 @@ class CitaViewModel(private val citaRepository: CitaRepository) : BaseViewModel(
     }
 
 }
+
+class CitaViewModelFactory(private val citaRepository: CitaRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CitaViewModel::class.java)) {
+            return CitaViewModel(citaRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+

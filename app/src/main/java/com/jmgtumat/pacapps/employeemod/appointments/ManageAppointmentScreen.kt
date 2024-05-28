@@ -2,10 +2,12 @@ package com.jmgtumat.pacapps.employeemod.appointments
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -13,6 +15,7 @@ import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
 import com.jmgtumat.pacapps.util.getCitasEnHorarioTrabajo
 import com.jmgtumat.pacapps.util.getDayOfWeekString
 import com.jmgtumat.pacapps.viewmodels.AppViewModel
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @Composable
@@ -30,6 +33,13 @@ fun ManageAppointmentsScreen(
             empleado.horariosTrabajo[selectedDate.getDayOfWeekString()] ?: defaultHorariosPorDia()
         )
     }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            appViewModel.citaViewModel.fetchCitasByDate(selectedDate.timeInMillis)
+        }
+    }
 
     EmpleadoDashboard(
         navController = navController,
@@ -39,6 +49,9 @@ fun ManageAppointmentsScreen(
             DatePicker(selectedDate) { date ->
                 selectedDate = date
                 horariosPorDia = empleado.horariosTrabajo[date.getDayOfWeekString()] ?: defaultHorariosPorDia()
+                coroutineScope.launch {
+                    appViewModel.citaViewModel.fetchCitasByDate(date.timeInMillis)
+                }
             }
 
             HorariosTrabajo(horariosPorDia) { updatedHorarios ->

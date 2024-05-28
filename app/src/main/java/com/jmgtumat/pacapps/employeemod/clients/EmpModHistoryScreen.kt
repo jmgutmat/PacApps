@@ -24,7 +24,7 @@ import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
 import com.jmgtumat.pacapps.viewmodels.AppViewModel
 
 @Composable
-fun HistoryScreen(
+fun EmpModHistoryScreen(
     clienteId: String,
     appViewModel: AppViewModel = viewModel(),
     navController: NavHostController
