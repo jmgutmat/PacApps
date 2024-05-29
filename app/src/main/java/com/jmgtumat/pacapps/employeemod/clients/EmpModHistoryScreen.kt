@@ -16,20 +16,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.jmgtumat.pacapps.clientmod.ClientAppointmentItem
 import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
-import com.jmgtumat.pacapps.viewmodels.AppViewModel
+import com.jmgtumat.pacapps.repository.CitaRepository
+import com.jmgtumat.pacapps.repository.ClienteRepository
+import com.jmgtumat.pacapps.viewmodels.CitaViewModel
+import com.jmgtumat.pacapps.viewmodels.CitaViewModelFactory
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 
 @Composable
-fun EmpModHistoryScreen(
-    clienteId: String,
-    appViewModel: AppViewModel = viewModel(),
-    navController: NavHostController
-) {
-    val clienteList by appViewModel.clienteViewModel.clientes.observeAsState(emptyList())
+fun EmpModHistoryScreen(clienteId: String, navController: NavController) {
+    val clienteViewModel: ClienteViewModel = viewModel(
+        factory = ClienteViewModelFactory(
+            ClienteRepository(/* parámetros de configuración si los hay */),
+        )
+    )
+    val citaViewModel: CitaViewModel = viewModel(
+        factory = CitaViewModelFactory(
+            CitaRepository(/* parámetros de configuración si los hay */),
+        )
+    )
+    val clienteList by clienteViewModel.clientes.observeAsState(emptyList())
     val currentCliente = clienteList.find { it.id == clienteId } ?: Cliente()
     val historialCitas = currentCliente.historialCitas
 
@@ -38,12 +49,12 @@ fun EmpModHistoryScreen(
 
     LaunchedEffect(historialCitas) {
         val fetchedCitas = historialCitas.map { citaId ->
-            appViewModel.citaViewModel.getCitaById(citaId.toString())
+            citaViewModel.getCitaById(citaId.toString())
         }
         citasList = fetchedCitas
     }
 
-    EmpleadoDashboard(navController = navController, appViewModel = appViewModel) {
+    EmpleadoDashboard(navController = navController) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp),

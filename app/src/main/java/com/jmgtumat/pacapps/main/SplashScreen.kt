@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.jmgtumat.pacapps.R
 import com.jmgtumat.pacapps.navigation.AppScreens
 import com.jmgtumat.pacapps.ui.theme.PacAppsTheme
@@ -18,12 +18,14 @@ import kotlinx.coroutines.delay
 
 
 @Composable
-fun SplashScreen(navController: NavHostController) {
+fun SplashScreen(navController: NavController) {
 
     LaunchedEffect(key1 = true){
         delay(5000)
         navController.popBackStack()
-        navController.navigate(AppScreens.MainScreen.route)
+        navController.navigate(AppScreens.MainScreen.route){
+            popUpTo(AppScreens.SplashScreen.route) { inclusive = true }
+        }
     }
     Splash()
 }

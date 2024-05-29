@@ -17,17 +17,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.jmgtumat.pacapps.navigation.AppNavigation
-import com.jmgtumat.pacapps.viewmodels.AppViewModel
+import androidx.navigation.NavController
 
 @Composable
 fun ClienteDashboard(
-    navController: NavHostController = rememberNavController(),
-    viewModel: AppViewModel = viewModel(),
-    content: @Composable (PaddingValues) -> Unit
+    navController: NavController,
+    contenido: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         bottomBar = {
@@ -39,14 +34,14 @@ fun ClienteDashboard(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            AppNavigation(navController,)
-            content(innerPadding)
+            contenido(innerPadding)
         }
     }
 }
 
+
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
+fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         ClienteScreen.Profile,
         ClienteScreen.History,
@@ -75,9 +70,9 @@ fun BottomNavigationBar(navController: NavHostController) {
 }
 
 
-enum class ClienteScreen(val route: String, val icon: ImageVector, val title: String) {
-    Profile("profile", Icons.Default.Person, "Perfil"),
-    History("history", Icons.Default.History, "Historial"),
-    NewAppointment("new_appointment", Icons.Default.Add, "Nueva Cita"),
-    Home("home", Icons.Default.Home, "Inicio")
+sealed class ClienteScreen(val route: String, val title: String, val icon: ImageVector) {
+    object Profile : ClienteScreen("/profile_screen", "Perfil", Icons.Default.Person)
+    object History : ClienteScreen("/clientmod_history_screen", "Historial", Icons.Default.History)
+    object NewAppointment : ClienteScreen("/new_appointments_screen", "Nueva Cita", Icons.Default.Add)
+    object Home : ClienteScreen("/client_home_screen", "Inicio", Icons.Default.Home)
 }

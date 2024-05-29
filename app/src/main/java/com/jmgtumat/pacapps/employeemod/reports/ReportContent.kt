@@ -15,13 +15,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jmgtumat.pacapps.repository.CitaRepository
+import com.jmgtumat.pacapps.repository.EmpleadoRepository
+import com.jmgtumat.pacapps.repository.ServicioRepository
 import com.jmgtumat.pacapps.util.DateSelector
-import com.jmgtumat.pacapps.viewmodels.AppViewModel
+import com.jmgtumat.pacapps.viewmodels.CitaViewModel
+import com.jmgtumat.pacapps.viewmodels.CitaViewModelFactory
+import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
+import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModelFactory
+import com.jmgtumat.pacapps.viewmodels.ServicioViewModel
+import com.jmgtumat.pacapps.viewmodels.ServicioViewModelFactory
 
 @Composable
 fun ReportContent(
     context: Context,
-    appViewModel: AppViewModel,
     startDate: MutableState<Long?>,
     endDate: MutableState<Long?>
 ) {
@@ -37,9 +45,21 @@ fun ReportContent(
         mutableStateOf<List<ServicePopularityReport>?>(null)
     }
 
-    val citaViewModel = appViewModel.citaViewModel
-    val servicioViewModel = appViewModel.servicioViewModel
-    val empleadoViewModel = appViewModel.empleadoViewModel
+    val citaViewModel: CitaViewModel = viewModel(
+        factory = CitaViewModelFactory(
+            CitaRepository(/* parámetros de configuración si los hay */),
+        )
+    )
+    val empleadoViewModel: EmpleadoViewModel = viewModel(
+        factory = EmpleadoViewModelFactory(
+            EmpleadoRepository(/* parámetros de configuración si los hay */),
+        )
+    )
+    val servicioViewModel: ServicioViewModel = viewModel(
+        factory = ServicioViewModelFactory(
+            ServicioRepository(/* parámetros de configuración si los hay */),
+        )
+    )
 
     LaunchedEffect(startDate.value, endDate.value) {
         if (startDate.value != null && endDate.value != null) {

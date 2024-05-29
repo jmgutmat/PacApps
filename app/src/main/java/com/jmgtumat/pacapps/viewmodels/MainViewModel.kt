@@ -1,18 +1,14 @@
 package com.jmgtumat.pacapps.viewmodels
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.jmgtumat.pacapps.data.Cliente
-import com.jmgtumat.pacapps.data.User
 import com.jmgtumat.pacapps.data.UserRole
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class MainViewModel : ViewModel() {
@@ -53,20 +49,19 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun redirectToRoleBasedScreen(navController: NavHostController, userId: String) {
-        viewModelScope.launch {
-            db.child("users").child(userId).get().addOnSuccessListener { dataSnapshot ->
-                val user = dataSnapshot.getValue(User::class.java)
-                val role = user?.rol ?: UserRole.CLIENTE
-                _userRole.value = role
-                when (role) {
-                    UserRole.ADMINISTRADOR -> navController.navigate("admin_screen")
-                    UserRole.EMPLEADO -> navController.navigate("employee_screen")
-                    UserRole.CLIENTE -> navController.navigate("client_screen")
+    fun getUserType(userId: String, callback: (Boolean) -> Unit) {
+        db.child("empleados").child(userId).get().addOnSuccessListener { empSnapshot ->
+            if (empSnapshot.exists()) {
+                callback(false)  // Es un empleado/administrador
+            } else {
+                db.child("clientes").child(userId).get().addOnSuccessListener { snapshot ->
+                    callback(snapshot.exists())  // Es un cliente si existe
+                }.addOnFailureListener {
+                    callback(false)  // No es un cliente
                 }
-            }.addOnFailureListener {
-                // Handle the error
             }
+        }.addOnFailureListener {
+            callback(false)  // No es un empleado/administrador
         }
     }
 }

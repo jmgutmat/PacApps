@@ -24,18 +24,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.jmgtumat.pacapps.R
 import com.jmgtumat.pacapps.navigation.AppScreens
+import com.jmgtumat.pacapps.navigation.redirectToRoleBasedScreen
 import com.jmgtumat.pacapps.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun MainScreen(navController: NavHostController, viewModel: MainViewModel) {
+fun MainScreen(navController: NavController) {
+
+    val viewModel = MainViewModel()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -57,7 +60,7 @@ fun MainScreen(navController: NavHostController, viewModel: MainViewModel) {
                     if (authResult.isSuccess) {
                         val userId = authResult.getOrNull()
                         userId?.let {
-                            viewModel.redirectToRoleBasedScreen(navController, it)
+                            redirectToRoleBasedScreen(navController, it, viewModel::getUserType)
                         }
                     } else {
                         errorMessage = authResult.exceptionOrNull()?.message ?: "Error al iniciar sesión con Google"
@@ -104,7 +107,7 @@ fun MainScreen(navController: NavHostController, viewModel: MainViewModel) {
                     if (result.isSuccess) {
                         val userId = result.getOrNull()
                         userId?.let {
-                            viewModel.redirectToRoleBasedScreen(navController, it)
+                            redirectToRoleBasedScreen(navController, it, viewModel::getUserType)
                         }
                     } else {
                         errorMessage = result.exceptionOrNull()?.message ?: "Error al iniciar sesión"

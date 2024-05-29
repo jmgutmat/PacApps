@@ -63,4 +63,20 @@ class EmailSignUpViewModel : BaseViewModel() {
             }
         }
     }
+
+    fun getUserType(userId: String, callback: (Boolean) -> Unit) {
+        db.child("empleados").child(userId).get().addOnSuccessListener { empSnapshot ->
+            if (empSnapshot.exists()) {
+                callback(false)  // Es un empleado/administrador
+            } else {
+                db.child("clientes").child(userId).get().addOnSuccessListener { snapshot ->
+                    callback(snapshot.exists())  // Es un cliente si existe
+                }.addOnFailureListener {
+                    callback(false)  // No es un cliente
+                }
+            }
+        }.addOnFailureListener {
+            callback(false)  // No es un empleado/administrador
+        }
+    }
 }

@@ -2,14 +2,15 @@ package com.jmgtumat.pacapps.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.jmgtumat.pacapps.auth.EmailSignUpScreen
 import com.jmgtumat.pacapps.clientmod.ClientHomeScreen
 import com.jmgtumat.pacapps.clientmod.ClientmodHistoryScreen
+import com.jmgtumat.pacapps.clientmod.NewAppointmentScreen
 import com.jmgtumat.pacapps.clientmod.ProfileScreen
-import com.jmgtumat.pacapps.data.UserRole
 import com.jmgtumat.pacapps.employeemod.appointments.ManageAppointmentsScreen
 import com.jmgtumat.pacapps.employeemod.clients.EmpModHistoryScreen
 import com.jmgtumat.pacapps.employeemod.clients.ManageClientsScreen
@@ -21,66 +22,66 @@ import com.jmgtumat.pacapps.main.SplashScreen
 import com.jmgtumat.pacapps.viewmodels.MainViewModel
 
 @Composable
-fun AppNavigation(navController: NavHostController) {
+fun AppNavigation() {
+    val navController = rememberNavController()
+
     NavHost(navController, startDestination = AppScreens.SplashScreen.route) {
         composable(AppScreens.SplashScreen.route) {
             SplashScreen(navController)
         }
         composable(AppScreens.MainScreen.route) {
             val viewModel: MainViewModel = viewModel()
-            MainScreen(navController, viewModel)
+            MainScreen(navController)
         }
 
         composable(AppScreens.EmailSignUpScreen.route) {
-            EmailSignUpScreen(viewModel(), navController)
+            EmailSignUpScreen(navController)
         }
 
         composable(AppScreens.ClientHomeScreen.route) {
             ClientHomeScreen(navController)
         }
+
+        composable(AppScreens.NewAppointmentScreen.route) {
+            NewAppointmentScreen(navController)
+        }
+
         composable(AppScreens.ClientModHistoryScreen.route) {
-            ClientmodHistoryScreen(navController, viewModel())
+            ClientmodHistoryScreen(navController)
         }
         composable(AppScreens.ProfileScreen.route) {
-            ProfileScreen(navController, viewModel())
+            ProfileScreen(navController)
         }
         composable(AppScreens.ManageAppointmentsScreen.route) {
-            ManageAppointmentsScreen(navController, viewModel())
+            ManageAppointmentsScreen(navController)
         }
         composable(AppScreens.ManageEmployeesScreen.route) {
-            ManageEmployeesScreen(navController, viewModel())
+            ManageEmployeesScreen(navController)
         }
         composable(AppScreens.ManageServicesScreen.route) {
-            ManageServicesScreen(viewModel())
+            ManageServicesScreen(navController)
         }
         composable(AppScreens.ManageClientsScreen.route) {
-            ManageClientsScreen(navController = navController, viewModel())
+            ManageClientsScreen(navController)
         }
 
         composable(AppScreens.EmpModHistoryScreen.route) { backStackEntry ->
             val clienteId = backStackEntry.arguments?.getString("clienteId") ?: ""
-            EmpModHistoryScreen(clienteId, viewModel(), navController)
+            EmpModHistoryScreen(clienteId, navController)
         }
 
         composable(AppScreens.ReportsScreen.route) {
-            ReportsScreen(navController, viewModel())
+            ReportsScreen(navController)
         }
     }
 }
 
-fun redirectToRoleBasedScreen(navController: NavHostController, userId: String, roleProvider: (String, (UserRole) -> Unit) -> Unit) {
-    roleProvider(userId) { role ->
-        when (role) {
-            UserRole.CLIENTE -> {
-                navController.navigate(AppScreens.ClientHomeScreen.route) {
-                    popUpTo(AppScreens.MainScreen.route) { inclusive = true }
-                }
-            }
-            UserRole.EMPLEADO, UserRole.ADMINISTRADOR -> {
-                navController.navigate(AppScreens.ManageAppointmentsScreen.route) {
-                    popUpTo(AppScreens.MainScreen.route) { inclusive = true }
-                }
-            }
+fun redirectToRoleBasedScreen(navController: NavController, userId: String, getUserType: (String, (Boolean) -> Unit) -> Unit) {
+    getUserType(userId) { isClient ->
+        if (isClient) {
+            navController.navigate("/client_home_screen")
+        } else {
+            navController.navigate("/manage_appointments_screen")
         }
     }
 }

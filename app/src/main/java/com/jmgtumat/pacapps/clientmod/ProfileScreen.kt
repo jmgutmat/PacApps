@@ -18,14 +18,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.jmgtumat.pacapps.data.Cliente
+import com.jmgtumat.pacapps.repository.ClienteRepository
 import com.jmgtumat.pacapps.util.validateProfileInput
-import com.jmgtumat.pacapps.viewmodels.AppViewModel
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 
 @Composable
-fun ProfileScreen(navController: NavHostController, viewModel: AppViewModel = viewModel()) {
-    val clienteList by viewModel.clienteViewModel.clientes.observeAsState(emptyList())
+fun ProfileScreen(navController: NavController) {
+    val clienteViewModel: ClienteViewModel = viewModel(
+        factory = ClienteViewModelFactory(
+            ClienteRepository(/* parámetros de configuración si los hay */),
+        )
+    )
+    val clienteList by clienteViewModel.clientes.observeAsState(emptyList())
     val currentCliente = clienteList.firstOrNull() ?: Cliente()
 
     var nombre by remember { mutableStateOf(currentCliente.nombre) }
@@ -36,7 +43,7 @@ fun ProfileScreen(navController: NavHostController, viewModel: AppViewModel = vi
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-    ClienteDashboard(navController = navController, viewModel = viewModel) { innerPadding ->
+    ClienteDashboard(navController = navController) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -78,7 +85,7 @@ fun ProfileScreen(navController: NavHostController, viewModel: AppViewModel = vi
                         telefono = telefono,
                         correoElectronico = correoElectronico
                     )
-                    viewModel.clienteViewModel.updateCliente(updatedCliente)
+                    clienteViewModel.updateCliente(updatedCliente)
                 } else {
                     showError = true
                     errorMessage = isValid.errorMessage

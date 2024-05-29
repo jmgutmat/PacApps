@@ -13,23 +13,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
 import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
-import com.jmgtumat.pacapps.viewmodels.AppViewModel
 
 @Composable
-fun ReportsScreen(
-    navController: NavHostController = rememberNavController(),
-    appViewModel: AppViewModel = viewModel()
-) {
+fun ReportsScreen(navController: NavController) {
     val context = LocalContext.current
 
-    EmpleadoDashboard(
-        navController = navController,
-        appViewModel = appViewModel
-    ) { innerPadding ->
+    EmpleadoDashboard(navController = navController) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -40,7 +31,6 @@ fun ReportsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             ReportContent(
                 context = context,
-                appViewModel = appViewModel,
                 startDate = remember { mutableStateOf<Long?>(null) },
                 endDate = remember { mutableStateOf<Long?>(null) }
             )

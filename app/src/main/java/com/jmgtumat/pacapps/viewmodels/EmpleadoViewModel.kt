@@ -1,5 +1,6 @@
 package com.jmgtumat.pacapps.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,10 +24,13 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         viewModelScope.launch {
             setLoading()
             try {
+                Log.d("EmpleadoViewModel", "Fetching empleados")
                 val fetchedEmpleados = empleadoRepository.getEmpleados()
                 _empleados.value = fetchedEmpleados
+                Log.d("EmpleadoViewModel", "Fetched empleados: $fetchedEmpleados")
                 setSuccess()
             } catch (e: Exception) {
+                Log.e("EmpleadoViewModel", "Error fetching empleados", e)
                 setError(e.message)
             }
         }

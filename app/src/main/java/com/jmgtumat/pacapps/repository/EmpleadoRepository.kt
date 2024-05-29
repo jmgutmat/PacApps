@@ -1,5 +1,6 @@
 package com.jmgtumat.pacapps.repository
 
+import android.util.Log
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.GenericTypeIndicator
@@ -12,8 +13,11 @@ class EmpleadoRepository {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("empleados")
 
     suspend fun getEmpleados(): List<Empleado> {
+        Log.d("EmpleadoRepository", "Fetching empleados from Firebase")
         val snapshot = database.get().await()
-        return snapshot.children.mapNotNull { it.getValue(Empleado::class.java) }
+        val empleados = snapshot.children.mapNotNull { it.getValue(Empleado::class.java) }
+        Log.d("EmpleadoRepository", "Fetched empleados: $empleados")
+        return empleados
     }
 
     suspend fun addEmpleado(empleado: Empleado) {

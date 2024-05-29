@@ -18,18 +18,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.CitaEstado
 import com.jmgtumat.pacapps.data.Cliente
+import com.jmgtumat.pacapps.repository.ClienteRepository
 import com.jmgtumat.pacapps.util.formatDateNew
 import com.jmgtumat.pacapps.util.formatTimeNew
-import com.jmgtumat.pacapps.viewmodels.AppViewModel
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 
 @Composable
-fun ClientHomeScreen(navController: NavHostController) {
-    val viewModel: AppViewModel = viewModel()
-    val clienteList by viewModel.clienteViewModel.clientes.observeAsState(emptyList())
+fun ClientHomeScreen(navController: NavController) {
+
+    val clienteViewModel: ClienteViewModel = viewModel(
+        factory = ClienteViewModelFactory(
+            ClienteRepository(/* parámetros de configuración si los hay */),
+        )
+    )
+    val clienteList by clienteViewModel.clientes.observeAsState(emptyList())
     val currentCliente = clienteList.firstOrNull() ?: Cliente()
     var pendingCita by remember { mutableStateOf<Cita?>(null) }
 
@@ -37,7 +44,7 @@ fun ClientHomeScreen(navController: NavHostController) {
         pendingCita = currentCliente.historialCitas.firstOrNull { it.estado == CitaEstado.PENDIENTE }
     }
 
-    ClienteDashboard(navController = navController, viewModel = viewModel) { innerPadding ->
+    ClienteDashboard(navController = navController) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -67,7 +74,7 @@ fun ClientHomeScreen(navController: NavHostController) {
                 Text(text = "No tiene ninguna cita pendiente")
                 Button(
                     onClick = {
-                        navController.navigate(ClienteScreen.NewAppointment.route)
+                        navController.navigate("/new_appointments_screen")
                     },
                     modifier = Modifier.padding(top = 16.dp)
                 ) {

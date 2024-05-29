@@ -15,13 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.navigation.NavHostController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.jmgtumat.pacapps.navigation.redirectToRoleBasedScreen
 import com.jmgtumat.pacapps.util.validateInputFields
 import com.jmgtumat.pacapps.viewmodels.EmailSignUpViewModel
 
 @Composable
-fun EmailSignUpScreen(viewModel: EmailSignUpViewModel, navController: NavHostController) {
+fun EmailSignUpScreen(navController: NavController) {
+    val viewModel: EmailSignUpViewModel = viewModel()
     var nombre by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
@@ -29,6 +31,9 @@ fun EmailSignUpScreen(viewModel: EmailSignUpViewModel, navController: NavHostCon
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val getUserType: (String, (Boolean) -> Unit) -> Unit = { userId, callback ->
+        viewModel.getUserType(userId, callback)
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -71,11 +76,7 @@ fun EmailSignUpScreen(viewModel: EmailSignUpViewModel, navController: NavHostCon
             if (validationResult.isValid) {
                 viewModel.signUpWithEmailAndPassword(nombre, apellidos, telefono, correoElectronico, password) { firebaseUser ->
                     firebaseUser?.let {
-                        viewModel.fetchUserRole(it.uid) { role ->
-                            redirectToRoleBasedScreen(navController, it.uid) { userId, callback ->
-                                callback(role)
-                            }
-                        }
+                        redirectToRoleBasedScreen(navController, it.uid, getUserType)
                     } ?: run {
                         showError = true
                         errorMessage = "Error signing up"
