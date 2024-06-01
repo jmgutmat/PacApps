@@ -5,8 +5,10 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.GenericTypeIndicator
 import com.jmgtumat.pacapps.data.Empleado
-import com.jmgtumat.pacapps.data.HorarioDisponible
+import com.jmgtumat.pacapps.data.HorariosPorDia
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class EmpleadoRepository {
 
@@ -34,12 +36,31 @@ class EmpleadoRepository {
         database.child(empleadoId).removeValue().await()
     }
 
-    suspend fun getHorarioTrabajo(empleadoId: String): Map<String, HorarioDisponible>? {
-        val snapshot = database.child(empleadoId).child("horarioTrabajo").get().await()
-        return snapshot.getValue(object : GenericTypeIndicator<Map<String, HorarioDisponible>>() {})
+    suspend fun getHorariosTrabajo(empleadoId: String): Map<String, HorariosPorDia>? {
+        val snapshot = database.child(empleadoId).child("horariosTrabajo").get().await()
+        val horariosTrabajo = snapshot.getValue(object : GenericTypeIndicator<Map<String, HorariosPorDia>>() {})
+
+        // Asegurarse de que las horas de inicio y fin estén en el formato adecuado (HH:mm)
+        horariosTrabajo?.forEach { (_, horariosPorDia) ->
+            horariosPorDia.manana?.let { intervalo ->
+                intervalo.horaInicio = formatToHHmm(intervalo.horaInicio)
+                intervalo.horaFin = formatToHHmm(intervalo.horaFin)
+            }
+            horariosPorDia.tarde?.let { intervalo ->
+                intervalo.horaInicio = formatToHHmm(intervalo.horaInicio)
+                intervalo.horaFin = formatToHHmm(intervalo.horaFin)
+            }
+        }
+
+        return horariosTrabajo
     }
 
-    suspend fun updateHorarioTrabajo(empleadoId: String, horarioTrabajo: Map<String, HorarioDisponible>) {
-        database.child(empleadoId).child("horarioTrabajo").setValue(horarioTrabajo).await()
+    private fun formatToHHmm(time: String): String {
+        val parsedTime = SimpleDateFormat("HH:mm", Locale.getDefault()).parse(time)
+        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(parsedTime)
+    }
+
+    suspend fun updateHorariosTrabajo(empleadoId: String, horarioTrabajo: Map<String, HorariosPorDia>) {
+        database.child(empleadoId).child("horariosTrabajo").setValue(horarioTrabajo).await()
     }
 }

@@ -1,34 +1,49 @@
 package com.jmgtumat.pacapps.employeemod.employees
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.room.util.copy
 import com.jmgtumat.pacapps.data.Empleado
-import com.jmgtumat.pacapps.data.HorarioDisponible
-import com.jmgtumat.pacapps.employeemod.appointments.TimePickerButton
+import com.jmgtumat.pacapps.data.HorariosPorDia
+import com.jmgtumat.pacapps.employeemod.appointments.HorarioModulo
 import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
 
 @Composable
@@ -69,13 +84,15 @@ fun EmployeeItem(
                 // Más información del empleado puede agregarse aquí
                 // Botones para modificar, eliminar y ver horario de trabajo del empleado
                 Row(
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    ModifyEmployeeButton(empleado, empleadoViewModel)
-                    DeleteEmployeeButton(empleado, empleadoViewModel)
-                    EmployeeHistoryButton(navController, empleado.id)
                     ModifyHorarioButton(empleado, empleadoViewModel) // Nuevo botón para modificar horario
+                    ModifyEmployeeButton(empleado, empleadoViewModel)
+                    EmployeeHistoryButton(navController, empleado.id)
+                    DeleteEmployeeButton(empleado, empleadoViewModel)
+
+
 
                 }
             }
@@ -177,8 +194,8 @@ fun ModifyEmployeeButton(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    Button(onClick = { showDialog = true }) {
-        Text("Modificar")
+    IconButton(onClick = { showDialog = true }) {
+        Icon(Icons.Filled.Edit, contentDescription = "Modificar empleado")
     }
 
     if (showDialog) {
@@ -257,8 +274,8 @@ fun DeleteEmployeeButton(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    Button(onClick = { showDialog = true }) {
-        Text("Eliminar")
+    IconButton(onClick = { showDialog = true }) {
+        Icon(Icons.Filled.Delete, contentDescription = "Eliminar empleado")
     }
 
     if (showDialog) {
@@ -306,15 +323,8 @@ fun DeleteEmployeeDialog(
 
 @Composable
 fun EmployeeHistoryButton(navController: NavController, empleadoId: String) {
-    Button(
-        onClick = {
-            navController.navigate("employee_history/$empleadoId")
-        },
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-    ) {
-        Text("Ver Historial de Citas")
+    IconButton(onClick = { navController.navigate("/empmod_history_screen/$empleadoId") }) {
+        Icon(Icons.Filled.History, contentDescription = "Ver historial de citas")
     }
 }
 
@@ -325,8 +335,8 @@ fun ModifyHorarioButton(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    Button(onClick = { showDialog = true }) {
-        Text("Modificar Horario")
+    IconButton(onClick = { showDialog = true }) {
+        Icon(Icons.Filled.Schedule, contentDescription = "Modificar horario de trabajo")
     }
 
     if (showDialog) {
@@ -342,53 +352,84 @@ fun ModifyHorarioDialog(
     empleadoViewModel: EmpleadoViewModel,
     onDismiss: () -> Unit
 ) {
+    val horariosTrabajo by empleadoViewModel.horariosTrabajo.observeAsState(initial = null)
     var horarioTrabajo by remember { mutableStateOf(empleado.horariosTrabajo) }
+    var selectedDay by remember { mutableStateOf("") }
 
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = { Text("Modificar Horario de Trabajo") },
-        text = {
-            Column {
-                for (dia in listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")) {
-                    val horarioDia = horarioTrabajo[dia] ?: HorarioDisponible()
-                    Text(text = dia)
-                    TimePickerButton(time = horarioDia.horaInicio) { newHoraInicio ->
-                        horarioTrabajo = horarioTrabajo.toMutableMap().apply {
-                            this[dia] = horarioDia.copy(horaInicio = newHoraInicio)
-                        }
-                    }
-                    TimePickerButton(time = horarioDia.horaFin) { newHoraFin ->
-                        horarioTrabajo = horarioTrabajo.toMutableMap().apply {
-                            this[dia] = horarioDia.copy(horaFin = newHoraFin)
-                        }
-                    }
-                    Row {
-                        Checkbox(
-                            checked = horarioDia.disponible,
-                            onCheckedChange = { isChecked ->
-                                horarioTrabajo = horarioTrabajo.toMutableMap().apply {
-                                    this[dia] = horarioDia.copy(disponible = isChecked)
-                                }
+    LaunchedEffect(empleado.id) {
+        empleadoViewModel.fetchHorariosTrabajo(empleado.id)
+    }
+
+    if (horariosTrabajo == null) {
+        CircularProgressIndicator()
+    } else {
+        horarioTrabajo = horariosTrabajo ?: empleado.horariosTrabajo
+
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = { Text("Modificar Horario de Trabajo") },
+            text = {
+                Column {
+                    val diasSemana = listOf("L", "M", "X", "J", "V", "S")
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth().padding(8.dp)
+                    ) {
+                        diasSemana.forEachIndexed { index, dia ->
+                            val dayName = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")[index]
+                            val isSelected = selectedDay == dayName
+                            Box(
+                                modifier = Modifier
+                                    .width(40.dp)
+                                    .height(40.dp)
+                                    .background(
+                                        if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                        shape = CircleShape
+                                    )
+                                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                    .clickable { selectedDay = dayName },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = dia,
+                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
                             }
-                        )
-                        Text("Disponible")
+                        }
+                    }
+                    if (selectedDay.isNotEmpty()) {
+                        val horarioDia = horarioTrabajo[selectedDay] ?: HorariosPorDia()
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = "Mañana", style = MaterialTheme.typography.headlineSmall)
+                        HorarioModulo("Mañana", horarioDia.manana) { updatedManana ->
+                            horarioTrabajo = horarioTrabajo.toMutableMap().apply {
+                                this[selectedDay] = horarioDia.copy(manana = updatedManana)
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = "Tarde", style = MaterialTheme.typography.headlineSmall)
+                        HorarioModulo("Tarde", horarioDia.tarde) { updatedTarde ->
+                            horarioTrabajo = horarioTrabajo.toMutableMap().apply {
+                                this[selectedDay] = horarioDia.copy(tarde = updatedTarde)
+                            }
+                        }
                     }
                 }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    empleadoViewModel.updateHorariosTrabajo(empleado.id, horarioTrabajo)
+                    onDismiss()
+                }) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                Button(onClick = onDismiss) {
+                    Text("Cancelar")
+                }
             }
-        },
-        confirmButton = {
-            Button(onClick = {
-                empleadoViewModel.updateHorarioTrabajo(empleado.id, horarioTrabajo)
-                onDismiss()
-            }) {
-                Text("Guardar")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancelar")
-            }
-        }
-    )
+        )
+    }
 }
-

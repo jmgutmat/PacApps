@@ -1,7 +1,7 @@
 package com.jmgtumat.pacapps.data
 
 data class Cita(
-    val id: String = "", // Modificado para que el ID pueda generarse automáticamente
+    var id: String = "", // Modificado para que el ID pueda generarse automáticamente
     val clienteId: String = "", // ID del cliente que realiza la cita
     val empleadoId: String = "", // ID del empleado que atenderá la cita
     val servicioId: String = "", // ID del servicio para el que se reserva la cita
@@ -13,5 +13,5 @@ data class Cita(
 )
 
 enum class CitaEstado {
-    PENDIENTE, CONFIRMADA, CANCELADA
+    PENDIENTE, CONFIRMADA, CANCELADA, DISPONIBLE
 }

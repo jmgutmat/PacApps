@@ -3,14 +3,14 @@ package com.jmgtumat.pacapps.employeemod.appointments
 import android.app.DatePickerDialog
 import android.widget.DatePicker
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -83,10 +83,7 @@ fun HorarioModulo(title: String, intervalo: Intervalo, onIntervaloChange: (Inter
     var horaInicio by remember { mutableStateOf(intervalo.horaInicio) }
     var horaFin by remember { mutableStateOf(intervalo.horaFin) }
 
-    Column(
-        modifier = Modifier.padding(8.dp)
-    ) {
-        Text(text = title, style = MaterialTheme.typography.titleMedium)
+    Column(modifier = Modifier.padding(8.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(4.dp)
@@ -102,12 +99,15 @@ fun HorarioModulo(title: String, intervalo: Intervalo, onIntervaloChange: (Inter
                 text = "$horaInicio - $horaFin",
                 style = MaterialTheme.typography.bodyMedium
             )
-            Spacer(modifier = Modifier.width(8.dp))
+        }
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().padding(4.dp)
+        ) {
             TimePickerButton(time = horaInicio) { newHoraInicio ->
                 horaInicio = newHoraInicio
                 onIntervaloChange(intervalo.copy(horaInicio = horaInicio, horaFin = horaFin, disponible = checked))
             }
-            Spacer(modifier = Modifier.width(8.dp))
             TimePickerButton(time = horaFin) { newHoraFin ->
                 horaFin = newHoraFin
                 onIntervaloChange(intervalo.copy(horaInicio = horaInicio, horaFin = horaFin, disponible = checked))
@@ -119,8 +119,9 @@ fun HorarioModulo(title: String, intervalo: Intervalo, onIntervaloChange: (Inter
 @Composable
 fun TimePickerButton(time: String, onTimeChange: (String) -> Unit) {
     val context = LocalContext.current
-    val hour = time.split(":")[0].toInt()
-    val minute = time.split(":")[1].toInt()
+    val parts = time.split(":")
+    val hour = parts.getOrNull(0)?.toIntOrNull() ?: 0
+    val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -137,9 +138,10 @@ fun TimePickerButton(time: String, onTimeChange: (String) -> Unit) {
     }
 
     Button(onClick = { showDialog = true }) {
-        Text(text = time)
+        Text(text = time.ifEmpty { "00:00" })
     }
 }
+
 
 @Composable
 fun AddAppointmentButton(navController: NavController) {

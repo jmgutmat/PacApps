@@ -25,10 +25,12 @@ class CitaRepository {
         }
     }
 
-    suspend fun addCita(cita: Cita) {
-        val newCitaRef = database.push()
-        val citaConId = cita.copy(id = newCitaRef.key!!)
-        newCitaRef.setValue(citaConId).await()
+    suspend fun addCita(cita: Cita): String {
+        val newCitaRef = database.push() // Obtiene una nueva referencia con un ID único
+        cita.id = newCitaRef.key ?: "" // Asigna el ID a la cita
+        newCitaRef.setValue(cita).await() // Guarda la cita en la base de datos
+        return newCitaRef.key ?: "" // Devuelve el ID de la nueva cita
+
     }
 
     suspend fun updateCita(cita: Cita) {

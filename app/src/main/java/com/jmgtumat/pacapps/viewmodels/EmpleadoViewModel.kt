@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.jmgtumat.pacapps.data.Empleado
-import com.jmgtumat.pacapps.data.HorarioDisponible
+import com.jmgtumat.pacapps.data.HorariosPorDia
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import kotlinx.coroutines.launch
 
@@ -15,6 +15,9 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
 
     private val _empleados = MutableLiveData<List<Empleado>>()
     val empleados: LiveData<List<Empleado>> get() = _empleados
+
+    private val _horariosTrabajo = MutableLiveData<Map<String, HorariosPorDia>?>()
+    val horariosTrabajo: LiveData<Map<String, HorariosPorDia>?> get() = _horariosTrabajo
 
     init {
         fetchEmpleados()
@@ -24,13 +27,14 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         viewModelScope.launch {
             setLoading()
             try {
-                Log.d("EmpleadoViewModel", "Fetching empleados")
                 val fetchedEmpleados = empleadoRepository.getEmpleados()
                 _empleados.value = fetchedEmpleados
-                Log.d("EmpleadoViewModel", "Fetched empleados: $fetchedEmpleados")
                 setSuccess()
+                // Log de los horarios de trabajo del primer empleado
+                fetchedEmpleados.firstOrNull()?.let { empleado ->
+                    Log.d("EmpleadoViewModel", "Horarios de trabajo del primer empleado: ${empleado.horariosTrabajo}")
+                }
             } catch (e: Exception) {
-                Log.e("EmpleadoViewModel", "Error fetching empleados", e)
                 setError(e.message)
             }
         }
@@ -69,24 +73,22 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         }
     }
 
-    fun getHorarioTrabajo(empleadoId: String): LiveData<Map<String, HorarioDisponible>?> {
-        val horarioLiveData = MutableLiveData<Map<String, HorarioDisponible>?>()
+    fun fetchHorariosTrabajo(empleadoId: String) {
         viewModelScope.launch {
             try {
-                val horarioTrabajo = empleadoRepository.getHorarioTrabajo(empleadoId)
-                horarioLiveData.value = horarioTrabajo
+                val horarioTrabajo = empleadoRepository.getHorariosTrabajo(empleadoId)
+                _horariosTrabajo.value = horarioTrabajo
                 setSuccess()
             } catch (e: Exception) {
                 setError(e.message)
             }
         }
-        return horarioLiveData
     }
 
-    fun updateHorarioTrabajo(empleadoId: String, horarioTrabajo: Map<String, HorarioDisponible>) {
+    fun updateHorariosTrabajo(empleadoId: String, horariosTrabajo: Map<String, HorariosPorDia>) {
         viewModelScope.launch {
             try {
-                empleadoRepository.updateHorarioTrabajo(empleadoId, horarioTrabajo)
+                empleadoRepository.updateHorariosTrabajo(empleadoId, horariosTrabajo)
             } catch (e: Exception) {
                 setError(e.message)
             }

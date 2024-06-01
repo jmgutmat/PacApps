@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.jmgtumat.pacapps.data.Cita
+import com.jmgtumat.pacapps.data.CitaEstado
 import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.data.Empleado
 import com.jmgtumat.pacapps.data.Servicio
@@ -32,11 +34,26 @@ class ClienteViewModel(
     private val _historialCitas = MutableLiveData<List<Cita>>()
     val historialCitas: LiveData<List<Cita>> get() = _historialCitas
 
+    // Añade una propiedad para el cliente autenticado
+    private val _clienteId = MutableLiveData<String>()
+    val clienteId: LiveData<String> get() = _clienteId
+
+    private val _citaPendiente = MutableLiveData<Cita?>()
+    val citaPendiente: LiveData<Cita?> get() = _citaPendiente
 
     init {
         fetchClientes()
         fetchServicios()
         fetchEmpleados()
+        // Aquí deberías inicializar el ID del cliente autenticado
+        _clienteId.value = getAuthenticatedClienteId() // Función para obtener el ID del cliente autenticado
+    }
+
+    private fun getAuthenticatedClienteId(): String {
+        // Aquí deberías implementar la lógica para obtener el ID del cliente autenticado
+        // Por ejemplo, si usas Firebase Authentication:
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        return currentUser?.uid ?: throw IllegalStateException("User not authenticated")
     }
 
     private fun fetchClientes() {
@@ -78,6 +95,8 @@ class ClienteViewModel(
         }
     }
 
+
+
     fun insertCliente(cliente: Cliente) {
         viewModelScope.launch {
             try {
@@ -111,11 +130,29 @@ class ClienteViewModel(
         }
     }
 
+    fun fetchHistorialCitasClienteAutenticado() {
+        viewModelScope.launch {
+            setLoading()
+            try {
+                val clienteId = _clienteId.value ?: return@launch
+                val fetchedHistorialCitas = clienteRepository.getHistorialCitas(clienteId)
+                _historialCitas.value = fetchedHistorialCitas
+
+                // Verificar si hay alguna cita pendiente
+                val citaPendiente = fetchedHistorialCitas.firstOrNull { it.estado == CitaEstado.PENDIENTE }
+                _citaPendiente.value = citaPendiente
+
+                setSuccess()
+            } catch (e: Exception) {
+                setError(e.message)
+            }
+        }
+    }
+
     fun fetchHistorialCitas(clienteId: String) {
         viewModelScope.launch {
             setLoading()
             try {
-                // Aquí recuperamos el historial de citas del cliente
                 val fetchedHistorialCitas = clienteRepository.getHistorialCitas(clienteId)
                 _historialCitas.value = fetchedHistorialCitas
                 setSuccess()
@@ -124,7 +161,19 @@ class ClienteViewModel(
             }
         }
     }
+
+    fun updateHistorialCitas(clienteId: String, citas: List<Cita>) {
+        viewModelScope.launch {
+            try {
+                clienteRepository.updateHistorialCitas(clienteId, citas)
+            } catch (e: Exception) {
+                setError(e.message)
+            }
+        }
+    }
+
 }
+
 
 class ClienteViewModelFactory(private val clienteRepository: ClienteRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

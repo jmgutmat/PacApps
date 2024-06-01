@@ -1,5 +1,6 @@
 package com.jmgtumat.pacapps.repository
 
+import android.util.Log
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.jmgtumat.pacapps.data.Cita
@@ -31,10 +32,18 @@ class ClienteRepository {
         database.child(clienteId).removeValue().await()
     }
 
+    suspend fun updateHistorialCitas(clienteId: String, citas: List<Cita>) {
+        val citaIds = citas.map { it.id } // Map the list of Cita objects to their IDs
+        Log.d("ClienteRepository", "Actualizando historial de citas para $clienteId con los IDs: $citaIds")
+        database.child(clienteId).child("historialCitas").setValue(citaIds).await()
+    }
+
     suspend fun getHistorialCitas(clienteId: String): List<Cita> {
         val clienteCitasSnapshot = database.child(clienteId).child("historialCitas").get().await()
-        val citaIds = clienteCitasSnapshot.children.map { it.getValue(String::class.java)!! }
+        val citaIds = clienteCitasSnapshot.children.mapNotNull { it.getValue(String::class.java) }
         val citas = mutableListOf<Cita>()
+
+        Log.d("ClienteRepository", "Obteniendo historial de citas para $clienteId con los IDs: $citaIds")
 
         citaIds.forEach { citaId ->
             val citaSnapshot = citasDatabase.child(citaId).get().await()
@@ -44,4 +53,5 @@ class ClienteRepository {
 
         return citas
     }
+
 }
