@@ -15,6 +15,11 @@ import com.jmgtumat.pacapps.util.SearchBar
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 
+/**
+ * Pantalla para administrar clientes.
+ *
+ * @param navController El controlador de navegación.
+ */
 @Composable
 fun ManageClientsScreen(navController: NavController) {
     val clienteViewModel: ClienteViewModel = viewModel(
@@ -25,8 +30,12 @@ fun ManageClientsScreen(navController: NavController) {
     val clientes by clienteViewModel.clientes.observeAsState(emptyList())
     var searchQuery by remember { mutableStateOf("") }
 
+    /**
+     * Diseño de la pantalla de administración de clientes.
+     */
     EmpleadoDashboard(navController = navController) {
         Column {
+            // Barra de búsqueda para filtrar clientes
             SearchBar(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { newQuery ->
@@ -34,10 +43,13 @@ fun ManageClientsScreen(navController: NavController) {
                 }
             )
 
+            // Filtrar clientes según la consulta de búsqueda
             val filteredClientes = filterClientes(clientes, searchQuery)
 
+            // Botón para añadir un nuevo cliente
             AddClientButton(navController, clienteViewModel)
 
+            // Mostrar la lista de clientes filtrada
             filteredClientes.forEach { cliente ->
                 ClientItem(cliente, clienteViewModel, navController)
             }

@@ -10,8 +10,15 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlin.math.min
 
+/**
+ * Calcula las fechas disponibles para una cita basándose en el servicio, las citas existentes y los horarios de los empleados.
+ *
+ * @param servicio el servicio para el que se están calculando las fechas disponibles.
+ * @param citas lista de citas existentes.
+ * @param empleados lista de empleados con sus horarios de trabajo.
+ * @return una lista de objetos Calendar representando las fechas disponibles.
+ */
 fun calculateAvailableDates(servicio: Servicio, citas: List<Cita>, empleados: List<Empleado>): List<Calendar> {
     Log.d("NewAppointmentScreen", "Calculating available dates for service: ${servicio.nombre}")
 
@@ -70,7 +77,15 @@ fun calculateAvailableDates(servicio: Servicio, citas: List<Cita>, empleados: Li
     return availableDates
 }
 
-
+/**
+ * Calcula los intervalos de tiempo disponibles para una cita basándose en los intervalos de trabajo, las citas existentes y la duración del servicio.
+ *
+ * @param date el día para el que se están calculando los intervalos.
+ * @param slots los intervalos de trabajo disponibles.
+ * @param citas las citas existentes para el día dado.
+ * @param duracionServicio la duración del servicio en minutos.
+ * @return una lista de objetos Intervalo representando los intervalos disponibles.
+ */
 fun calculateAvailableIntervals(date: Calendar, slots: List<Intervalo>, citas: List<Cita>, duracionServicio: Int): List<Intervalo> {
     val availableIntervals = mutableListOf<Intervalo>()
     val df = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -101,24 +116,15 @@ fun calculateAvailableIntervals(date: Calendar, slots: List<Intervalo>, citas: L
     return availableIntervals
 }
 
-
-
-//private fun hasAvailableSlots(date: Calendar, servicio: Servicio, citas: List<Cita>, empleados: List<Empleado>): Boolean {
-//    return empleados.any { empleado ->
-//        val workSchedule = empleado.horariosTrabajo[date.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
-//            ?.toString()]
-//        workSchedule != null && calculateAvailableSlotsForEmployee(date, servicio, citas, workSchedule).isNotEmpty()
-//    }
-//}
-
-//fun calculateAvailableSlots(date: Calendar, servicio: Servicio, citas: List<Cita>, empleados: List<Empleado>): List<Calendar> {
-//    Log.d("NewAppointmentScreen", "Calculating available slots for date: ${date.time} and service: ${servicio.nombre}")
-//    return empleados.flatMap { empleado ->
-//        val workSchedule = empleado.horariosTrabajo[date.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
-//            ?.toString()]
-//        workSchedule?.let { calculateAvailableSlotsForEmployee(date, servicio, citas, it) } ?: emptyList()
-//    }
-//}
+/**
+ * Calcula los intervalos de tiempo disponibles para un servicio en un día específico, para todos los empleados, teniendo en cuenta las citas existentes.
+ *
+ * @param date el día para el que se están calculando los intervalos.
+ * @param servicio el servicio para el que se están calculando los intervalos.
+ * @param citas las citas existentes.
+ * @param empleados la lista de empleados.
+ * @return una lista de objetos Calendar representando los intervalos de tiempo disponibles.
+ */
 fun calculateAvailableSlots(date: Calendar, servicio: Servicio, citas: List<Cita>, empleados: List<Empleado>): List<Calendar> {
     Log.d("NewAppointmentScreen", "Calculating available slots for date: ${date.time} and service: ${servicio.nombre}")
     val availableSlots = mutableListOf<Calendar>()
@@ -135,6 +141,15 @@ fun calculateAvailableSlots(date: Calendar, servicio: Servicio, citas: List<Cita
     return availableSlots
 }
 
+/**
+ * Calcula los intervalos de tiempo disponibles para un empleado en un día específico, para un horario dado, teniendo en cuenta las citas existentes.
+ *
+ * @param date el día para el que se están calculando los intervalos.
+ * @param servicio el servicio para el que se están calculando los intervalos.
+ * @param citas las citas existentes.
+ * @param horariosPorDia los horarios de trabajo del empleado para el día dado.
+ * @return una lista de objetos Calendar representando los intervalos de tiempo disponibles.
+ */
 private fun calculateAvailableSlotsForEmployee(date: Calendar, servicio: Servicio, citas: List<Cita>, horariosPorDia: HorariosPorDia): List<Calendar> {
     val availableSlots = mutableListOf<Calendar>()
     val intervals = listOf(horariosPorDia.manana, horariosPorDia.tarde)
@@ -172,23 +187,47 @@ private fun calculateAvailableSlotsForEmployee(date: Calendar, servicio: Servici
     return availableSlots
 }
 
-
-private fun isSlotAvailable(slotStart: Calendar, slotEnd: Calendar, servicio: Servicio, citas: List<Cita>): Boolean {
-    return citas.none { cita ->
-        val citaStart = Calendar.getInstance().apply { timeInMillis = cita.horaInicio }
-        val citaEnd = Calendar.getInstance().apply { timeInMillis = cita.horaInicio + cita.duracion * 60 * 1000 }
-
-        (slotStart.before(citaEnd) && slotEnd.after(citaStart)) ||
-                (slotEnd.after(citaStart) && slotStart.before(citaEnd)) ||
-                (min(slotStart.timeInMillis - citaEnd.timeInMillis, citaStart.timeInMillis - slotEnd.timeInMillis) < 5 * 60 * 1000)
-    }
-}
-
+/**
+ * Verifica si una fecha dada es el mismo día que una fecha de calendario.
+ *
+ * @param date1 la fecha en milisegundos.
+ * @param date2 el objeto Calendar que representa la fecha.
+ * @return true si son el mismo día, de lo contrario false.
+ */
 fun isSameDay(date1: Long, date2: Calendar): Boolean {
     val calendar1 = Calendar.getInstance().apply { timeInMillis = date1 }
     return calendar1.get(Calendar.YEAR) == date2.get(Calendar.YEAR) &&
             calendar1.get(Calendar.DAY_OF_YEAR) == date2.get(Calendar.DAY_OF_YEAR)
 }
+
+
+//private fun hasAvailableSlots(date: Calendar, servicio: Servicio, citas: List<Cita>, empleados: List<Empleado>): Boolean {
+//    return empleados.any { empleado ->
+//        val workSchedule = empleado.horariosTrabajo[date.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
+//            ?.toString()]
+//        workSchedule != null && calculateAvailableSlotsForEmployee(date, servicio, citas, workSchedule).isNotEmpty()
+//    }
+//}
+
+//fun calculateAvailableSlots(date: Calendar, servicio: Servicio, citas: List<Cita>, empleados: List<Empleado>): List<Calendar> {
+//    Log.d("NewAppointmentScreen", "Calculating available slots for date: ${date.time} and service: ${servicio.nombre}")
+//    return empleados.flatMap { empleado ->
+//        val workSchedule = empleado.horariosTrabajo[date.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
+//            ?.toString()]
+//        workSchedule?.let { calculateAvailableSlotsForEmployee(date, servicio, citas, it) } ?: emptyList()
+//    }
+//}
+
+//private fun isSlotAvailable(slotStart: Calendar, slotEnd: Calendar, servicio: Servicio, citas: List<Cita>): Boolean {
+//    return citas.none { cita ->
+//        val citaStart = Calendar.getInstance().apply { timeInMillis = cita.horaInicio }
+//        val citaEnd = Calendar.getInstance().apply { timeInMillis = cita.horaInicio + cita.duracion * 60 * 1000 }
+//
+//        (slotStart.before(citaEnd) && slotEnd.after(citaStart)) ||
+//                (slotEnd.after(citaStart) && slotStart.before(citaEnd)) ||
+//                (min(slotStart.timeInMillis - citaEnd.timeInMillis, citaStart.timeInMillis - slotEnd.timeInMillis) < 5 * 60 * 1000)
+//    }
+//}
 
 /*
 package com.jmgtumat.pacapps.clientmod

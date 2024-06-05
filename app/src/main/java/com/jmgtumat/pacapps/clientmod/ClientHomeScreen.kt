@@ -31,20 +31,29 @@ import com.jmgtumat.pacapps.viewmodels.CitaViewModelFactory
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 
+/**
+ * [ClientHomeScreen] es la pantalla principal del cliente que muestra su información y
+ * la cita pendiente (si la hay).
+ *
+ * @param navController el controlador de navegación para la navegación dentro de la aplicación.
+ */
 @Composable
 fun ClientHomeScreen(navController: NavController) {
+    // Obtiene el ViewModel del cliente
     val clienteViewModel: ClienteViewModel = viewModel(
         factory = ClienteViewModelFactory(ClienteRepository())
     )
+    // Obtiene el ViewModel de la cita
     val citaViewModel: CitaViewModel = viewModel(
         factory = CitaViewModelFactory(CitaRepository())
     )
 
+    // Observa el ID del cliente y la cita pendiente
     val clienteId by clienteViewModel.clienteId.observeAsState()
     val pendingCita by clienteViewModel.citaPendiente.observeAsState()
     val serviciosList by clienteViewModel.servicios.observeAsState(emptyList())
 
-
+    // Obtiene los datos del cliente y la cita pendiente cuando cambia el ID del cliente
     LaunchedEffect(clienteId) {
         clienteId?.let {
             Log.d("ClientHomeScreen", "Fetching data for clienteId: $it")
@@ -53,6 +62,7 @@ fun ClientHomeScreen(navController: NavController) {
         }
     }
 
+    // Renderiza la interfaz de usuario
     ClienteDashboard(navController = navController) { innerPadding ->
         Column(
             modifier = Modifier
@@ -63,6 +73,7 @@ fun ClientHomeScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Log.d("ClientHomeScreen", "Rendering UI with pendingCita: $pendingCita")
+            // Muestra la cita pendiente si la hay
             pendingCita?.let { cita ->
                 val servicio = serviciosList.find { it.id == cita.servicioId }
 
@@ -94,6 +105,7 @@ fun ClientHomeScreen(navController: NavController) {
                     }
                 }
             } ?: run {
+                // Si no hay cita pendiente, muestra un mensaje y un botón para crear una nueva cita
                 Text(text = "No tiene ninguna cita pendiente")
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(

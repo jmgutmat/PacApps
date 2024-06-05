@@ -24,9 +24,15 @@ import com.jmgtumat.pacapps.viewmodels.CitaViewModelFactory
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 
+/**
+ * Pantalla que muestra el historial de citas de un cliente para el módulo del empleado.
+ *
+ * @param clienteId El ID del cliente del cual se mostrará el historial de citas.
+ * @param navController El controlador de navegación.
+ */
 @Composable
 fun EmpModHistoryScreen(clienteId: String, navController: NavController) {
-    Log.d("EmpModHistoryScreen", "Cliente ID: $clienteId") // Agregamos un log aquí para verificar el ID del cliente
+    Log.d("EmpModHistoryScreen", "Cliente ID: $clienteId") // Se agrega un registro aquí para verificar el ID del cliente
     val clienteViewModel: ClienteViewModel = viewModel(
         factory = ClienteViewModelFactory(
             ClienteRepository(),
@@ -47,7 +53,7 @@ fun EmpModHistoryScreen(clienteId: String, navController: NavController) {
         clienteViewModel.fetchHistorialCitas(clienteId)
     }
 
-
+    // Diseño de la pantalla utilizando EmpleadoDashboard
     EmpleadoDashboard(navController = navController) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -60,6 +66,7 @@ fun EmpModHistoryScreen(clienteId: String, navController: NavController) {
                 Log.d("EmpModHistoryScreen", "Cita: $cita")
                 val servicio = serviciosList.find { it.id == cita.servicioId }
                 val empleado = empleadosList.find { it.id == cita.empleadoId }
+                // Se muestra cada cita del historial utilizando ClientAppointmentItem
                 ClientAppointmentItem(cita,
                     servicio?.nombre ?: "Desconocido",
                     empleado?.nombre ?: "Desconocido")

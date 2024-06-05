@@ -25,15 +25,26 @@ import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.util.formatDateNew
 import com.jmgtumat.pacapps.util.formatTimeNew
 
+/**
+ * Componente composable que representa un elemento de cita para el empleado, mostrando información
+ * relevante sobre la cita y proporcionando opciones para confirmarla o cancelarla.
+ *
+ * @param cita La cita que se va a mostrar.
+ * @param onConfirm La función de callback que se llama cuando se confirma la cita.
+ * @param onCancel La función de callback que se llama cuando se cancela la cita.
+ */
 @Composable
 fun EmployeeAppointmentItem(
     cita: Cita,
     onConfirm: () -> Unit,
     onCancel: () -> Unit
 ) {
+    // Estado para controlar la visibilidad del diálogo de confirmación para cancelar la cita
     var showDialog by remember { mutableStateOf(false) }
+    // Estado para controlar si el componente está expandido
     var expanded by remember { mutableStateOf(false) }
 
+    // Componente de tarjeta que contiene la información de la cita
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -44,12 +55,14 @@ fun EmployeeAppointmentItem(
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Muestra los detalles de la cita
             Text(text = "Servicio: ${cita.servicioId}", style = MaterialTheme.typography.titleLarge)
             Text(text = "Empleado: ${cita.empleadoId}", style = MaterialTheme.typography.bodyLarge)
             Text(text = "Fecha: ${formatDateNew(cita.fecha)}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Hora: ${formatTimeNew(cita.horaInicio)}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Estado: ${cita.estado}", style = MaterialTheme.typography.bodyMedium)
 
+            // Botones para confirmar o cancelar la cita
             Row {
                 Button(onClick = onConfirm) {
                     Text("Confirmar")
@@ -62,6 +75,7 @@ fun EmployeeAppointmentItem(
         }
     }
 
+    // Diálogo de confirmación para cancelar la cita
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },

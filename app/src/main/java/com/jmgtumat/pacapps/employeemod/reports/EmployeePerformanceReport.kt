@@ -12,6 +12,14 @@ import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.CitaEstado
 import com.jmgtumat.pacapps.data.Empleado
 
+/**
+ * Clase de datos que representa un informe de rendimiento de un empleado.
+ *
+ * @property employeeName El nombre completo del empleado.
+ * @property totalAppointments El número total de citas del empleado.
+ * @property confirmedAppointments El número de citas confirmadas del empleado.
+ * @property canceledAppointments El número de citas canceladas del empleado.
+ */
 data class EmployeePerformanceReport(
     val employeeName: String,
     val totalAppointments: Int,
@@ -19,6 +27,13 @@ data class EmployeePerformanceReport(
     val canceledAppointments: Int
 )
 
+/**
+ * Genera un informe de rendimiento de un empleado a partir de las citas proporcionadas.
+ *
+ * @param empleado El empleado para el cual se genera el informe.
+ * @param citas La lista de citas relacionadas con el empleado.
+ * @return El informe de rendimiento del empleado.
+ */
 suspend fun generateEmployeePerformanceReport(
     empleado: Empleado,
     citas: List<Cita>
@@ -36,6 +51,11 @@ suspend fun generateEmployeePerformanceReport(
     )
 }
 
+/**
+ * Composable que muestra el contenido del informe de rendimiento de los empleados.
+ *
+ * @param report La lista de informes de rendimiento de empleados a mostrar.
+ */
 @Composable
 fun EmployeePerformanceReportContent(report: List<EmployeePerformanceReport>) {
     Column(

@@ -19,6 +19,12 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Componente Composable para seleccionar fechas mediante un diálogo de selección de fecha.
+ * @param context El contexto de la aplicación.
+ * @param startDate El estado mutable que representa la fecha de inicio seleccionada.
+ * @param endDate El estado mutable que representa la fecha de fin seleccionada.
+ */
 @Composable
 fun DateSelector(
     context: Context,
@@ -84,8 +90,11 @@ fun DateSelector(
     }
 }
 
-
-fun Long.toFormattedString(): String {
+/**
+ * Convierte un valor de tipo Long que representa una fecha en formato de cadena de caracteres con el formato "dd/MM/yyyy".
+ * @return La fecha formateada como una cadena de caracteres.
+ */
+fun Long?.toFormattedString(): String {
     return if (this != null) {
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(this))
     } else {

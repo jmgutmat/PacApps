@@ -24,20 +24,30 @@ import com.jmgtumat.pacapps.repository.ClienteRepository
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 
+/**
+ * Pantalla para mostrar y editar el perfil del cliente.
+ *
+ * @param navController El controlador de navegación.
+ */
 @Composable
 fun ProfileScreen(navController: NavController) {
+    // ViewModel para obtener y actualizar información del cliente
     val clienteViewModel: ClienteViewModel = viewModel(
         factory = ClienteViewModelFactory(
-            ClienteRepository(/* parámetros de configuración si los hay */),
+            ClienteRepository(),
         )
     )
+
+    // Estado del cliente y sus datos actuales
     val clienteList by clienteViewModel.clientes.observeAsState(emptyList())
     val currentCliente = clienteList.firstOrNull() ?: Cliente()
 
+    // Estados para los campos del perfil del cliente
     var nombre by remember { mutableStateOf(currentCliente.nombre) }
     var apellidos by remember { mutableStateOf(currentCliente.apellidos) }
     var telefono by remember { mutableStateOf(currentCliente.telefono) }
 
+    // Mostrar el contenido en el dashboard del cliente
     ClienteDashboard(navController = navController) { innerPadding ->
         Column(
             modifier = Modifier
@@ -47,6 +57,7 @@ fun ProfileScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Campos de entrada para editar el perfil del cliente
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
@@ -65,6 +76,7 @@ fun ProfileScreen(navController: NavController) {
                 label = { Text("Teléfono") }
             )
 
+            // Botón para actualizar los datos del cliente
             Button(onClick = {
                 val updatedCliente = currentCliente.copy(
                     nombre = nombre,
@@ -76,11 +88,12 @@ fun ProfileScreen(navController: NavController) {
                 Text("Actualizar Datos")
             }
 
+            // Botón para cerrar la sesión del cliente
             Button(
                 onClick = {
                     FirebaseAuth.getInstance().signOut()
                     navController.navigate("/main_screen") {
-                        popUpTo(0) // Clear back stack
+                        popUpTo(0) // Limpiar la pila de retroceso
                     }
                 },
                 modifier = Modifier.padding(top = 16.dp)

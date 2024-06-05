@@ -26,20 +26,31 @@ import com.jmgtumat.pacapps.data.Servicio
 import com.jmgtumat.pacapps.viewmodels.ServicioViewModel
 
 
+/**
+ * Composable que muestra una lista de servicios.
+ *
+ * @param servicios La lista de servicios a mostrar.
+ * @param servicioViewModel El ViewModel utilizado para realizar operaciones en los servicios.
+ */
 @Composable
 fun ServicesList(servicios: List<Servicio>, servicioViewModel: ServicioViewModel) {
     LazyColumn {
         items(servicios) { servicio ->
-            ServiceItem(servicio, servicioViewModel) // Pasar servicioViewModel como un parámetro adicional
+            ServiceItem(servicio, servicioViewModel)
         }
     }
 }
 
-
+/**
+ * Composable que muestra un elemento individual de servicio en la lista.
+ *
+ * @param servicio El servicio a mostrar.
+ * @param servicioViewModel El ViewModel utilizado para realizar operaciones en los servicios.
+ */
 @Composable
 fun ServiceItem(
     servicio: Servicio,
-    servicioViewModel: ServicioViewModel // Agregamos el parámetro ServicioViewModel
+    servicioViewModel: ServicioViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -61,7 +72,7 @@ fun ServiceItem(
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
-                    text = "$${servicio.precio}",
+                    text = "${servicio.precio}€",
                     style = MaterialTheme.typography.headlineSmall
                 )
             }
@@ -74,7 +85,6 @@ fun ServiceItem(
                     text = "Duración: ${servicio.duracion} minutos",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                // Botones para modificar y eliminar el servicio
                 Row(
                     horizontalArrangement = Arrangement.End,
                     modifier = Modifier.fillMaxWidth()
@@ -87,6 +97,11 @@ fun ServiceItem(
     }
 }
 
+/**
+ * Composable que muestra un botón para agregar un nuevo servicio.
+ *
+ * @param servicioViewModel El ViewModel utilizado para realizar operaciones en los servicios.
+ */
 @Composable
 fun AddServiceButton(
     servicioViewModel: ServicioViewModel
@@ -108,6 +123,12 @@ fun AddServiceButton(
     }
 }
 
+/**
+ * Composable que muestra un botón para modificar un servicio existente.
+ *
+ * @param servicio El servicio que se modificará.
+ * @param servicioViewModel El ViewModel utilizado para realizar operaciones en los servicios.
+ */
 @Composable
 fun ModifyServiceButton(
     servicio: Servicio,
@@ -131,6 +152,12 @@ fun ModifyServiceButton(
     }
 }
 
+/**
+ * Composable que muestra un botón para eliminar un servicio existente.
+ *
+ * @param servicio El servicio que se eliminará.
+ * @param servicioViewModel El ViewModel utilizado para realizar operaciones en los servicios.
+ */
 @Composable
 fun DeleteServiceButton(
     servicio: Servicio,
@@ -154,6 +181,12 @@ fun DeleteServiceButton(
     }
 }
 
+/**
+ * Composable que muestra un diálogo para agregar un nuevo servicio.
+ *
+ * @param servicioViewModel El ViewModel utilizado para realizar operaciones en los servicios.
+ * @param onDismiss La acción a realizar cuando se descarta el diálogo.
+ */
 @Composable
 fun AddServiceDialog(
     servicioViewModel: ServicioViewModel,
@@ -221,6 +254,13 @@ fun AddServiceDialog(
     }
 }
 
+/**
+ * Composable que muestra un diálogo para modificar un servicio existente.
+ *
+ * @param servicio El servicio que se modificará.
+ * @param servicioViewModel El ViewModel utilizado para realizar operaciones en los servicios.
+ * @param onDismiss La acción a realizar cuando se descarta el diálogo.
+ */
 @Composable
 fun ModifyServiceDialog(
     servicio: Servicio,
@@ -289,6 +329,13 @@ fun ModifyServiceDialog(
     }
 }
 
+/**
+ * Composable que muestra un diálogo para eliminar un servicio existente.
+ *
+ * @param servicio El servicio que se eliminará.
+ * @param servicioViewModel El ViewModel utilizado para realizar operaciones en los servicios.
+ * @param onDismiss La acción a realizar cuando se descarta el diálogo.
+ */
 @Composable
 fun DeleteServiceDialog(
     servicio: Servicio,

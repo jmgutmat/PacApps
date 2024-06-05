@@ -15,6 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+/**
+ * Componente Composable que representa una barra de búsqueda.
+ * @param searchQuery La consulta de búsqueda actual.
+ * @param onSearchQueryChange La acción que se ejecuta cuando cambia la consulta de búsqueda.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
@@ -28,7 +33,7 @@ fun SearchBar(
             .fillMaxWidth()
             .padding(8.dp),
         label = { Text("Buscar") },
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Icono de búsqueda") },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = Color.Transparent,
             unfocusedBorderColor = Color.Transparent,

@@ -13,14 +13,20 @@ import com.jmgtumat.pacapps.repository.ClienteRepository
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import kotlinx.coroutines.launch
 
-class CitaViewModel(private val citaRepository: CitaRepository,
-                    private val clienteRepository: ClienteRepository,
-                    private val empleadoRepository: EmpleadoRepository
+/**
+ * ViewModel para manejar la lógica relacionada con las citas.
+ * @param citaRepository Repositorio de citas para interactuar con la capa de datos.
+ * @param clienteRepository Repositorio de clientes para interactuar con la capa de datos.
+ * @param empleadoRepository Repositorio de empleados para interactuar con la capa de datos.
+ */
+class CitaViewModel(
+    private val citaRepository: CitaRepository,
+    private val clienteRepository: ClienteRepository,
+    private val empleadoRepository: EmpleadoRepository
 ) : BaseViewModel() {
 
     private val _citas = MutableLiveData<List<Cita>>()
     val citas: LiveData<List<Cita>> get() = _citas
-
 
     init {
         fetchCitas()
@@ -65,6 +71,11 @@ class CitaViewModel(private val citaRepository: CitaRepository,
         }
     }
 
+    /**
+     * Método suspendido para obtener citas por ID de empleado y fecha.
+     * @param empleadoId ID del empleado.
+     * @param dateInMillis Fecha en milisegundos.
+     */
     suspend fun fetchCitasByEmpleadoIdAndDate(empleadoId: String, dateInMillis: Long) {
         try {
             setLoading()
@@ -76,42 +87,38 @@ class CitaViewModel(private val citaRepository: CitaRepository,
         }
     }
 
-
-
+    /**
+     * Método para insertar una nueva cita.
+     * @param cita Cita a insertar.
+     * @param clienteId ID del cliente asociado a la cita.
+     */
     fun insertCita(cita: Cita, clienteId: String) {
         viewModelScope.launch {
             try {
                 Log.d("CitaViewModel", "Fecha de la cita: ${cita.fecha}")
-                val citaId = citaRepository.addCita(cita) // Agrega la cita y obtiene su ID
-                cita.id = citaId // Asegura que la cita tenga el ID asignado
+                val citaId = citaRepository.addCita(cita)
+                cita.id = citaId
                 fetchCitas()
-                Log.d("CitaViewModel", "Cita añadida: $cita")
 
-                // Obtener el historial de citas actual del cliente
                 val historialCitas = clienteRepository.getHistorialCitas(clienteId).toMutableList()
-                Log.d("CitaViewModel", "Historial de citas antes de agregar: $historialCitas")
-
-                // Agregar la nueva cita al historial de citas
                 historialCitas.add(cita)
-                Log.d("CitaViewModel", "Historial de citas después de agregar: $historialCitas")
 
-                // Actualizar el historial de citas del cliente con los IDs correctos
                 clienteRepository.updateHistorialCitas(clienteId, historialCitas)
-                Log.d("CitaViewModel", "Historial de citas actualizado para el cliente $clienteId")
 
-                // Actualizar citas asignadas del empleado
                 val empleadoId = cita.empleadoId
                 val citasAsignadas = empleadoRepository.getCitasAsignadas(empleadoId).map { it.id }.toMutableList()
                 citasAsignadas.add(cita.id)
                 empleadoRepository.updateCitasAsignadas(empleadoId, citasAsignadas)
-                Log.d("CitaViewModel", "Citas asignadas del empleado $empleadoId actualizadas")
             } catch (e: Exception) {
                 setError(e.message)
             }
         }
     }
 
-
+    /**
+     * Método para actualizar una cita existente.
+     * @param cita Cita a actualizar.
+     */
     fun updateCita(cita: Cita) {
         viewModelScope.launch {
             try {
@@ -123,27 +130,30 @@ class CitaViewModel(private val citaRepository: CitaRepository,
         }
     }
 
-//    fun deleteCita(citaId: String) {
-//        viewModelScope.launch {
-//            try {
-//                citaRepository.deleteCita(citaId)
-//                fetchCitas()
-//            } catch (e: Exception) {
-//                setError(e.message)
-//            }
-//        }
-//    }
-
+    /**
+     * Método suspendido para obtener una cita por su ID.
+     * @param citaId ID de la cita.
+     * @return La cita correspondiente al ID proporcionado.
+     */
     suspend fun getCitaById(citaId: String): Cita {
         return citaRepository.getCitaById(citaId)
     }
 
+    /**
+     * Método para obtener citas dentro de un rango de fechas.
+     * @param startDate Fecha de inicio del rango en milisegundos.
+     * @param endDate Fecha de fin del rango en milisegundos.
+     * @return Lista de citas dentro del rango de fechas.
+     */
     fun getCitasByDateRange(startDate: Long, endDate: Long): List<Cita> {
         val citas = _citas.value ?: emptyList()
         return citas.filter { it.fecha in startDate..endDate }
     }
 
-
+    /**
+     * Método para confirmar una cita.
+     * @param citaId ID de la cita a confirmar.
+     */
     fun confirmarCita(citaId: String) {
         viewModelScope.launch {
             try {
@@ -156,6 +166,10 @@ class CitaViewModel(private val citaRepository: CitaRepository,
         }
     }
 
+    /**
+     * Método para cancelar una cita.
+     * @param citaId ID de la cita a cancelar.
+     */
     fun cancelarCita(citaId: String) {
         viewModelScope.launch {
             try {
@@ -170,6 +184,10 @@ class CitaViewModel(private val citaRepository: CitaRepository,
 
 }
 
+/**
+ * Clase Factory para proporcionar una instancia de [CitaViewModel].
+ * @param citaRepository Repositorio de citas para la inyección de dependencias.
+ */
 class CitaViewModelFactory(private val citaRepository: CitaRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CitaViewModel::class.java)) {
@@ -179,3 +197,13 @@ class CitaViewModelFactory(private val citaRepository: CitaRepository) : ViewMod
     }
 }
 
+//    fun deleteCita(citaId: String) {
+//        viewModelScope.launch {
+//            try {
+//                citaRepository.deleteCita(citaId)
+//                fetchCitas()
+//            } catch (e: Exception) {
+//                setError(e.message)
+//            }
+//        }
+//    }

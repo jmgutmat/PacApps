@@ -59,9 +59,6 @@ fun AppNavigation() {
         composable(AppScreens.ManageEmployeesScreen.route) {
             ManageEmployeesScreen(navController)
         }
-//        composable(AppScreens.EmployeeHistoryScreen.route) {
-//            EmployeeHistoryScreen(navController)
-//        }
         composable(AppScreens.ManageServicesScreen.route) {
             ManageServicesScreen(navController)
         }
@@ -90,3 +87,7 @@ fun redirectToRoleBasedScreen(navController: NavController, userId: String, getU
         }
     }
 }
+
+//        composable(AppScreens.EmployeeHistoryScreen.route) {
+//            EmployeeHistoryScreen(navController)
+//        }

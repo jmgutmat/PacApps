@@ -1,7 +1,5 @@
 package com.jmgtumat.pacapps.navigation
 
-import androidx.navigation.NavHostController
-
 sealed class AppScreens(val route: String) {
     //MainScreens
     object SplashScreen : AppScreens("/splash_screen")
@@ -25,9 +23,9 @@ sealed class AppScreens(val route: String) {
     //AuthScreens
     object EmailSignUpScreen : AppScreens("/email_sign_up_screen")
 
-    companion object {
+    /*companion object {
         fun getRouteForScreen(navController: NavHostController, screen: AppScreens) {
             return navController.navigate(screen.route)
         }
-    }
+    }*/
 }

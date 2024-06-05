@@ -17,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -46,14 +45,24 @@ import com.jmgtumat.pacapps.data.HorariosPorDia
 import com.jmgtumat.pacapps.employeemod.appointments.HorarioModulo
 import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
 
+/**
+ * Composable que muestra un elemento de empleado con su información básica y opciones de acción.
+ *
+ * @param empleado El objeto Empleado que contiene la información del empleado a mostrar.
+ * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
+ * @param navController Controlador de navegación para manejar la navegación en la aplicación.
+ */
 @Composable
 fun EmployeeItem(
     empleado: Empleado,
     empleadoViewModel: EmpleadoViewModel,
-    navController: NavController // Agregamos el parámetro NavController
+    navController: NavController // Parámetro para controlar la navegación
 ) {
     var expanded by remember { mutableStateOf(false) }
 
+    /**
+     * Diseño de un elemento de empleado.
+     */
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,33 +76,34 @@ fun EmployeeItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                // Nombre completo del empleado
                 Text(
                     text = "${empleado.nombre} ${empleado.apellidos}",
                     style = MaterialTheme.typography.headlineSmall
                 )
+                // Número de teléfono del empleado
                 Text(
                     text = "Teléfono: ${empleado.telefono}",
                     style = MaterialTheme.typography.headlineSmall
                 )
             }
             if (expanded) {
+                // Correo electrónico del empleado
                 Text(
                     text = "Correo Electrónico: ${empleado.correoElectronico}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                // Más información del empleado puede agregarse aquí
-                // Botones para modificar, eliminar y ver horario de trabajo del empleado
+                // Sección para mostrar más información y opciones de acción para el empleado
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    ModifyHorarioButton(empleado, empleadoViewModel) // Nuevo botón para modificar horario
+                    // Botón para modificar horario del empleado
+                    ModifyHorarioButton(empleado, empleadoViewModel)
+                    // Botón para modificar información del empleado
                     ModifyEmployeeButton(empleado, empleadoViewModel)
-                    //EmployeeHistoryButton(navController, empleado.id)
+                    // Botón para eliminar empleado
                     DeleteEmployeeButton(empleado, empleadoViewModel)
-
-
-
                 }
             }
         }
@@ -101,10 +111,20 @@ fun EmployeeItem(
 }
 
 
+
+/**
+ * Composable que muestra un botón flotante para agregar un nuevo empleado y controla el diálogo de agregar empleado.
+ *
+ * @param navController Controlador de navegación para manejar la navegación en la aplicación.
+ * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
+ */
 @Composable
 fun AddEmployeeButton(navController: NavController, empleadoViewModel: EmpleadoViewModel) {
     var showDialog by remember { mutableStateOf(false) }
 
+    /**
+     * Botón flotante para agregar un nuevo empleado.
+     */
     FloatingActionButton(
         onClick = { showDialog = true },
         modifier = Modifier.padding(16.dp)
@@ -123,6 +143,12 @@ fun AddEmployeeButton(navController: NavController, empleadoViewModel: EmpleadoV
     }
 }
 
+/**
+ * Composable que muestra un diálogo para agregar un nuevo empleado.
+ *
+ * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
+ * @param onDismiss Callback que se llama cuando se cierra el diálogo.
+ */
 @Composable
 fun AddEmployeeDialog(
     empleadoViewModel: EmpleadoViewModel,
@@ -133,6 +159,9 @@ fun AddEmployeeDialog(
     var telefono by remember { mutableStateOf("") }
     var correoElectronico by remember { mutableStateOf("") }
 
+    /**
+     * Diálogo para agregar un nuevo empleado.
+     */
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = { Text("Añadir Nuevo Empleado") },
@@ -187,6 +216,12 @@ fun AddEmployeeDialog(
 }
 
 
+/**
+ * Composable que muestra un botón para modificar un empleado y controla el diálogo de modificación del empleado.
+ *
+ * @param empleado El empleado que se modificará.
+ * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
+ */
 @Composable
 fun ModifyEmployeeButton(
     empleado: Empleado,
@@ -194,6 +229,9 @@ fun ModifyEmployeeButton(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
+    /**
+     * Botón que activa el diálogo para modificar el empleado.
+     */
     IconButton(onClick = { showDialog = true }) {
         Icon(Icons.Filled.Edit, contentDescription = "Modificar empleado")
     }
@@ -205,6 +243,13 @@ fun ModifyEmployeeButton(
     }
 }
 
+/**
+ * Composable que muestra un diálogo para modificar un empleado.
+ *
+ * @param empleado El empleado que se modificará.
+ * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
+ * @param onDismiss Callback que se llama cuando se cierra el diálogo.
+ */
 @Composable
 fun ModifyEmployeeDialog(
     empleado: Empleado,
@@ -216,6 +261,9 @@ fun ModifyEmployeeDialog(
     var telefono by remember { mutableStateOf(empleado.telefono) }
     var correoElectronico by remember { mutableStateOf(empleado.correoElectronico) }
 
+    /**
+     * Diálogo para modificar los detalles del empleado.
+     */
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = { Text("Modificar Empleado") },
@@ -267,6 +315,13 @@ fun ModifyEmployeeDialog(
     )
 }
 
+
+/**
+ * Composable que muestra un botón para eliminar un empleado y controla el diálogo de confirmación de eliminación.
+ *
+ * @param empleado El empleado que se eliminará.
+ * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
+ */
 @Composable
 fun DeleteEmployeeButton(
     empleado: Empleado,
@@ -274,6 +329,9 @@ fun DeleteEmployeeButton(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
+    /**
+     * Botón que activa el diálogo de confirmación para eliminar el empleado.
+     */
     IconButton(onClick = { showDialog = true }) {
         Icon(Icons.Filled.Delete, contentDescription = "Eliminar empleado")
     }
@@ -285,12 +343,22 @@ fun DeleteEmployeeButton(
     }
 }
 
+/**
+ * Composable que muestra un diálogo de confirmación para eliminar un empleado.
+ *
+ * @param empleado El empleado que se eliminará.
+ * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
+ * @param onDismiss Callback que se llama cuando se cierra el diálogo.
+ */
 @Composable
 fun DeleteEmployeeDialog(
     empleado: Empleado,
     empleadoViewModel: EmpleadoViewModel,
     onDismiss: () -> Unit
 ) {
+    /**
+     * Diálogo de confirmación para eliminar el empleado.
+     */
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = { Text("Eliminar Empleado") },
@@ -321,13 +389,23 @@ fun DeleteEmployeeDialog(
 }
 
 
+
+/*
 @Composable
 fun EmployeeHistoryButton(navController: NavController, empleadoId: String) {
     IconButton(onClick = { navController.navigate("/employee_history_screen") }) {
         Icon(Icons.Filled.History, contentDescription = "Ver historial de citas")
     }
 }
+*/
 
+/**
+ * Composable que muestra un botón para modificar el horario de trabajo de un empleado y controla el diálogo
+ * correspondiente.
+ *
+ * @param empleado El empleado cuyo horario de trabajo se modificará.
+ * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
+ */
 @Composable
 fun ModifyHorarioButton(
     empleado: Empleado,
@@ -335,6 +413,9 @@ fun ModifyHorarioButton(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
+    /**
+     * Botón que activa el diálogo de modificación del horario de trabajo del empleado.
+     */
     IconButton(onClick = { showDialog = true }) {
         Icon(Icons.Filled.Schedule, contentDescription = "Modificar horario de trabajo")
     }
@@ -346,6 +427,13 @@ fun ModifyHorarioButton(
     }
 }
 
+/**
+ * Composable que muestra un diálogo para modificar el horario de trabajo de un empleado.
+ *
+ * @param empleado El empleado cuyo horario de trabajo se modificará.
+ * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
+ * @param onDismiss Callback que se llama cuando se cierra el diálogo.
+ */
 @Composable
 fun ModifyHorarioDialog(
     empleado: Empleado,
@@ -357,8 +445,8 @@ fun ModifyHorarioDialog(
     var selectedDay by remember { mutableStateOf("") }
 
     LaunchedEffect(empleado.id) {
-        empleadoViewModel.fetchEmpleados() // Fetch all employees (if needed)
-        empleadoViewModel.fetchHorariosTrabajo(empleado.id) // Fetch horarios for this employee
+        empleadoViewModel.fetchEmpleados() // Obtener todos los empleados (si es necesario)
+        empleadoViewModel.fetchHorariosTrabajo(empleado.id) // Obtener los horarios para este empleado
     }
 
     if (horariosTrabajo == null) {
@@ -400,24 +488,24 @@ fun ModifyHorarioDialog(
                         }
                     }
                     if (selectedDay.isNotEmpty()) {
-                        // Handle potential null value for horarioTrabajo[selectedDay]
+                        // Manejar el valor potencialmente nulo para horarioTrabajo[selectedDay]
                         val horarioDia = horarioTrabajo?.get(selectedDay) ?: HorariosPorDia()
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = "Mañana", style = MaterialTheme.typography.headlineSmall)
                         HorarioModulo("Mañana", horarioDia.manana) { updatedManana ->
-                            horarioTrabajo?.let { // Update only if horarioTrabajo is not null
+                            horarioTrabajo?.let { // Actualizar solo si horarioTrabajo no es nulo
                                 val mutableHorarioTrabajo = it.toMutableMap()
                                 mutableHorarioTrabajo[selectedDay] = horarioDia.copy(manana = updatedManana)
-                                horarioTrabajo = mutableHorarioTrabajo // Update state with the modified map
+                                horarioTrabajo = mutableHorarioTrabajo // Actualizar estado con el mapa modificado
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = "Tarde", style = MaterialTheme.typography.headlineSmall)
                         HorarioModulo("Tarde", horarioDia.tarde) { updatedTarde ->
-                            horarioTrabajo?.let { // Update only if horarioTrabajo is not null
+                            horarioTrabajo?.let { // Actualizar solo si horarioTrabajo no es nulo
                                 val mutableHorarioTrabajo = it.toMutableMap()
                                 mutableHorarioTrabajo[selectedDay] = horarioDia.copy(tarde = updatedTarde)
-                                horarioTrabajo = mutableHorarioTrabajo // Update state with the modified map
+                                horarioTrabajo = mutableHorarioTrabajo // Actualizar estado con el mapa modificado
                             }
                         }
                     }

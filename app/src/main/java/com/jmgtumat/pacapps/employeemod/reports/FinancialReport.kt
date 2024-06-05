@@ -12,11 +12,26 @@ import com.jmgtumat.pacapps.data.CitaEstado
 import com.jmgtumat.pacapps.viewmodels.CitaViewModel
 import com.jmgtumat.pacapps.viewmodels.ServicioViewModel
 
+/**
+ * Clase de datos que representa un informe financiero.
+ *
+ * @property ingresosPorServicio Mapa que almacena los ingresos por servicio.
+ * @property ingresoTotal El ingreso total generado durante el período especificado.
+ */
 data class FinancialReport(
     val ingresosPorServicio: Map<String, Double>,
     val ingresoTotal: Double
 )
 
+/**
+ * Genera un informe financiero que muestra los ingresos totales y los ingresos por servicio durante un período específico.
+ *
+ * @param startDate La fecha de inicio del período.
+ * @param endDate La fecha de fin del período.
+ * @param citaViewModel El ViewModel de citas para acceder a los datos de las citas.
+ * @param servicioViewModel El ViewModel de servicios para acceder a los datos de los servicios.
+ * @return El informe financiero generado.
+ */
 suspend fun generateFinancialReport(
     startDate: Long,
     endDate: Long,
@@ -50,7 +65,11 @@ suspend fun generateFinancialReport(
     )
 }
 
-
+/**
+ * Composable que muestra el contenido del informe financiero.
+ *
+ * @param report El informe financiero a mostrar.
+ */
 @Composable
 fun FinancialReportContent(report: FinancialReport) {
     Column(

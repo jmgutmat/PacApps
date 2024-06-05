@@ -11,11 +11,24 @@ import androidx.compose.ui.unit.dp
 import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.Servicio
 
+/**
+ * Clase que representa un informe de popularidad de servicio.
+ *
+ * @property serviceName Nombre del servicio.
+ * @property totalAppointments Número total de citas para el servicio.
+ */
 data class ServicePopularityReport(
     val serviceName: String,
     val totalAppointments: Int
 )
 
+/**
+ * Función suspendida que genera un informe de popularidad de servicio basado en las citas proporcionadas.
+ *
+ * @param servicio El servicio para el cual se generará el informe de popularidad.
+ * @param citas La lista de citas para analizar.
+ * @return El informe de popularidad del servicio.
+ */
 suspend fun generateServicePopularityReport(
     servicio: Servicio,
     citas: List<Cita>
@@ -29,6 +42,11 @@ suspend fun generateServicePopularityReport(
     )
 }
 
+/**
+ * Composable que muestra el contenido del informe de popularidad de servicios.
+ *
+ * @param report La lista de informes de popularidad de servicios a mostrar.
+ */
 @Composable
 fun ServicePopularityReportContent(report: List<ServicePopularityReport>) {
     Column(

@@ -12,6 +12,9 @@ import com.jmgtumat.pacapps.data.HorariosPorDia
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel para manejar la lógica relacionada con los empleados.
+ */
 class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : BaseViewModel() {
 
     private val _empleados = MutableLiveData<List<Empleado>>()
@@ -26,13 +29,14 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
     private val _citasAsignadas = MutableLiveData<List<Cita>>()
     val citasAsignadas: LiveData<List<Cita>> get() = _citasAsignadas
 
-
     init {
         _empleadoId.value = getAuthenticatedEmpleadoId()
         fetchEmpleados()
     }
 
-
+    /**
+     * Recupera la lista de empleados.
+     */
     fun fetchEmpleados() {
         viewModelScope.launch {
             setLoading()
@@ -40,7 +44,6 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
                 val fetchedEmpleados = empleadoRepository.getEmpleados()
                 _empleados.value = fetchedEmpleados
                 setSuccess()
-                // Log de los horarios de trabajo del primer empleado
                 fetchedEmpleados.firstOrNull()?.let { empleado ->
                     Log.d("EmpleadoViewModel", "Horarios de trabajo del primer empleado: ${empleado.horariosTrabajo}")
                 }
@@ -50,10 +53,17 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         }
     }
 
+    /**
+     * Obtiene el ID del empleado autenticado.
+     */
     fun getAuthenticatedEmpleadoId(): String {
         return empleadoRepository.getAuthenticatedEmpleadoId()
     }
 
+    /**
+     * Recupera las citas asignadas a un empleado.
+     * @param empleadoId ID del empleado.
+     */
     fun fetchCitasAsignadas(empleadoId: String) {
         viewModelScope.launch {
             val citas = empleadoRepository.getCitasAsignadas(empleadoId)
@@ -61,6 +71,10 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         }
     }
 
+    /**
+     * Inserta un nuevo empleado.
+     * @param empleado Empleado a insertar.
+     */
     fun insertEmpleado(empleado: Empleado) {
         viewModelScope.launch {
             try {
@@ -72,6 +86,10 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         }
     }
 
+    /**
+     * Actualiza los datos de un empleado.
+     * @param empleado Empleado a actualizar.
+     */
     fun updateEmpleado(empleado: Empleado) {
         viewModelScope.launch {
             try {
@@ -83,6 +101,10 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         }
     }
 
+    /**
+     * Elimina un empleado.
+     * @param empleadoId ID del empleado a eliminar.
+     */
     fun deleteEmpleado(empleadoId: String) {
         viewModelScope.launch {
             try {
@@ -94,6 +116,10 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         }
     }
 
+    /**
+     * Recupera los horarios de trabajo de un empleado.
+     * @param empleadoId ID del empleado.
+     */
     fun fetchHorariosTrabajo(empleadoId: String) {
         viewModelScope.launch {
             try {
@@ -109,6 +135,11 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         }
     }
 
+    /**
+     * Actualiza los horarios de trabajo de un empleado.
+     * @param empleadoId ID del empleado.
+     * @param horariosTrabajo Mapa que contiene los horarios de trabajo por día.
+     */
     fun updateHorariosTrabajo(empleadoId: String, horariosTrabajo: Map<String, HorariosPorDia>) {
         viewModelScope.launch {
             try {
@@ -120,6 +151,10 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
     }
 }
 
+/**
+ * Factoría para crear instancias de EmpleadoViewModel.
+ * @param empleadoRepository Repositorio de empleados.
+ */
 class EmpleadoViewModelFactory(private val empleadoRepository: EmpleadoRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(EmpleadoViewModel::class.java)) {

@@ -4,20 +4,27 @@ import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,19 +52,29 @@ import com.jmgtumat.pacapps.navigation.redirectToRoleBasedScreen
 import com.jmgtumat.pacapps.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Pantalla principal de inicio de sesión.
+ *
+ * Esta composable muestra la pantalla principal de inicio de sesión donde los usuarios
+ * pueden ingresar sus credenciales o iniciar sesión con Google.
+ *
+ * @param navController NavController para navegar entre las pantallas.
+ */
 @Composable
 fun MainScreen(navController: NavController) {
 
+    // ViewModel para manejar la lógica de inicio de sesión
     val viewModel = MainViewModel()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+    // Estados de los campos de entrada y mensajes de error
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
 
-
+    // Cliente de inicio de sesión de Google y lanzador para obtener el resultado de inicio de sesión de Google
     val googleSignInClient = remember { getGoogleSignInClient(context) }
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -84,6 +101,7 @@ fun MainScreen(navController: NavController) {
         }
     }
 
+    // Diseño de la pantalla de inicio de sesión
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,12 +109,12 @@ fun MainScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Imagen de la aplicación en la parte superior
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp), // Ajusta la altura deseada
             contentAlignment = Alignment.TopCenter // Alinea el contenido en la parte superior
-
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_blanco),
@@ -106,6 +124,7 @@ fun MainScreen(navController: NavController) {
             )
         }
 
+        // Campo de texto para ingresar el correo electrónico
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -113,6 +132,7 @@ fun MainScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         )
 
+        // Campo de texto para ingresar la contraseña con opción de ocultar o mostrar la contraseña
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -129,6 +149,7 @@ fun MainScreen(navController: NavController) {
             }
         )
 
+        // Botón para iniciar sesión con correo y contraseña
         Button(
             onClick = {
                 coroutineScope.launch {
@@ -143,6 +164,8 @@ fun MainScreen(navController: NavController) {
                     }
                 }
             },
+            elevation = ButtonDefaults.buttonElevation(4.dp),
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
@@ -150,10 +173,13 @@ fun MainScreen(navController: NavController) {
             Text("Iniciar Sesión")
         }
 
+        // Botón para registrar una nueva cuenta
         Button(
             onClick = {
                 navController.navigate(AppScreens.EmailSignUpScreen.route)
             },
+            elevation = ButtonDefaults.buttonElevation(4.dp),
+            shape = MaterialTheme.shapes.medium,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
@@ -161,25 +187,45 @@ fun MainScreen(navController: NavController) {
             Text("Registrarse")
         }
 
-        IconButton(
-            onClick = {
-                val signInIntent = googleSignInClient.signInIntent
-                googleSignInLauncher.launch(signInIntent)
-            },
-            modifier = Modifier
-                .padding(vertical = 8.dp)
+        Surface(
+            modifier = Modifier.padding(vertical = 8.dp),
+            shape = MaterialTheme.shapes.medium,
+            shadowElevation = 4.dp
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_google), // Agregar el icono de Google
-                contentDescription = "Google"
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clickable {
+                        val signInIntent = googleSignInClient.signInIntent
+                        googleSignInLauncher.launch(signInIntent)
+                    }
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_google),
+                    contentDescription = "Google",
+                    modifier = Modifier.width(24.dp).height(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Continuar con Google")
+            }
         }
+
+
+
+        // Mensaje de error si hay un problema durante el inicio de sesión
         if (errorMessage.isNotBlank()) {
             Text(text = errorMessage, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
         }
     }
 }
 
+/**
+ * Obtiene el cliente de inicio de sesión de Google.
+ *
+ * @param context El contexto actual.
+ * @return Cliente de inicio de sesión de Google.
+ */
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestIdToken(context.getString(R.string.default_web_client_id))

@@ -1,9 +1,17 @@
 package com.jmgtumat.pacapps.util
 
-// Clase para representar el resultado de la validación
+/**
+ * Clase para representar el resultado de la validación de un campo.
+ * @property isValid Indica si el campo es válido o no.
+ * @property errorMessage Mensaje de error asociado a la validación, vacío si el campo es válido.
+ */
 data class ValidationResult(val isValid: Boolean, val errorMessage: String)
 
-// Función para validar el correo electrónico
+/**
+ * Función para validar un correo electrónico.
+ * @param email El correo electrónico a validar.
+ * @return [ValidationResult] que indica si el correo electrónico es válido y, en caso contrario, proporciona un mensaje de error.
+ */
 fun validateEmail(email: String): ValidationResult {
     val emailRegex = Regex("""^[^\s@]+@[^\s@]+\.[^\s@]+$""")
     return if (email.isBlank()) {
@@ -15,7 +23,11 @@ fun validateEmail(email: String): ValidationResult {
     }
 }
 
-// Función para validar la contraseña
+/**
+ * Función para validar una contraseña.
+ * @param password La contraseña a validar.
+ * @return [ValidationResult] que indica si la contraseña es válida y, en caso contrario, proporciona un mensaje de error.
+ */
 fun validatePassword(password: String): ValidationResult {
     val passwordRegex = Regex("""^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$""")
     return when {
@@ -29,8 +41,12 @@ fun validatePassword(password: String): ValidationResult {
     }
 }
 
-
-// Función para validar la entrada de datos
+/**
+ * Función para validar la entrada de datos de un correo electrónico y una contraseña.
+ * @param email El correo electrónico a validar.
+ * @param password La contraseña a validar.
+ * @return [ValidationResult] que indica si ambos campos son válidos y, en caso contrario, proporciona un mensaje de error.
+ */
 fun validateInputFields(email: String, password: String): ValidationResult {
     val emailValidationResult = validateEmail(email)
     val passwordValidationResult = validatePassword(password)

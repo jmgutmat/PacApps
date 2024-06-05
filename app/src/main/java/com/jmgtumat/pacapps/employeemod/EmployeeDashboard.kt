@@ -20,10 +20,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 
+/**
+ * Panel de control del empleado que muestra las diferentes funcionalidades disponibles.
+ *
+ * @param navController El controlador de navegación utilizado para la navegación entre pantallas.
+ * @param content La interfaz de usuario composable que se debe mostrar en el panel de control.
+ */
 @Composable
 fun EmpleadoDashboard(
     navController: NavController,
-    content: @Composable (PaddingValues) -> Unit // Cambiamos la firma para aceptar un @Composable como parámetro
+    content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         bottomBar = {
@@ -35,11 +41,16 @@ fun EmpleadoDashboard(
                 .fillMaxSize()
                 .padding(innerPadding)
         ){
-        content(innerPadding) // Llamamos al @Composable content y pasamos el innerPadding
+            content(innerPadding)
         }
     }
 }
 
+/**
+ * Barra de navegación inferior que contiene los íconos de las diferentes funcionalidades disponibles.
+ *
+ * @param navController El controlador de navegación utilizado para la navegación entre pantallas.
+ */
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
@@ -70,7 +81,13 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-
+/**
+ * Enumeración sellada que representa las diferentes pantallas disponibles en el panel de control del empleado.
+ *
+ * @param route La ruta de navegación asociada a la pantalla.
+ * @param icon El ícono asociado a la pantalla.
+ * @param title El título de la pantalla.
+ */
 sealed class EmpleadoScreen(val route: String, val icon: ImageVector, val title: String) {
     object Citas : EmpleadoScreen("/manage_appointments_screen", Icons.AutoMirrored.Filled.Assignment, "Citas")
     object Clientes : EmpleadoScreen("/manage_clients_screen", Icons.Default.Group, "Clientes")

@@ -29,6 +29,13 @@ import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModelFactory
 import com.jmgtumat.pacapps.viewmodels.ServicioViewModel
 import com.jmgtumat.pacapps.viewmodels.ServicioViewModelFactory
 
+/**
+ * @Composable que muestra el contenido de los informes financieros, de rendimiento de empleados y de popularidad de servicios.
+ *
+ * @param context El contexto de la aplicación.
+ * @param startDate El estado mutable que representa la fecha de inicio del período del informe.
+ * @param endDate El estado mutable que representa la fecha de fin del período del informe.
+ */
 @Composable
 fun ReportContent(
     context: Context,
@@ -95,11 +102,6 @@ fun ReportContent(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        /*item {
-            PerformanceChart(context, citaViewModel)
-            Spacer(modifier = Modifier.height(16.dp))
-        }*/
-
         financialReport?.let {
             item {
                 FinancialReportContent(report = it)
@@ -122,7 +124,13 @@ fun ReportContent(
     }
 }
 
-
+/**
+ * @Composable que muestra el selector de fechas para filtrar los informes.
+ *
+ * @param context El contexto de la aplicación.
+ * @param startDate El estado mutable que representa la fecha de inicio del período del informe.
+ * @param endDate El estado mutable que representa la fecha de fin del período del informe.
+ */
 @Composable
 fun DateSelectorReport(
     context: Context,

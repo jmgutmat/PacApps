@@ -29,6 +29,13 @@ import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.navigation.AppScreens
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 
+/**
+ * Composable que muestra un elemento de cliente en una lista.
+ *
+ * @param cliente El cliente a mostrar.
+ * @param clienteViewModel El ViewModel del cliente.
+ * @param navController El controlador de navegación.
+ */
 @Composable
 fun ClientItem(
     cliente: Cliente,
@@ -77,9 +84,12 @@ fun ClientItem(
     }
 }
 
-
-
-
+/**
+ * Composable que muestra un botón para añadir un nuevo cliente.
+ *
+ * @param navController El controlador de navegación.
+ * @param clienteViewModel El ViewModel del cliente.
+ */
 @Composable
 fun AddClientButton(navController: NavController, clienteViewModel: ClienteViewModel) {
     var showDialog by remember { mutableStateOf(false) }
@@ -102,6 +112,12 @@ fun AddClientButton(navController: NavController, clienteViewModel: ClienteViewM
     }
 }
 
+/**
+ * Composable que muestra un diálogo para añadir un nuevo cliente.
+ *
+ * @param clienteViewModel El ViewModel del cliente.
+ * @param onDismiss La acción a realizar al cerrar el diálogo.
+ */
 @Composable
 fun AddClientDialog(
     clienteViewModel: ClienteViewModel,
@@ -163,7 +179,13 @@ fun AddClientDialog(
     )
 }
 
-
+/**
+ * Filtra la lista de clientes según la consulta proporcionada.
+ *
+ * @param clientes La lista de clientes a filtrar.
+ * @param query La consulta de búsqueda.
+ * @return La lista filtrada de clientes.
+ */
 @Composable
 fun filterClientes(clientes: List<Cliente>, query: String): List<Cliente> {
     return if (query.isEmpty()) {
@@ -178,6 +200,12 @@ fun filterClientes(clientes: List<Cliente>, query: String): List<Cliente> {
     }
 }
 
+/**
+ * Composable que muestra un botón para modificar un cliente.
+ *
+ * @param cliente El cliente a modificar.
+ * @param clienteViewModel El ViewModel del cliente.
+ */
 @Composable
 fun ModifyClientButton(
     cliente: Cliente,
@@ -196,6 +224,13 @@ fun ModifyClientButton(
     }
 }
 
+/**
+ * Composable que muestra un diálogo para modificar un cliente existente.
+ *
+ * @param cliente El cliente a modificar.
+ * @param clienteViewModel El ViewModel del cliente.
+ * @param onDismiss La acción a realizar al cerrar el diálogo.
+ */
 @Composable
 fun ModifyClientDialog(
     cliente: Cliente,
@@ -258,6 +293,12 @@ fun ModifyClientDialog(
     )
 }
 
+/**
+ * Composable que muestra un botón para eliminar un cliente.
+ *
+ * @param cliente El cliente a eliminar.
+ * @param clienteViewModel El ViewModel del cliente.
+ */
 @Composable
 fun DeleteClientButton(
     cliente: Cliente,
@@ -276,6 +317,13 @@ fun DeleteClientButton(
     }
 }
 
+/**
+ * Composable que muestra un diálogo para confirmar la eliminación de un cliente.
+ *
+ * @param cliente El cliente a eliminar.
+ * @param clienteViewModel El ViewModel del cliente.
+ * @param onDismiss La acción a realizar al cerrar el diálogo.
+ */
 @Composable
 fun DeleteClientDialog(
     cliente: Cliente,
@@ -311,6 +359,12 @@ fun DeleteClientDialog(
     )
 }
 
+/**
+ * Composable que muestra un botón para ver el historial de un cliente.
+ *
+ * @param cliente El cliente del cual ver el historial.
+ * @param navController El controlador de navegación.
+ */
 @Composable
 fun ViewHistoryButton(
     cliente: Cliente,
@@ -318,12 +372,10 @@ fun ViewHistoryButton(
 ) {
     Button(
         onClick = {
-            // Verifica que el clienteId se esté pasando correctamente
             Log.d("ClientId", "ClienteId: ${cliente.id}")
 
             navController.currentBackStackEntry?.arguments?.putString("clienteId", cliente.id)
             navController.navigate("${AppScreens.EmpModHistoryScreen.route}/${cliente.id}") {
-                // Asegúrate de pasar el clienteId como argumento en la navegación
                 launchSingleTop = true
                 restoreState = true
             }
@@ -332,5 +384,3 @@ fun ViewHistoryButton(
         Text("Ver Historial")
     }
 }
-
-

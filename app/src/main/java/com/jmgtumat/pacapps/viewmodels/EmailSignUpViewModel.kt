@@ -6,15 +6,32 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.jmgtumat.pacapps.data.Cliente
-import com.jmgtumat.pacapps.data.User
-import com.jmgtumat.pacapps.data.UserRole
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel para manejar la lógica de registro de usuarios por correo electrónico.
+ */
 class EmailSignUpViewModel : BaseViewModel() {
 
     private val db: DatabaseReference = FirebaseDatabase.getInstance().reference
 
-    fun signUpWithEmailAndPassword(nombre: String, apellidos: String, telefono: String, correoElectronico: String, password: String, onComplete: (FirebaseUser?) -> Unit) {
+    /**
+     * Método para registrar un usuario con correo electrónico y contraseña.
+     * @param nombre Nombre del usuario.
+     * @param apellidos Apellidos del usuario.
+     * @param telefono Número de teléfono del usuario.
+     * @param correoElectronico Correo electrónico del usuario.
+     * @param password Contraseña del usuario.
+     * @param onComplete Callback que se llama cuando se completa el registro.
+     */
+    fun signUpWithEmailAndPassword(
+        nombre: String,
+        apellidos: String,
+        telefono: String,
+        correoElectronico: String,
+        password: String,
+        onComplete: (FirebaseUser?) -> Unit
+    ) {
         val auth = FirebaseAuth.getInstance()
         auth.createUserWithEmailAndPassword(correoElectronico, password)
             .addOnCompleteListener { task ->
@@ -38,32 +55,23 @@ class EmailSignUpViewModel : BaseViewModel() {
                                 onComplete(firebaseUser)
                             }
                             .addOnFailureListener { exception ->
-                                setError("Error saving user data: ${exception.message}")
+                                setError("Error al guardar los datos del usuario: ${exception.message}")
                                 onComplete(null)
                             }
                     }
                 } else {
                     val exception = task.exception
-                    setError("Error signing up: ${exception?.message ?: "Unknown error"}")
+                    setError("Error al registrarse: ${exception?.message ?: "Error desconocido"}")
                     onComplete(null)
                 }
             }
     }
 
-    fun fetchUserRole(userId: String, onRoleFetched: (UserRole) -> Unit) {
-        viewModelScope.launch {
-            setLoading()
-            db.child("clientes").child(userId).get().addOnSuccessListener { dataSnapshot ->
-                val user = dataSnapshot.getValue(User::class.java)
-                val role = user?.rol ?: UserRole.CLIENTE
-                onRoleFetched(role)
-                setSuccess()
-            }.addOnFailureListener { exception ->
-                setError("Error fetching user role: ${exception.message}")
-            }
-        }
-    }
-
+    /**
+     * Método para obtener el tipo de usuario (cliente o empleado) a partir de su ID.
+     * @param userId ID del usuario.
+     * @param callback Callback que se llama con el resultado.
+     */
     fun getUserType(userId: String, callback: (Boolean) -> Unit) {
         db.child("empleados").child(userId).get().addOnSuccessListener { empSnapshot ->
             if (empSnapshot.exists()) {
@@ -80,3 +88,17 @@ class EmailSignUpViewModel : BaseViewModel() {
         }
     }
 }
+
+/*    fun fetchUserRole(userId: String, onRoleFetched: (UserRole) -> Unit) {
+        viewModelScope.launch {
+            setLoading()
+            db.child("clientes").child(userId).get().addOnSuccessListener { dataSnapshot ->
+                val user = dataSnapshot.getValue(User::class.java)
+                val role = user?.rol ?: UserRole.CLIENTE
+                onRoleFetched(role)
+                setSuccess()
+            }.addOnFailureListener { exception ->
+                setError("Error fetching user role: ${exception.message}")
+            }
+        }
+    }*/

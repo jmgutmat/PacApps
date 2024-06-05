@@ -9,15 +9,24 @@ import com.jmgtumat.pacapps.data.Servicio
 import com.jmgtumat.pacapps.repository.ServicioRepository
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel para la gestión de servicios.
+ */
 class ServicioViewModel(private val servicioRepository: ServicioRepository) : BaseViewModel() {
 
     private val _servicios = MutableLiveData<List<Servicio>>()
     val servicios: LiveData<List<Servicio>> get() = _servicios
 
+    /**
+     * Inicializa la carga de servicios al crear la instancia del ViewModel.
+     */
     init {
         fetchServicios()
     }
 
+    /**
+     * Obtiene la lista de servicios desde el repositorio.
+     */
     private fun fetchServicios() {
         viewModelScope.launch {
             setLoading()
@@ -31,6 +40,10 @@ class ServicioViewModel(private val servicioRepository: ServicioRepository) : Ba
         }
     }
 
+    /**
+     * Inserta un nuevo servicio en el repositorio.
+     * @param servicio El servicio a insertar.
+     */
     fun insertServicio(servicio: Servicio) {
         viewModelScope.launch {
             try {
@@ -42,6 +55,10 @@ class ServicioViewModel(private val servicioRepository: ServicioRepository) : Ba
         }
     }
 
+    /**
+     * Actualiza un servicio existente en el repositorio.
+     * @param servicio El servicio a actualizar.
+     */
     fun updateServicio(servicio: Servicio) {
         viewModelScope.launch {
             try {
@@ -53,6 +70,10 @@ class ServicioViewModel(private val servicioRepository: ServicioRepository) : Ba
         }
     }
 
+    /**
+     * Elimina un servicio del repositorio.
+     * @param servicioId El ID del servicio a eliminar.
+     */
     fun deleteServicio(servicioId: String) {
         viewModelScope.launch {
             try {
@@ -65,6 +86,9 @@ class ServicioViewModel(private val servicioRepository: ServicioRepository) : Ba
     }
 }
 
+/**
+ * Factoría para crear instancias de ServicioViewModel.
+ */
 class ServicioViewModelFactory(private val servicioRepository: ServicioRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ServicioViewModel::class.java)) {

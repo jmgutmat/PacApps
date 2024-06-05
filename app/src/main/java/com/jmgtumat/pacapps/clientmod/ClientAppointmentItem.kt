@@ -1,7 +1,6 @@
 package com.jmgtumat.pacapps.clientmod
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,11 +30,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.jmgtumat.pacapps.data.Cita
-import com.jmgtumat.pacapps.data.CitaEstado
 import com.jmgtumat.pacapps.util.formatDateNew
 import com.jmgtumat.pacapps.util.formatTimeNew
 import java.util.Calendar
 
+/**
+ * Composable que muestra un elemento de cita para el cliente.
+ *
+ * @param cita la cita que se muestra.
+ * @param servicioNombre el nombre del servicio de la cita.
+ * @param empleadoNombre el nombre del empleado de la cita.
+ */
 @Composable
 fun ClientAppointmentItem(
     cita: Cita,
@@ -67,28 +71,13 @@ fun ClientAppointmentItem(
     }
 }
 
-@Composable
-fun NewAppointmentItem(
-    cita: Cita,
-    onItemClicked: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .clickable(onClick = onItemClicked),
-        elevation = CardDefaults.cardElevation(4.dp),
-    ) {
-        Surface(color = Color.Transparent) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                BasicText(text = "Servicio: ${cita.servicioId}")
-                BasicText(text = "Hora: ${formatTimeNew(cita.horaInicio)}")
-            }
-        }
-    }
-}
-
-
+/**
+ * Composable que muestra una cuadrícula de slots de citas disponibles.
+ *
+ * @param availableSlots los slots de citas disponibles.
+ * @param citas las citas existentes.
+ * @param onSlotSelected la acción que se ejecuta cuando se selecciona un slot.
+ */
 @Composable
 fun AppointmentGrid(
     availableSlots: List<Calendar>,
@@ -99,7 +88,7 @@ fun AppointmentGrid(
 
     Column(modifier = Modifier.verticalScroll(scrollState)) {
         availableSlots.forEach { slot ->
-            val citasInThisSlot = citas.filter { cita ->
+            val citasEnEsteSlot = citas.filter { cita ->
                 val slotStart = Calendar.getInstance().apply { timeInMillis = slot.timeInMillis }
                 val slotEnd = (slotStart.clone() as Calendar).apply { add(Calendar.MINUTE, cita.duracion) }
                 cita.horaInicio >= slotStart.timeInMillis && cita.horaInicio < slotEnd.timeInMillis
@@ -139,7 +128,7 @@ fun AppointmentGrid(
                         .padding(8.dp),
                     verticalArrangement = Arrangement.Center
                 ) {
-                    citasInThisSlot.forEach { cita ->
+                    citasEnEsteSlot.forEach { cita ->
                         BasicText(
                             text = "Hora: ${formatTimeNew(cita.horaInicio)}",
                             modifier = Modifier
@@ -162,6 +151,31 @@ fun AppointmentGrid(
 }
 
 
+/*
+@Composable
+fun NewAppointmentItem(
+    cita: Cita,
+    onItemClicked: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .clickable(onClick = onItemClicked),
+        elevation = CardDefaults.cardElevation(4.dp),
+    ) {
+        Surface(color = Color.Transparent) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                BasicText(text = "Servicio: ${cita.servicioId}")
+                BasicText(text = "Hora: ${formatTimeNew(cita.horaInicio)}")
+            }
+        }
+    }
+}
+*/
+
+
+/*
 @Composable
 fun AppointmentHourBlock(
     hour: Int,
@@ -223,3 +237,4 @@ fun AppointmentHourBlock(
 }
 
 
+*/

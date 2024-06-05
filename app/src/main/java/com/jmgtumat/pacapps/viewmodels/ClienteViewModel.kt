@@ -18,6 +18,13 @@ import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import com.jmgtumat.pacapps.repository.ServicioRepository
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel para manejar la lógica relacionada con los clientes.
+ * @param clienteRepository Repositorio de clientes para interactuar con la capa de datos.
+ * @param servicioRepository Repositorio de servicios para interactuar con la capa de datos.
+ * @param empleadoRepository Repositorio de empleados para interactuar con la capa de datos.
+ * @param citaRepository Repositorio de citas para interactuar con la capa de datos.
+ */
 class ClienteViewModel(
     private val clienteRepository: ClienteRepository,
     private val servicioRepository: ServicioRepository,
@@ -37,29 +44,29 @@ class ClienteViewModel(
     private val _historialCitas = MutableLiveData<List<Cita>>()
     val historialCitas: LiveData<List<Cita>> get() = _historialCitas
 
-    // Añade una propiedad para el cliente autenticado
     private val _clienteId = MutableLiveData<String>()
     val clienteId: LiveData<String> get() = _clienteId
 
     private val _citaPendiente = MutableLiveData<Cita?>()
     val citaPendiente: LiveData<Cita?> get() = _citaPendiente
 
-
     init {
         fetchClientes()
         fetchServicios()
         fetchEmpleados()
-        _clienteId.value = getAuthenticatedClienteId() // Función para obtener el ID del cliente autenticado
-        fetchHistorialCitasClienteAutenticado() // Fetch the historial citas on initialization
+        _clienteId.value = getAuthenticatedClienteId()
+        fetchHistorialCitasClienteAutenticado()
         fetchCitaPendienteClienteAutenticado()
-
     }
 
+    /**
+     * Método para obtener el ID del cliente autenticado.
+     * @return El ID del cliente autenticado.
+     * @throws IllegalStateException Si el usuario no está autenticado.
+     */
     private fun getAuthenticatedClienteId(): String {
-        // Aquí deberías implementar la lógica para obtener el ID del cliente autenticado
-        // Por ejemplo, si usas Firebase Authentication:
         val currentUser = FirebaseAuth.getInstance().currentUser
-        return currentUser?.uid ?: throw IllegalStateException("User not authenticated")
+        return currentUser?.uid ?: throw IllegalStateException("Usuario no autenticado")
     }
 
     private fun fetchClientes() {
@@ -102,8 +109,10 @@ class ClienteViewModel(
         }
     }
 
-
-
+    /**
+     * Método para insertar un nuevo cliente.
+     * @param cliente Cliente a insertar.
+     */
     fun insertCliente(cliente: Cliente) {
         viewModelScope.launch {
             try {
@@ -115,6 +124,10 @@ class ClienteViewModel(
         }
     }
 
+    /**
+     * Método para actualizar un cliente existente.
+     * @param cliente Cliente a actualizar.
+     */
     fun updateCliente(cliente: Cliente) {
         viewModelScope.launch {
             try {
@@ -126,6 +139,10 @@ class ClienteViewModel(
         }
     }
 
+    /**
+     * Método para eliminar un cliente.
+     * @param clienteId ID del cliente a eliminar.
+     */
     fun deleteCliente(clienteId: String) {
         viewModelScope.launch {
             try {
@@ -152,8 +169,7 @@ class ClienteViewModel(
         }
     }
 
-
-    fun fetchHistorialCitasClienteAutenticado() {
+    private fun fetchHistorialCitasClienteAutenticado() {
         viewModelScope.launch {
             setLoading()
             try {
@@ -166,6 +182,53 @@ class ClienteViewModel(
             }
         }
     }
+
+    /**
+     * Método suspendido para obtener las citas del historial de un cliente.
+     * @param clienteId ID del cliente.
+     * @return Lista de citas del historial del cliente.
+     */
+    private suspend fun getCitasFromHistorial(clienteId: String): List<Cita> {
+        val citaIds = clienteRepository.getHistorialCitas(clienteId)
+        val citas = mutableListOf<Cita>()
+        for (citaId in citaIds) {
+            val cita = citaRepository.getCitaById(citaId.id)
+            citas.add(cita)
+        }
+        return citas
+    }
+
+    /**
+     * Método para obtener el historial de citas de un cliente.
+     * @param clienteId ID del cliente.
+     */
+    fun fetchHistorialCitas(clienteId: String) {
+        viewModelScope.launch {
+            setLoading()
+            try {
+                val fetchedHistorialCitas = getCitasFromHistorial(clienteId)
+                _historialCitas.value = fetchedHistorialCitas
+                setSuccess()
+            } catch (e: Exception) {
+                setError(e.message)
+            }
+        }
+    }
+}
+
+/**
+ * Clase Factory para proporcionar una instancia de [ClienteViewModel].
+ * @param clienteRepository Repositorio de clientes para la inyección de dependencias.
+ */
+class ClienteViewModelFactory(private val clienteRepository: ClienteRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ClienteViewModel::class.java)) {
+            return ClienteViewModel(clienteRepository, ServicioRepository(), EmpleadoRepository(), CitaRepository()) as T
+        }
+        throw IllegalArgumentException("Clase ViewModel desconocida")
+    }
+}
+
 
 //    fun fetchServicioNombre(servicioId: String) {
 //        viewModelScope.launch {
@@ -180,31 +243,6 @@ class ClienteViewModel(
 //        }
 //    }
 
-    suspend fun getCitasFromHistorial(clienteId: String): List<Cita> {
-        val citaIds = clienteRepository.getHistorialCitas(clienteId)
-        val citas = mutableListOf<Cita>()
-        for (citaId in citaIds) {
-            val cita = citaRepository.getCitaById(citaId.id)  // Obtener cita por ID desde el nodo "citas"
-            citas.add(cita)
-        }
-        return citas
-    }
-
-    fun fetchHistorialCitas(clienteId: String) {
-        viewModelScope.launch {
-            setLoading()
-            try {
-                val fetchedHistorialCitas = getCitasFromHistorial(clienteId)
-                _historialCitas.value = fetchedHistorialCitas
-                setSuccess()
-            } catch (e: Exception) {
-                setError(e.message)
-            }
-        }
-    }
-
-
-
 //    fun updateHistorialCitas(clienteId: String, citas: List<Cita>) {
 //        viewModelScope.launch {
 //            try {
@@ -214,15 +252,3 @@ class ClienteViewModel(
 //            }
 //        }
 //    }
-
-}
-
-
-class ClienteViewModelFactory(private val clienteRepository: ClienteRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ClienteViewModel::class.java)) {
-            return ClienteViewModel(clienteRepository, ServicioRepository(), EmpleadoRepository(), CitaRepository()) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}

@@ -21,8 +21,14 @@ import com.jmgtumat.pacapps.viewmodels.CitaViewModelFactory
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 
+/**
+ * Composable para mostrar el historial de citas del cliente.
+ *
+ * @param navController El controlador de navegación.
+ */
 @Composable
 fun ClientmodHistoryScreen(navController: NavController) {
+    // Se obtienen las instancias de los ViewModel
     val clienteViewModel: ClienteViewModel = viewModel(
         factory = ClienteViewModelFactory(
             ClienteRepository(),
@@ -34,17 +40,20 @@ fun ClientmodHistoryScreen(navController: NavController) {
         )
     )
 
+    // Observa el ID del cliente y el historial de citas
     val clienteId by clienteViewModel.clienteId.observeAsState()
     val historialCitas by clienteViewModel.historialCitas.observeAsState(emptyList())
     val serviciosList by clienteViewModel.servicios.observeAsState(emptyList())
     val empleadosList by clienteViewModel.empleados.observeAsState(emptyList())
 
+    // Al detectar un cambio en el ID del cliente, se recupera el historial de citas
     LaunchedEffect(clienteId) {
         clienteId?.let {
             clienteViewModel.fetchHistorialCitas(it)
         }
     }
 
+    // Se muestra el historial de citas en el dashboard del cliente
     ClienteDashboard(navController = navController) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -54,8 +63,10 @@ fun ClientmodHistoryScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(historialCitas) { cita ->
+                // Busca el servicio y el empleado asociados a cada cita
                 val servicio = serviciosList.find { it.id == cita.servicioId }
                 val empleado = empleadosList.find { it.id == cita.empleadoId }
+                // Muestra cada elemento del historial de citas
                 ClientAppointmentItem(cita,
                     servicio?.nombre ?: "Desconocido",
                     empleado?.nombre ?: "Desconocido")

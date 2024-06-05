@@ -19,6 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 
+/**
+ * Composable que muestra el contenido principal del dashboard del cliente.
+ *
+ * @param navController el controlador de navegación.
+ * @param contenido el contenido a mostrar en el dashboard.
+ */
 @Composable
 fun ClienteDashboard(
     navController: NavController,
@@ -32,14 +38,18 @@ fun ClienteDashboard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding()
         ) {
             contenido(innerPadding)
         }
     }
 }
 
-
+/**
+ * Composable que muestra la barra de navegación inferior del cliente.
+ *
+ * @param navController el controlador de navegación.
+ */
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
@@ -69,7 +79,13 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-
+/**
+ * Clase sellada que representa las diferentes pantallas del cliente.
+ *
+ * @param route la ruta de navegación de la pantalla.
+ * @param title el título de la pantalla.
+ * @param icon el ícono asociado a la pantalla.
+ */
 sealed class ClienteScreen(val route: String, val title: String, val icon: ImageVector) {
     object Profile : ClienteScreen("/profile_screen", "Perfil", Icons.Default.Person)
     object History : ClienteScreen("/clientmod_history_screen", "Historial", Icons.Default.History)

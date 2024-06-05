@@ -7,10 +7,16 @@ import com.jmgtumat.pacapps.data.Cita
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 
+/**
+ * Repositorio para acceder y manipular datos de citas en la base de datos Firebase.
+ */
 class CitaRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("citas")
 
+    /**
+     * Obtiene todas las citas de la base de datos.
+     */
     suspend fun getCitas(): List<Cita> {
         val snapshot = database.get().await()
         return snapshot.children.mapNotNull { child ->
@@ -18,6 +24,9 @@ class CitaRepository {
         }
     }
 
+    /**
+     * Obtiene las citas filtradas por fecha.
+     */
     suspend fun getCitasByDate(dateInMillis: Long): List<Cita> {
         val snapshot = database.get().await()
         return snapshot.children.mapNotNull { child ->
@@ -30,6 +39,9 @@ class CitaRepository {
         }
     }
 
+    /**
+     * Obtiene las citas filtradas por ID de empleado.
+     */
     suspend fun getCitasByEmpleadoId(empleadoId: String): List<Cita> {
         val snapshot = database.get().await()
         return snapshot.children.mapNotNull { child ->
@@ -39,34 +51,48 @@ class CitaRepository {
         }
     }
 
+    /**
+     * Agrega una nueva cita a la base de datos.
+     */
     suspend fun addCita(cita: Cita): String {
         val newCitaRef = database.push() // Obtiene una nueva referencia con un ID único
         cita.id = newCitaRef.key ?: "" // Asigna el ID a la cita
         newCitaRef.setValue(cita).await() // Guarda la cita en la base de datos
         return newCitaRef.key ?: "" // Devuelve el ID de la nueva cita
-
     }
 
+    /**
+     * Actualiza una cita existente en la base de datos.
+     */
     suspend fun updateCita(cita: Cita) {
         database.child(cita.id).setValue(cita).await()
     }
 
+    /**
+     * Elimina una cita de la base de datos.
+     */
     suspend fun deleteCita(citaId: String) {
         database.child(citaId).removeValue().await()
     }
 
+    /**
+     * Obtiene una cita por su ID.
+     */
     suspend fun getCitaById(citaId: String): Cita {
         val snapshot = database.child(citaId).get().await()
         return snapshot.getValue(Cita::class.java)!!
     }
 
+    /**
+     * Obtiene las citas filtradas por ID de empleado y fecha.
+     */
     suspend fun getCitasByEmpleadoIdAndDate(empleadoId: String, dateInMillis: Long): List<Cita> {
         val snapshot = database.get().await()
         val citasByEmpleado = snapshot.children.mapNotNull { child ->
             child.getValue(Cita::class.java)
-        }.filter { it.empleadoId == empleadoId } // Filter by employee ID
+        }.filter { it.empleadoId == empleadoId } // Filtra por ID de empleado
 
-        // Filter by date only (year, month, day)
+        // Filtra por fecha (año, mes, día)
         val selectedDate = Calendar.getInstance().apply { timeInMillis = dateInMillis }
         val selectedYear = selectedDate.get(Calendar.YEAR)
         val selectedMonth = selectedDate.get(Calendar.MONTH)
@@ -81,10 +107,8 @@ class CitaRepository {
                     citaCalendar.get(Calendar.MONTH) == selectedMonth &&
                     citaCalendar.get(Calendar.DAY_OF_MONTH) == selectedDay
         }
-
     }
-
-
+}
 
 //    suspend fun getHistorialCitasCliente(clienteId: String): List<Cita> {
 //        val snapshot = database.orderByChild("clienteId").equalTo(clienteId).get().await()
@@ -101,4 +125,4 @@ class CitaRepository {
 //        val snapshot = database.orderByChild("fecha").startAt(startDate.toDouble()).endAt(endDate.toDouble()).get().await()
 //        return snapshot.children.map { it.getValue(Cita::class.java)!! }
 //    }
-}
+

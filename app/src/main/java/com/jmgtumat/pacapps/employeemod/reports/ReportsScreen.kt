@@ -21,6 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
 
+/**
+ * @Composable que muestra la pantalla de informes y estadísticas.
+ *
+ * @param navController El controlador de navegación para la navegación entre destinos.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportsScreen(navController: NavController) {
@@ -36,8 +41,8 @@ fun ReportsScreen(navController: NavController) {
             TopAppBar(
                 title = { Text("Informes y Estadísticas") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle navigation icon click */ }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = { /* Manejar clic en el ícono de navegación */ }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
                 }
             )

@@ -1,10 +1,13 @@
 package com.jmgtumat.pacapps.util
 
-import com.jmgtumat.pacapps.data.Cita
-import com.jmgtumat.pacapps.data.Empleado
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * Función utilitaria que convierte una hora en formato de cadena a minutos desde la medianoche.
+ * @param time La hora en formato de cadena (HH:mm).
+ * @return La hora en minutos desde la medianoche.
+ */
 private fun getCitaHour(time: String): Long {
     val parts = time.split(":")
     return if (parts.size == 2) {
@@ -16,6 +19,35 @@ private fun getCitaHour(time: String): Long {
     }
 }
 
+/**
+ * Función utilitaria que formatea una fecha en milisegundos en un formato de cadena personalizado.
+ * @param millis La fecha en milisegundos.
+ * @return La fecha formateada en el formato "Día de Mes".
+ */
+fun formatDateNew(millis: Long): String {
+    val calendar = Calendar.getInstance().apply { timeInMillis = millis }
+    return "${calendar.get(Calendar.DAY_OF_MONTH)} de ${calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())}"
+}
+
+/**
+ * Función utilitaria que formatea una hora en milisegundos en un formato de cadena personalizado.
+ * @param millis La hora en milisegundos.
+ * @return La hora formateada en el formato "HH:mm".
+ */
+fun formatTimeNew(millis: Long): String {
+    val calendar = Calendar.getInstance().apply { timeInMillis = millis }
+    return "${calendar.get(Calendar.HOUR_OF_DAY)}:${calendar.get(Calendar.MINUTE)}"
+}
+/*
+private fun getCitaHour(timeInMillis: Long): String {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = timeInMillis
+    return calendar.get(Calendar.HOUR_OF_DAY).toString()
+}
+*/
+
+
+/*
 fun getCitasEnHorarioTrabajo(citas: List<Cita>, empleado: Empleado, selectedDate: Calendar): List<Cita> {
     val dayOfWeek = selectedDate.get(Calendar.DAY_OF_WEEK)
     val dayString = getDayString(dayOfWeek)
@@ -39,10 +71,9 @@ fun getCitasEnHorarioTrabajo(citas: List<Cita>, empleado: Empleado, selectedDate
         citaCalendar.get(Calendar.DAY_OF_WEEK) == dayOfWeek && (isMorning || isAfternoon)
     }
 }
+*/
 
-
-
-
+/*
 fun getDayString(dayOfWeek: Int): String {
     return when (dayOfWeek) {
         Calendar.MONDAY -> "Lunes"
@@ -55,19 +86,4 @@ fun getDayString(dayOfWeek: Int): String {
         else -> ""
     }
 }
-
-fun formatDateNew(millis: Long): String {
-    val calendar = Calendar.getInstance().apply { timeInMillis = millis }
-    return "${calendar.get(Calendar.DAY_OF_MONTH)} de ${calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())}"
-}
-
-fun formatTimeNew(millis: Long): String {
-    val calendar = Calendar.getInstance().apply { timeInMillis = millis }
-    return "${calendar.get(Calendar.HOUR_OF_DAY)}:${calendar.get(Calendar.MINUTE)}"
-}
-
-private fun getCitaHour(timeInMillis: Long): String {
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = timeInMillis
-    return calendar.get(Calendar.HOUR_OF_DAY).toString()
-}
+*/

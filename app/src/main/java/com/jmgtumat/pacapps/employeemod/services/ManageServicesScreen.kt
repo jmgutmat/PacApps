@@ -13,6 +13,11 @@ import com.jmgtumat.pacapps.repository.ServicioRepository
 import com.jmgtumat.pacapps.viewmodels.ServicioViewModel
 import com.jmgtumat.pacapps.viewmodels.ServicioViewModelFactory
 
+/**
+ * Pantalla para administrar los servicios, donde se pueden agregar, modificar y eliminar servicios.
+ *
+ * @param navController El controlador de navegación utilizado para la navegación entre pantallas.
+ */
 @Composable
 fun ManageServicesScreen(navController: NavController) {
     val servicioViewModel: ServicioViewModel = viewModel(
@@ -22,9 +27,9 @@ fun ManageServicesScreen(navController: NavController) {
     )
     val servicios by servicioViewModel.servicios.observeAsState(emptyList())
 
-    EmpleadoDashboard(navController = navController) { innerPadding -> // Llamamos a EmpleadoDashboard y pasamos un @Composable como parámetro
+    EmpleadoDashboard(navController = navController) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding) // Usamos innerPadding proporcionado por EmpleadoDashboard
+            modifier = Modifier.padding(innerPadding)
         ) {
             // Botón para añadir un nuevo servicio
             AddServiceButton(servicioViewModel)

@@ -20,6 +20,12 @@ import com.jmgtumat.pacapps.util.SearchBar
 import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
 import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModelFactory
 
+/**
+ * Pantalla para administrar los empleados, que muestra una lista de empleados con opciones para buscar,
+ * agregar, modificar y eliminar empleados.
+ *
+ * @param navController El controlador de navegación para navegar a otras pantallas.
+ */
 @Composable
 fun ManageEmployeesScreen(navController: NavController) {
     val empleadoViewModel: EmpleadoViewModel = viewModel(
@@ -39,6 +45,7 @@ fun ManageEmployeesScreen(navController: NavController) {
                 onSearchQueryChange = { searchQuery = it }
             )
 
+            // Columna desplazable que contiene la lista de empleados
             LazyColumn(
                 modifier = Modifier.weight(1f)
             ) {
@@ -52,6 +59,7 @@ fun ManageEmployeesScreen(navController: NavController) {
                 }
             }
 
+            // Botón para agregar un nuevo empleado
             AddEmployeeButton(navController, empleadoViewModel)
         }
     }
