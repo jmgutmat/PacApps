@@ -1,5 +1,6 @@
 package com.jmgtumat.pacapps.repository
 
+import android.util.Log
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.jmgtumat.pacapps.data.Cita
@@ -12,16 +13,29 @@ class CitaRepository {
 
     suspend fun getCitas(): List<Cita> {
         val snapshot = database.get().await()
-        return snapshot.children.map { it.getValue(Cita::class.java)!! }
+        return snapshot.children.mapNotNull { child ->
+            child.getValue(Cita::class.java)
+        }
     }
 
     suspend fun getCitasByDate(dateInMillis: Long): List<Cita> {
         val snapshot = database.get().await()
-        return snapshot.children.mapNotNull { it.getValue(Cita::class.java) }.filter {
+        return snapshot.children.mapNotNull { child ->
+            child.getValue(Cita::class.java)
+        }.filter {
             val calendar = Calendar.getInstance().apply { timeInMillis = it.fecha }
             val selectedCalendar = Calendar.getInstance().apply { timeInMillis = dateInMillis }
             calendar.get(Calendar.YEAR) == selectedCalendar.get(Calendar.YEAR) &&
                     calendar.get(Calendar.DAY_OF_YEAR) == selectedCalendar.get(Calendar.DAY_OF_YEAR)
+        }
+    }
+
+    suspend fun getCitasByEmpleadoId(empleadoId: String): List<Cita> {
+        val snapshot = database.get().await()
+        return snapshot.children.mapNotNull { child ->
+            child.getValue(Cita::class.java)
+        }.filter {
+            it.empleadoId == empleadoId
         }
     }
 
@@ -46,8 +60,45 @@ class CitaRepository {
         return snapshot.getValue(Cita::class.java)!!
     }
 
-    suspend fun getCitasByDateRange(startDate: Long, endDate: Long): List<Cita> {
-        val snapshot = database.orderByChild("fecha").startAt(startDate.toDouble()).endAt(endDate.toDouble()).get().await()
-        return snapshot.children.map { it.getValue(Cita::class.java)!! }
+    suspend fun getCitasByEmpleadoIdAndDate(empleadoId: String, dateInMillis: Long): List<Cita> {
+        val snapshot = database.get().await()
+        val citasByEmpleado = snapshot.children.mapNotNull { child ->
+            child.getValue(Cita::class.java)
+        }.filter { it.empleadoId == empleadoId } // Filter by employee ID
+
+        // Filter by date only (year, month, day)
+        val selectedDate = Calendar.getInstance().apply { timeInMillis = dateInMillis }
+        val selectedYear = selectedDate.get(Calendar.YEAR)
+        val selectedMonth = selectedDate.get(Calendar.MONTH)
+        val selectedDay = selectedDate.get(Calendar.DAY_OF_MONTH)
+
+        Log.d("CitaRepository", "Fecha seleccionada: $selectedYear-$selectedMonth-$selectedDay")
+
+        return citasByEmpleado.filter {
+            val citaCalendar = Calendar.getInstance().apply { timeInMillis = it.fecha }
+            Log.d("Fecha cita", "Año: ${citaCalendar.get(Calendar.YEAR)}, Mes: ${citaCalendar.get(Calendar.MONTH)}, Día: ${citaCalendar.get(Calendar.DAY_OF_MONTH)}")
+            citaCalendar.get(Calendar.YEAR) == selectedYear &&
+                    citaCalendar.get(Calendar.MONTH) == selectedMonth &&
+                    citaCalendar.get(Calendar.DAY_OF_MONTH) == selectedDay
+        }
+
     }
+
+
+
+//    suspend fun getHistorialCitasCliente(clienteId: String): List<Cita> {
+//        val snapshot = database.orderByChild("clienteId").equalTo(clienteId).get().await()
+//        return snapshot.children.map { it.getValue(Cita::class.java)!! }
+//    }
+//
+//    suspend fun getCitaPendienteCliente(clienteId: String): Cita? {
+//        val snapshot = database.orderByChild("clienteId").equalTo(clienteId).get().await()
+//        val citas = snapshot.children.mapNotNull { it.getValue(Cita::class.java) }
+//        return citas.find { it.estado == CitaEstado.PENDIENTE }
+//    }
+//
+//    suspend fun getCitasByDateRange(startDate: Long, endDate: Long): List<Cita> {
+//        val snapshot = database.orderByChild("fecha").startAt(startDate.toDouble()).endAt(endDate.toDouble()).get().await()
+//        return snapshot.children.map { it.getValue(Cita::class.java)!! }
+//    }
 }

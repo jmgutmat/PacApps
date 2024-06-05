@@ -19,7 +19,7 @@ import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 fun ManageClientsScreen(navController: NavController) {
     val clienteViewModel: ClienteViewModel = viewModel(
         factory = ClienteViewModelFactory(
-            ClienteRepository(/* parámetros de configuración si los hay */),
+            ClienteRepository(),
         )
     )
     val clientes by clienteViewModel.clientes.observeAsState(emptyList())

@@ -29,8 +29,12 @@ fun PerformanceChart(context: Context, citaViewModel: CitaViewModel) {
         Entry(index.toFloat(), cita.duracion.toFloat()) // Modificar la obtención de la duración real según la estructura de la cita
     }
 
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Column {
             Text("Desempeño Mensual", style = MaterialTheme.typography.titleMedium)
             LineChart(context).apply {
                 data = LineData(LineDataSet(points, "Performance").apply {
@@ -38,13 +42,13 @@ fun PerformanceChart(context: Context, citaViewModel: CitaViewModel) {
                     setCircleColor(Color.Blue.toArgb())
                     setDrawValues(false)
                 })
-                xAxis.position = XAxis.XAxisPosition.BOTTOM
-                axisRight.isEnabled = false
-                description.isEnabled = false
-                legend.isEnabled = false
-                axisLeft.setDrawGridLines(false)
-                xAxis.setDrawGridLines(false)
-                invalidate()
+                xAxis.position = XAxis.XAxisPosition.BOTTOM // Posición de las etiquetas del eje X
+                axisRight.isEnabled = false // Deshabilitar el eje derecho
+                description.isEnabled = false // Deshabilitar la descripción
+                legend.isEnabled = false // Deshabilitar la leyenda
+                axisLeft.setDrawGridLines(false) // Ocultar las líneas de la cuadrícula del eje Y
+                xAxis.setDrawGridLines(false) // Ocultar las líneas de la cuadrícula del eje X
+                invalidate() // Actualizar el gráfico
             }
         }
     }

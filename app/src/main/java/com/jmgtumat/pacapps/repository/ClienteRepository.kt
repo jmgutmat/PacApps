@@ -14,9 +14,29 @@ class ClienteRepository {
 
 
     suspend fun getClientes(): List<Cliente> {
-        val snapshot = database.get().await()
-        return snapshot.children.map { it.getValue(Cliente::class.java)!! }
+        try {
+            val snapshot = database.get().await()
+            val clientes = mutableListOf<Cliente>()
+
+            snapshot.children.forEach { clienteSnapshot ->
+                try {
+                    val cliente = clienteSnapshot.getValue(Cliente::class.java)!!
+                    clientes.add(cliente)
+                } catch (e: Exception) {
+                    Log.e("ClienteRepository", "Error al convertir cliente: ${e.message}")
+                    Log.e("ClienteRepository", "ClienteSnapshot: $clienteSnapshot")
+                }
+            }
+
+            Log.d("ClienteRepository", "Clientes obtenidos: $clientes")
+            return clientes
+        } catch (e: Exception) {
+            Log.e("ClienteRepository", "Error al obtener clientes: ${e.message}")
+            throw e
+        }
     }
+
+
 
     suspend fun addCliente(cliente: Cliente) {
         val newClienteRef = database.push()
@@ -43,15 +63,16 @@ class ClienteRepository {
         val citaIds = clienteCitasSnapshot.children.mapNotNull { it.getValue(String::class.java) }
         val citas = mutableListOf<Cita>()
 
-        Log.d("ClienteRepository", "Obteniendo historial de citas para $clienteId con los IDs: $citaIds")
-
         citaIds.forEach { citaId ->
-            val citaSnapshot = citasDatabase.child(citaId).get().await()
-            val cita = citaSnapshot.getValue(Cita::class.java)
-            cita?.let { citas.add(it) }
+            try {
+                val citaSnapshot = citasDatabase.child(citaId).get().await()
+                val cita = citaSnapshot.getValue(Cita::class.java)
+                cita?.let { citas.add(it) }
+            } catch (e: Exception) {
+                Log.e("ClienteRepository", "Error al obtener la cita con ID: $citaId, Error: ${e.message}")
+            }
         }
 
         return citas
     }
-
 }

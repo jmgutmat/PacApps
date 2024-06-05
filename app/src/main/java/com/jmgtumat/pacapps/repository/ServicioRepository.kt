@@ -27,4 +27,9 @@ class ServicioRepository {
     suspend fun deleteServicio(servicioId: String) {
         database.child(servicioId).removeValue().await()
     }
+
+    suspend fun getServicioById(servicioId: String): Servicio {
+        val snapshot = database.child(servicioId).get().await()
+        return snapshot.getValue(Servicio::class.java) ?: throw IllegalArgumentException("Servicio no encontrado")
+    }
 }

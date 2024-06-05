@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +30,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -103,9 +105,12 @@ fun NewAppointmentScreen(navController: NavController) {
                     ) {
                         Row( // Use Row instead of Column for horizontal arrangement
                             modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween // Distribute content horizontally
                         ) {
-                            Column { // Information section
+                            Column (
+                                modifier = Modifier.weight(1f)
+                            ){ // Information section
                                 Text(text = servicio.nombre, style = MaterialTheme.typography.titleLarge)
                                 if (expandedServiceId == servicio.id) {
                                     Text(text = "Duración: ${servicio.duracion} minutos", style = MaterialTheme.typography.bodyMedium)
@@ -113,6 +118,7 @@ fun NewAppointmentScreen(navController: NavController) {
                                 }
                             }
                             if (expandedServiceId == servicio.id) { // Show button only when service is expanded
+                                Spacer(modifier = Modifier.width(16.dp))
                                 IconButton(
                                     onClick = {
                                         Log.d("NewAppointmentScreen", "Service selected: ${servicio.nombre}")
@@ -149,7 +155,7 @@ fun NewAppointmentScreen(navController: NavController) {
                 }
 
                 selectedDate?.let { date ->
-                    Text(text = "Available slots for ${date.time}")
+                    Text(text = "Citas disponibles para  ${date.time}")
                     AppointmentGrid(
                         citas = citas.filter { cita -> isSameDay(cita.fecha, date) },
                         availableSlots = availableSlots,

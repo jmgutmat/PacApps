@@ -1,6 +1,7 @@
 package com.jmgtumat.pacapps.employeemod.reports
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,14 +31,26 @@ suspend fun generateServicePopularityReport(
 
 @Composable
 fun ServicePopularityReportContent(report: List<ServicePopularityReport>) {
-    Column {
-        Text("Informe de popularidad de servicios:", style = MaterialTheme.typography.bodyLarge)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            "Informe de popularidad de servicios:",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
         report.forEach { serviceReport ->
             Text(
-                text = "Servicio: ${serviceReport.serviceName}, " +
-                        "Citas Totales: ${serviceReport.totalAppointments}",
+                text = "Servicio: ${serviceReport.serviceName}",
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Citas Totales: ${serviceReport.totalAppointments}",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
         }
     }

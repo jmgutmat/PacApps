@@ -1,8 +1,8 @@
 package com.jmgtumat.pacapps.employeemod.reports
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,12 +53,32 @@ suspend fun generateFinancialReport(
 
 @Composable
 fun FinancialReportContent(report: FinancialReport) {
-    Column {
-        Text("Ingresos Totales: ${report.ingresoTotal}", style = MaterialTheme.typography.bodyLarge)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text("Ingresos por Servicio:", style = MaterialTheme.typography.bodyLarge)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            "Ingresos Totales:",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Text(
+            text = "${report.ingresoTotal} €",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Text(
+            "Ingresos por Servicio:",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
         report.ingresosPorServicio.forEach { (servicio, ingreso) ->
-            Text("$servicio: $ingreso", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = "$servicio: $ingreso €",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
         }
     }
 }

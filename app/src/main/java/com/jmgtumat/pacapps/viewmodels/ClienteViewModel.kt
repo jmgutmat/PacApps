@@ -1,5 +1,6 @@
 package com.jmgtumat.pacapps.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,7 @@ import com.jmgtumat.pacapps.data.CitaEstado
 import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.data.Empleado
 import com.jmgtumat.pacapps.data.Servicio
+import com.jmgtumat.pacapps.repository.CitaRepository
 import com.jmgtumat.pacapps.repository.ClienteRepository
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import com.jmgtumat.pacapps.repository.ServicioRepository
@@ -19,7 +21,8 @@ import kotlinx.coroutines.launch
 class ClienteViewModel(
     private val clienteRepository: ClienteRepository,
     private val servicioRepository: ServicioRepository,
-    private val empleadoRepository: EmpleadoRepository
+    private val empleadoRepository: EmpleadoRepository,
+    private val citaRepository: CitaRepository
 ) : BaseViewModel() {
 
     private val _clientes = MutableLiveData<List<Cliente>>()
@@ -41,12 +44,15 @@ class ClienteViewModel(
     private val _citaPendiente = MutableLiveData<Cita?>()
     val citaPendiente: LiveData<Cita?> get() = _citaPendiente
 
+
     init {
         fetchClientes()
         fetchServicios()
         fetchEmpleados()
-        // Aquí deberías inicializar el ID del cliente autenticado
         _clienteId.value = getAuthenticatedClienteId() // Función para obtener el ID del cliente autenticado
+        fetchHistorialCitasClienteAutenticado() // Fetch the historial citas on initialization
+        fetchCitaPendienteClienteAutenticado()
+
     }
 
     private fun getAuthenticatedClienteId(): String {
@@ -65,6 +71,7 @@ class ClienteViewModel(
                 setSuccess()
             } catch (e: Exception) {
                 setError(e.message)
+                Log.e("ClienteViewModel", "Error al obtener clientes: ${e.message}")
             }
         }
     }
@@ -130,30 +137,64 @@ class ClienteViewModel(
         }
     }
 
-    fun fetchHistorialCitasClienteAutenticado() {
+    fun fetchCitaPendienteClienteAutenticado() {
         viewModelScope.launch {
             setLoading()
             try {
-                val clienteId = _clienteId.value ?: return@launch
-                val fetchedHistorialCitas = clienteRepository.getHistorialCitas(clienteId)
-                _historialCitas.value = fetchedHistorialCitas
-
-                // Verificar si hay alguna cita pendiente
-                val citaPendiente = fetchedHistorialCitas.firstOrNull { it.estado == CitaEstado.PENDIENTE }
+                val clienteId = getAuthenticatedClienteId()
+                val historialCitas = getCitasFromHistorial(clienteId)
+                val citaPendiente = historialCitas.find { it.estado == CitaEstado.PENDIENTE }
                 _citaPendiente.value = citaPendiente
-
                 setSuccess()
             } catch (e: Exception) {
                 setError(e.message)
             }
         }
+    }
+
+
+    fun fetchHistorialCitasClienteAutenticado() {
+        viewModelScope.launch {
+            setLoading()
+            try {
+                val clienteId = getAuthenticatedClienteId()
+                val fetchedHistorialCitas = getCitasFromHistorial(clienteId)
+                _historialCitas.value = fetchedHistorialCitas.sortedByDescending { it.fecha }
+                setSuccess()
+            } catch (e: Exception) {
+                setError(e.message)
+            }
+        }
+    }
+
+//    fun fetchServicioNombre(servicioId: String) {
+//        viewModelScope.launch {
+//            setLoading()
+//            try {
+//                val servicio = servicioRepository.getServicioById(servicioId)
+//                _servicioNombre.value = servicio.nombre
+//                setSuccess()
+//            } catch (e: Exception) {
+//                setError(e.message)
+//            }
+//        }
+//    }
+
+    suspend fun getCitasFromHistorial(clienteId: String): List<Cita> {
+        val citaIds = clienteRepository.getHistorialCitas(clienteId)
+        val citas = mutableListOf<Cita>()
+        for (citaId in citaIds) {
+            val cita = citaRepository.getCitaById(citaId.id)  // Obtener cita por ID desde el nodo "citas"
+            citas.add(cita)
+        }
+        return citas
     }
 
     fun fetchHistorialCitas(clienteId: String) {
         viewModelScope.launch {
             setLoading()
             try {
-                val fetchedHistorialCitas = clienteRepository.getHistorialCitas(clienteId)
+                val fetchedHistorialCitas = getCitasFromHistorial(clienteId)
                 _historialCitas.value = fetchedHistorialCitas
                 setSuccess()
             } catch (e: Exception) {
@@ -162,15 +203,17 @@ class ClienteViewModel(
         }
     }
 
-    fun updateHistorialCitas(clienteId: String, citas: List<Cita>) {
-        viewModelScope.launch {
-            try {
-                clienteRepository.updateHistorialCitas(clienteId, citas)
-            } catch (e: Exception) {
-                setError(e.message)
-            }
-        }
-    }
+
+
+//    fun updateHistorialCitas(clienteId: String, citas: List<Cita>) {
+//        viewModelScope.launch {
+//            try {
+//                clienteRepository.updateHistorialCitas(clienteId, citas)
+//            } catch (e: Exception) {
+//                setError(e.message)
+//            }
+//        }
+//    }
 
 }
 
@@ -178,7 +221,7 @@ class ClienteViewModel(
 class ClienteViewModelFactory(private val clienteRepository: ClienteRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ClienteViewModel::class.java)) {
-            return ClienteViewModel(clienteRepository, ServicioRepository(), EmpleadoRepository()) as T
+            return ClienteViewModel(clienteRepository, ServicioRepository(), EmpleadoRepository(), CitaRepository()) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

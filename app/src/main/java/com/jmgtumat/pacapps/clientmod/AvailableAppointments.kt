@@ -150,10 +150,13 @@ private fun calculateAvailableSlotsForEmployee(date: Calendar, servicio: Servici
             while (currentSlotStart.timeInMillis + durationInMillis <= end) {
                 val slotEnd = currentSlotStart.timeInMillis + durationInMillis
 
-                val overlap = citas.any { cita ->
-                    val citaStart = cita.horaInicio
-                    val citaEnd = cita.horaInicio + cita.duracion * 60 * 1000
-                    !(slotEnd <= citaStart || currentSlotStart.timeInMillis >= citaEnd)
+                // Filtrar citas por dia
+                val citasDelDia = citas.filter { cita ->
+                    isSameDay(cita.fecha, date)
+                }
+
+                val overlap = citasDelDia.any { cita ->
+                    cita.horaInicio < slotEnd && cita.horaInicio + cita.duracion * 60 * 1000 > currentSlotStart.timeInMillis
                 }
 
                 if (!overlap) {

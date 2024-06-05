@@ -1,6 +1,7 @@
 package com.jmgtumat.pacapps.employeemod.reports
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,16 +38,36 @@ suspend fun generateEmployeePerformanceReport(
 
 @Composable
 fun EmployeePerformanceReportContent(report: List<EmployeePerformanceReport>) {
-    Column {
-        Text("Informe de rendimiento de empleados:", style = MaterialTheme.typography.bodyLarge)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            "Informe de rendimiento de empleados:",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
         report.forEach { employeeReport ->
             Text(
-                text = "Empleado: ${employeeReport.employeeName}, " +
-                        "Citas Totales: ${employeeReport.totalAppointments}, " +
-                        "Citas Confirmadas: ${employeeReport.confirmedAppointments}, " +
-                        "Citas Canceladas: ${employeeReport.canceledAppointments}",
+                text = "Empleado: ${employeeReport.employeeName}",
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Citas Totales: ${employeeReport.totalAppointments}",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Citas Confirmadas: ${employeeReport.confirmedAppointments}",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = "Citas Canceladas: ${employeeReport.canceledAppointments}",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
         }
     }

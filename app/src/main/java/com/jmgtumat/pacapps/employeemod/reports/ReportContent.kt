@@ -1,11 +1,12 @@
 package com.jmgtumat.pacapps.employeemod.reports
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -14,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jmgtumat.pacapps.repository.CitaRepository
@@ -60,6 +62,7 @@ fun ReportContent(
             ServicioRepository(/* parámetros de configuración si los hay */),
         )
     )
+    Log.d("ReportContent", "Citas: ${citaViewModel.citas.value}")
 
     LaunchedEffect(startDate.value, endDate.value) {
         if (startDate.value != null && endDate.value != null) {
@@ -86,35 +89,51 @@ fun ReportContent(
         }
     }
 
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            DateSelectorReport(context = context, startDate = startDate, endDate = endDate)
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        /*item {
+            PerformanceChart(context, citaViewModel)
+            Spacer(modifier = Modifier.height(16.dp))
+        }*/
+
+        financialReport?.let {
+            item {
+                FinancialReportContent(report = it)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+
+        employeePerformanceReport?.let {
+            item {
+                EmployeePerformanceReportContent(report = it)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+
+        servicePopularityReport?.let {
+            item {
+                ServicePopularityReportContent(report = it)
+            }
+        }
+    }
+}
+
+
+@Composable
+fun DateSelectorReport(
+    context: Context,
+    startDate: MutableState<Long?>,
+    endDate: MutableState<Long?>
+) {
     Column {
         DateSelector(
-            context = context,
+            context = LocalContext.current,
             startDate = startDate,
             endDate = endDate
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (financialReport != null) {
-            FinancialReportContent(report = financialReport!!)
-        } else {
-            Text("Seleccione ambas fechas para generar los informes", style = MaterialTheme.typography.bodyLarge)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        PerformanceChart(context, citaViewModel)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (employeePerformanceReport != null) {
-            EmployeePerformanceReportContent(report = employeePerformanceReport!!)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (servicePopularityReport != null) {
-            ServicePopularityReportContent(report = servicePopularityReport!!)
-        }
     }
 }

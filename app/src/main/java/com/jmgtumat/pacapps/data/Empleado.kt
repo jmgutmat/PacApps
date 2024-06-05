@@ -7,6 +7,6 @@ data class Empleado(
     override val telefono: String = "",
     override val correoElectronico: String = "",
     val horariosTrabajo: Map<String, HorariosPorDia> = emptyMap(), // Mapa de días de la semana a horarios disponibles
-    val citasAsignadas: List<Cita>  = emptyList(),
+    val citasAsignadas: List<String>  = emptyList(),
     override val rol: UserRole = UserRole.EMPLEADO
 ) : User(id, nombre, apellidos, telefono, correoElectronico, rol)

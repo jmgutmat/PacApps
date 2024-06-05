@@ -1,5 +1,6 @@
 package com.jmgtumat.pacapps.employeemod.clients
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jmgtumat.pacapps.data.Cliente
+import com.jmgtumat.pacapps.navigation.AppScreens
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 
 @Composable
@@ -314,7 +316,21 @@ fun ViewHistoryButton(
     cliente: Cliente,
     navController: NavController
 ) {
-    Button(onClick = { navController.navigate("history/${cliente.id}") }) {
+    Button(
+        onClick = {
+            // Verifica que el clienteId se esté pasando correctamente
+            Log.d("ClientId", "ClienteId: ${cliente.id}")
+
+            navController.currentBackStackEntry?.arguments?.putString("clienteId", cliente.id)
+            navController.navigate("${AppScreens.EmpModHistoryScreen.route}/${cliente.id}") {
+                // Asegúrate de pasar el clienteId como argumento en la navegación
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    ) {
         Text("Ver Historial")
     }
 }
+
+

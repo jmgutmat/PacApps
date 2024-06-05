@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.Empleado
 import com.jmgtumat.pacapps.data.HorariosPorDia
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
@@ -19,11 +20,20 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
     private val _horariosTrabajo = MutableLiveData<Map<String, HorariosPorDia>?>()
     val horariosTrabajo: LiveData<Map<String, HorariosPorDia>?> get() = _horariosTrabajo
 
+    private val _empleadoId = MutableLiveData<String>()
+    val empleadoId: LiveData<String> get() = _empleadoId
+
+    private val _citasAsignadas = MutableLiveData<List<Cita>>()
+    val citasAsignadas: LiveData<List<Cita>> get() = _citasAsignadas
+
+
     init {
+        _empleadoId.value = getAuthenticatedEmpleadoId()
         fetchEmpleados()
     }
 
-    private fun fetchEmpleados() {
+
+    fun fetchEmpleados() {
         viewModelScope.launch {
             setLoading()
             try {
@@ -37,6 +47,17 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
             } catch (e: Exception) {
                 setError(e.message)
             }
+        }
+    }
+
+    fun getAuthenticatedEmpleadoId(): String {
+        return empleadoRepository.getAuthenticatedEmpleadoId()
+    }
+
+    fun fetchCitasAsignadas(empleadoId: String) {
+        viewModelScope.launch {
+            val citas = empleadoRepository.getCitasAsignadas(empleadoId)
+            _citasAsignadas.value = citas
         }
     }
 
@@ -76,11 +97,14 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
     fun fetchHorariosTrabajo(empleadoId: String) {
         viewModelScope.launch {
             try {
+                Log.d("EmpleadoViewModel", "Recuperando horarios de trabajo para empleadoId: $empleadoId")
                 val horarioTrabajo = empleadoRepository.getHorariosTrabajo(empleadoId)
+                Log.d("EmpleadoViewModel", "Horarios de trabajo obtenidos: $horarioTrabajo")
                 _horariosTrabajo.value = horarioTrabajo
                 setSuccess()
             } catch (e: Exception) {
                 setError(e.message)
+                Log.d("EmpleadoViewModel", "Error al recuperar horarios de trabajo: ${e.message}")
             }
         }
     }

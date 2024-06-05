@@ -15,13 +15,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.repository.ClienteRepository
-import com.jmgtumat.pacapps.util.validateProfileInput
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 
@@ -38,10 +37,6 @@ fun ProfileScreen(navController: NavController) {
     var nombre by remember { mutableStateOf(currentCliente.nombre) }
     var apellidos by remember { mutableStateOf(currentCliente.apellidos) }
     var telefono by remember { mutableStateOf(currentCliente.telefono) }
-    var correoElectronico by remember { mutableStateOf(currentCliente.correoElectronico) }
-    var password by remember { mutableStateOf("") }
-    var showError by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
 
     ClienteDashboard(navController = navController) { innerPadding ->
         Column(
@@ -70,32 +65,27 @@ fun ProfileScreen(navController: NavController) {
                 label = { Text("Teléfono") }
             )
 
-            OutlinedTextField(
-                value = correoElectronico,
-                onValueChange = { correoElectronico = it },
-                label = { Text("Correo electrónico") }
-            )
-
             Button(onClick = {
-                val isValid = validateProfileInput(nombre, apellidos, telefono, correoElectronico, password)
-                if (isValid.isValid) {
-                    val updatedCliente = currentCliente.copy(
-                        nombre = nombre,
-                        apellidos = apellidos,
-                        telefono = telefono,
-                        correoElectronico = correoElectronico
-                    )
-                    clienteViewModel.updateCliente(updatedCliente)
-                } else {
-                    showError = true
-                    errorMessage = isValid.errorMessage
-                }
+                val updatedCliente = currentCliente.copy(
+                    nombre = nombre,
+                    apellidos = apellidos,
+                    telefono = telefono
+                )
+                clienteViewModel.updateCliente(updatedCliente)
             }) {
                 Text("Actualizar Datos")
             }
 
-            if (showError) {
-                Text(errorMessage, color = Color.Red)
+            Button(
+                onClick = {
+                    FirebaseAuth.getInstance().signOut()
+                    navController.navigate("/main_screen") {
+                        popUpTo(0) // Clear back stack
+                    }
+                },
+                modifier = Modifier.padding(top = 16.dp)
+            ) {
+                Text("Cerrar Sesión")
             }
         }
     }

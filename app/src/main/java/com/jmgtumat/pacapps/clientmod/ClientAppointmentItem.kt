@@ -39,7 +39,9 @@ import java.util.Calendar
 
 @Composable
 fun ClientAppointmentItem(
-    cita: Cita
+    cita: Cita,
+    servicioNombre: String,
+    empleadoNombre: String
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -53,13 +55,12 @@ fun ClientAppointmentItem(
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Servicio: ${cita.servicioId}", style = MaterialTheme.typography.titleLarge)
+            Text(text = "Servicio: $servicioNombre", style = MaterialTheme.typography.titleLarge)
             Text(text = "Hora: ${formatTimeNew(cita.horaInicio)}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Fecha: ${formatDateNew(cita.fecha)}", style = MaterialTheme.typography.bodyMedium)
 
             if (expanded) {
-                Text(text = "Fecha: ${formatDateNew(cita.fecha)}", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Empleado: ${cita.empleadoId}", style = MaterialTheme.typography.bodyLarge)
+                Text(text = "Empleado: $empleadoNombre", style = MaterialTheme.typography.bodyLarge)
                 Text(text = "Estado: ${cita.estado}", style = MaterialTheme.typography.bodyMedium)
             }
         }

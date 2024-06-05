@@ -6,6 +6,6 @@ data class Cliente(
     override val apellidos: String = "",
     override val telefono: String = "",
     override val correoElectronico: String = "",
-    val historialCitas: List<Cita> = emptyList(),
+    val historialCitas: List<String> = emptyList(),
     override val rol: UserRole = UserRole.CLIENTE
 ) : User(id, nombre, apellidos, telefono, correoElectronico, rol)

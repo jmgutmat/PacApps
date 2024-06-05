@@ -16,6 +16,7 @@ sealed class AppScreens(val route: String) {
     //EmployeeModScreens
     object ManageAppointmentsScreen : AppScreens("/manage_appointments_screen")
     object ManageEmployeesScreen : AppScreens("/manage_employees_screen")
+//    object EmployeeHistoryScreen : AppScreens("/employee_history_screen")
     object ManageServicesScreen : AppScreens("/manage_services_screen")
     object ManageClientsScreen : AppScreens("/manage_clients_screen")
     object EmpModHistoryScreen : AppScreens("/empmod_history_screen")

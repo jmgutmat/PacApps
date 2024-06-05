@@ -89,7 +89,7 @@ fun EmployeeItem(
                 ) {
                     ModifyHorarioButton(empleado, empleadoViewModel) // Nuevo botón para modificar horario
                     ModifyEmployeeButton(empleado, empleadoViewModel)
-                    EmployeeHistoryButton(navController, empleado.id)
+                    //EmployeeHistoryButton(navController, empleado.id)
                     DeleteEmployeeButton(empleado, empleadoViewModel)
 
 
@@ -323,7 +323,7 @@ fun DeleteEmployeeDialog(
 
 @Composable
 fun EmployeeHistoryButton(navController: NavController, empleadoId: String) {
-    IconButton(onClick = { navController.navigate("/empmod_history_screen/$empleadoId") }) {
+    IconButton(onClick = { navController.navigate("/employee_history_screen") }) {
         Icon(Icons.Filled.History, contentDescription = "Ver historial de citas")
     }
 }
@@ -353,17 +353,18 @@ fun ModifyHorarioDialog(
     onDismiss: () -> Unit
 ) {
     val horariosTrabajo by empleadoViewModel.horariosTrabajo.observeAsState(initial = null)
-    var horarioTrabajo by remember { mutableStateOf(empleado.horariosTrabajo) }
+    var horarioTrabajo by remember { mutableStateOf<Map<String, HorariosPorDia>?>(null) }
     var selectedDay by remember { mutableStateOf("") }
 
     LaunchedEffect(empleado.id) {
-        empleadoViewModel.fetchHorariosTrabajo(empleado.id)
+        empleadoViewModel.fetchEmpleados() // Fetch all employees (if needed)
+        empleadoViewModel.fetchHorariosTrabajo(empleado.id) // Fetch horarios for this employee
     }
 
     if (horariosTrabajo == null) {
         CircularProgressIndicator()
     } else {
-        horarioTrabajo = horariosTrabajo ?: empleado.horariosTrabajo
+        horarioTrabajo = horariosTrabajo
 
         AlertDialog(
             onDismissRequest = { onDismiss() },
@@ -399,19 +400,24 @@ fun ModifyHorarioDialog(
                         }
                     }
                     if (selectedDay.isNotEmpty()) {
-                        val horarioDia = horarioTrabajo[selectedDay] ?: HorariosPorDia()
+                        // Handle potential null value for horarioTrabajo[selectedDay]
+                        val horarioDia = horarioTrabajo?.get(selectedDay) ?: HorariosPorDia()
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = "Mañana", style = MaterialTheme.typography.headlineSmall)
                         HorarioModulo("Mañana", horarioDia.manana) { updatedManana ->
-                            horarioTrabajo = horarioTrabajo.toMutableMap().apply {
-                                this[selectedDay] = horarioDia.copy(manana = updatedManana)
+                            horarioTrabajo?.let { // Update only if horarioTrabajo is not null
+                                val mutableHorarioTrabajo = it.toMutableMap()
+                                mutableHorarioTrabajo[selectedDay] = horarioDia.copy(manana = updatedManana)
+                                horarioTrabajo = mutableHorarioTrabajo // Update state with the modified map
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = "Tarde", style = MaterialTheme.typography.headlineSmall)
                         HorarioModulo("Tarde", horarioDia.tarde) { updatedTarde ->
-                            horarioTrabajo = horarioTrabajo.toMutableMap().apply {
-                                this[selectedDay] = horarioDia.copy(tarde = updatedTarde)
+                            horarioTrabajo?.let { // Update only if horarioTrabajo is not null
+                                val mutableHorarioTrabajo = it.toMutableMap()
+                                mutableHorarioTrabajo[selectedDay] = horarioDia.copy(tarde = updatedTarde)
+                                horarioTrabajo = mutableHorarioTrabajo // Update state with the modified map
                             }
                         }
                     }
@@ -419,8 +425,10 @@ fun ModifyHorarioDialog(
             },
             confirmButton = {
                 Button(onClick = {
-                    empleadoViewModel.updateHorariosTrabajo(empleado.id, horarioTrabajo)
-                    onDismiss()
+                    if (horarioTrabajo != null) {
+                        empleadoViewModel.updateHorariosTrabajo(empleado.id, horarioTrabajo!!)
+                        onDismiss()
+                    }
                 }) {
                     Text("Guardar")
                 }

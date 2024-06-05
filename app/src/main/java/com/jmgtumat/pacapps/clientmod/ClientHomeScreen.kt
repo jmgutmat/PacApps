@@ -1,5 +1,6 @@
 package com.jmgtumat.pacapps.clientmod
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,21 +34,22 @@ import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 @Composable
 fun ClientHomeScreen(navController: NavController) {
     val clienteViewModel: ClienteViewModel = viewModel(
-        factory = ClienteViewModelFactory(
-            ClienteRepository(),
-        )
+        factory = ClienteViewModelFactory(ClienteRepository())
     )
     val citaViewModel: CitaViewModel = viewModel(
-        factory = CitaViewModelFactory(
-            CitaRepository(),
-        )
+        factory = CitaViewModelFactory(CitaRepository())
     )
-    val clienteList by clienteViewModel.clientes.observeAsState(emptyList())
-    val pendingCita by clienteViewModel.citaPendiente.observeAsState()
 
-    LaunchedEffect(pendingCita) {
-        if (pendingCita == null) {
-            clienteViewModel.fetchHistorialCitasClienteAutenticado()
+    val clienteId by clienteViewModel.clienteId.observeAsState()
+    val pendingCita by clienteViewModel.citaPendiente.observeAsState()
+    val serviciosList by clienteViewModel.servicios.observeAsState(emptyList())
+
+
+    LaunchedEffect(clienteId) {
+        clienteId?.let {
+            Log.d("ClientHomeScreen", "Fetching data for clienteId: $it")
+            clienteViewModel.fetchHistorialCitas(it)
+            clienteViewModel.fetchCitaPendienteClienteAutenticado()
         }
     }
 
@@ -60,7 +62,10 @@ fun ClientHomeScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Log.d("ClientHomeScreen", "Rendering UI with pendingCita: $pendingCita")
             pendingCita?.let { cita ->
+                val servicio = serviciosList.find { it.id == cita.servicioId }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -72,7 +77,9 @@ fun ClientHomeScreen(navController: NavController) {
                     ) {
                         Text(text = "Cita Pendiente", style = MaterialTheme.typography.titleLarge)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "Servicio: ${cita.servicioId}")
+                        if (servicio != null) {
+                            Text(text = "Servicio: ${servicio.nombre ?: "Cargando..."}")
+                        }
                         Text(text = "Fecha: ${formatDateNew(cita.fecha)}")
                         Text(text = "Hora: ${formatTimeNew(cita.horaInicio)}")
                         Text(text = "Duración: ${cita.duracion} minutos")
@@ -88,9 +95,7 @@ fun ClientHomeScreen(navController: NavController) {
                 }
             } ?: run {
                 Text(text = "No tiene ninguna cita pendiente")
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            if (pendingCita == null) {
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
                         navController.navigate("/new_appointments_screen")

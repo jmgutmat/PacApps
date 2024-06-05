@@ -1,5 +1,6 @@
 package com.jmgtumat.pacapps.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -58,6 +59,9 @@ fun AppNavigation() {
         composable(AppScreens.ManageEmployeesScreen.route) {
             ManageEmployeesScreen(navController)
         }
+//        composable(AppScreens.EmployeeHistoryScreen.route) {
+//            EmployeeHistoryScreen(navController)
+//        }
         composable(AppScreens.ManageServicesScreen.route) {
             ManageServicesScreen(navController)
         }
@@ -65,8 +69,9 @@ fun AppNavigation() {
             ManageClientsScreen(navController)
         }
 
-        composable(AppScreens.EmpModHistoryScreen.route) { backStackEntry ->
+        composable(AppScreens.EmpModHistoryScreen.route + "/{clienteId}") { backStackEntry ->
             val clienteId = backStackEntry.arguments?.getString("clienteId") ?: ""
+            Log.d("AppNavigation", "Cliente ID: $clienteId") // Agregamos un log aquí para verificar el ID del cliente
             EmpModHistoryScreen(clienteId, navController)
         }
 

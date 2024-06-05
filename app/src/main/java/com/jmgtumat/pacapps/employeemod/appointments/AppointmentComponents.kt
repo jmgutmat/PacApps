@@ -160,13 +160,20 @@ fun AddAppointmentButton(navController: NavController) {
 @Composable
 fun HorarioCompletoConCitas(
     citas: List<Cita>,
+    horariosTrabajo: HorariosPorDia,
     onConfirmCita: (String) -> Unit,
     onCancelCita: (String) -> Unit
 ) {
     val scrollState = rememberScrollState()
     Column(modifier = Modifier.verticalScroll(scrollState)) {
-        for (hour in 0..23) {
-            HourBlock(hour, citas, onConfirmCita, onCancelCita)
+        // Iterar sobre el horario de la mañana
+        for (intervalo in listOf(horariosTrabajo.manana)) {
+            HourBlock(intervalo, citas, onConfirmCita, onCancelCita)
+        }
+
+        // Iterar sobre el horario de la tarde
+        for (intervalo in listOf(horariosTrabajo.tarde)) {
+            HourBlock(intervalo, citas, onConfirmCita, onCancelCita)
         }
     }
 }
@@ -174,60 +181,76 @@ fun HorarioCompletoConCitas(
 
 
 @Composable
-fun HourBlock(hour: Int, citas: List<Cita>, onCancelCita: (String) -> Unit, onConfirmCita: (String) -> Unit) {
-    val hourStart = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, hour)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-    }.timeInMillis
+fun HourBlock(intervalo: Intervalo, citas: List<Cita>, onCancelCita: (String) -> Unit, onConfirmCita: (String) -> Unit) {
+    val startHour = intervalo.horaInicio.split(":").first().toInt()
+    val endHour = intervalo.horaFin.split(":").first().toInt()
 
-    val hourEnd = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, hour)
-        set(Calendar.MINUTE, 59)
-        set(Calendar.SECOND, 59)
-    }.timeInMillis
+    Column(
+        modifier = Modifier
+            .height(120.dp)
+            .fillMaxWidth()
+    ) {
+        for (hour in startHour until endHour) {
+            val hourStart = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, hour)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+            }.timeInMillis
 
-    val citasInThisHour = citas.filter { cita ->
-        cita.horaInicio in hourStart..hourEnd
-    }
+            val hourEnd = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, hour)
+                set(Calendar.MINUTE, 59)
+                set(Calendar.SECOND, 59)
+            }.timeInMillis
 
-    Box(modifier = Modifier.height(120.dp)) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val canvasWidth = size.width
-            drawLine(
-                color = Color.Gray,
-                start = Offset(0f, 0f),
-                end = Offset(canvasWidth, 0f),
-                strokeWidth = 1.dp.toPx()
-            )
-            drawLine(
-                color = Color.Gray,
-                start = Offset(0f, size.height / 2),
-                end = Offset(canvasWidth, size.height / 2),
-                strokeWidth = 1.dp.toPx()
-            )
-        }
+            val citasInThisHour = citas.filter { cita ->
+                cita.horaInicio in hourStart..hourEnd
+            }
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            citasInThisHour.forEach { cita ->
-                EmployeeAppointmentItem(
-                    cita = cita,
-                    onCancel = {
-                        onCancelCita(cita.id)
-                    },
-                    onConfirm = {
-                        onConfirmCita(cita.id)
+            Box(
+                modifier = Modifier
+                    .height(120.dp)
+                    .fillMaxWidth()
+            ) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val canvasWidth = size.width
+                    drawLine(
+                        color = Color.Gray,
+                        start = Offset(0f, 0f),
+                        end = Offset(canvasWidth, 0f),
+                        strokeWidth = 1.dp.toPx()
+                    )
+                    drawLine(
+                        color = Color.Gray,
+                        start = Offset(0f, size.height / 2),
+                        end = Offset(canvasWidth, size.height / 2),
+                        strokeWidth = 1.dp.toPx()
+                    )
+                }
+
+                Column(modifier = Modifier.fillMaxSize()) {
+                    citasInThisHour.forEach { cita ->
+                        EmployeeAppointmentItem(
+                            cita = cita,
+                            onCancel = {
+                                onCancelCita(cita.id)
+                            },
+                            onConfirm = {
+                                onConfirmCita(cita.id)
+                            }
+                        )
                     }
+                }
+
+                Text(
+                    text = String.format("%02d:00", hour),
+                    modifier = Modifier.padding(start = 8.dp, top = 8.dp)
                 )
             }
         }
-
-        Text(
-            text = String.format("%02d:00", hour),
-            modifier = Modifier.padding(start = 8.dp, top = 8.dp)
-        )
     }
 }
+
 
 fun defaultHorariosPorDia() = HorariosPorDia(
     Intervalo("09:30", "14:00", true),
