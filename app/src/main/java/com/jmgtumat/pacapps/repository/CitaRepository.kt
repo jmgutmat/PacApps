@@ -12,7 +12,7 @@ import java.util.Calendar
  */
 class CitaRepository {
 
-    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("citas")
+    var database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("citas")
 
     /**
      * Obtiene todas las citas de la base de datos.

@@ -1,24 +1,34 @@
 package com.jmgtumat.pacapps.employeemod
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.outlined.AirlineSeatReclineExtra
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.jmgtumat.pacapps.navigation.AppScreens
 
 /**
  * Panel de control del empleado que muestra las diferentes funcionalidades disponibles.
@@ -32,6 +42,26 @@ fun EmpleadoDashboard(
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Tu título existente (opcional)
+                Text("Dashboard del Empleado",
+                    style = MaterialTheme.typography.titleLarge)
+
+                IconButton(onClick = {
+                    FirebaseAuth.getInstance().signOut()
+                    navController.navigate(AppScreens.MainScreen.route)
+                }) {
+                    Icon(Icons.Filled.Logout, contentDescription = "Logout")
+                }
+            }
+        },
         bottomBar = {
             BottomNavigationBar(navController)
         }

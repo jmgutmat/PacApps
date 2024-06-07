@@ -19,23 +19,17 @@ import com.google.firebase.database.PropertyName
 open class User(
     @get:PropertyName("id")
     open val id: String = "",
-
     @get:PropertyName("nombre")
     open val nombre: String = "",
-
     @get:PropertyName("apellidos")
     open val apellidos: String = "",
-
     @get:PropertyName("telefono")
     open val telefono: String = "",
-
     @get:PropertyName("correoElectronico")
     open val correoElectronico: String = "",
-
     @get:PropertyName("rol")
     open val rol: UserRole = UserRole.CLIENTE
 )
-
 /**
  * Enumeración que representa los roles de usuario en la aplicación.
  */

@@ -1,6 +1,9 @@
 package com.jmgtumat.pacapps.main
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -16,10 +19,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +32,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,19 +68,17 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun MainScreen(navController: NavController) {
-
-    // ViewModel para manejar la lógica de inicio de sesión
     val viewModel = MainViewModel()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // Estados de los campos de entrada y mensajes de error
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
+    val contactEmail by viewModel.contactEmail.collectAsState()
 
-    // Cliente de inicio de sesión de Google y lanzador para obtener el resultado de inicio de sesión de Google
+
     val googleSignInClient = remember { getGoogleSignInClient(context) }
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -85,46 +89,50 @@ fun MainScreen(navController: NavController) {
             val idToken = account.idToken
             if (idToken != null) {
                 coroutineScope.launch {
+                    Log.d("MainScreen", "ID Token obtained: $idToken")
                     val authResult = viewModel.signInWithGoogle(idToken)
                     if (authResult.isSuccess) {
                         val userId = authResult.getOrNull()
+                        Log.d("MainScreen", "Google sign-in successful, userId: $userId")
                         userId?.let {
                             redirectToRoleBasedScreen(navController, it, viewModel::getUserType)
                         }
                     } else {
                         errorMessage = authResult.exceptionOrNull()?.message ?: "Error al iniciar sesión con Google"
+                        Log.e("MainScreen", "Google sign-in failed: $errorMessage")
                     }
                 }
+            } else {
+                errorMessage = "ID Token is null"
+                Log.e("MainScreen", "Google sign-in failed: $errorMessage")
             }
         } catch (e: ApiException) {
-            errorMessage = e.localizedMessage ?: "Error al obtener el ID Token de Google"
+            errorMessage = "Error al obtener el ID Token de Google: ${e.statusCode}"
+            Log.e("MainScreen", "Google sign-in failed", e)
         }
     }
 
-    // Diseño de la pantalla de inicio de sesión
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Imagen de la aplicación en la parte superior
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp), // Ajusta la altura deseada
-            contentAlignment = Alignment.TopCenter // Alinea el contenido en la parte superior
+                .height(300.dp),
+            contentAlignment = Alignment.TopCenter
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_blanco),
                 contentDescription = null,
                 modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter),
-                contentScale = ContentScale.Crop // Ajusta la escala para que la imagen se recorte según el tamaño del contenedor
+                contentScale = ContentScale.Crop
             )
         }
 
-        // Campo de texto para ingresar el correo electrónico
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -132,7 +140,6 @@ fun MainScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Campo de texto para ingresar la contraseña con opción de ocultar o mostrar la contraseña
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -149,18 +156,19 @@ fun MainScreen(navController: NavController) {
             }
         )
 
-        // Botón para iniciar sesión con correo y contraseña
         Button(
             onClick = {
                 coroutineScope.launch {
                     val result = viewModel.signInWithEmailAndPassword(email, password)
                     if (result.isSuccess) {
                         val userId = result.getOrNull()
+                        Log.d("MainScreen", "Email sign-in successful, userId: $userId")
                         userId?.let {
                             redirectToRoleBasedScreen(navController, it, viewModel::getUserType)
                         }
                     } else {
                         errorMessage = result.exceptionOrNull()?.message ?: "Error al iniciar sesión"
+                        Log.e("MainScreen", "Email sign-in failed: $errorMessage")
                     }
                 }
             },
@@ -173,7 +181,6 @@ fun MainScreen(navController: NavController) {
             Text("Iniciar Sesión")
         }
 
-        // Botón para registrar una nueva cuenta
         Button(
             onClick = {
                 navController.navigate(AppScreens.EmailSignUpScreen.route)
@@ -211,14 +218,28 @@ fun MainScreen(navController: NavController) {
             }
         }
 
-
-
-        // Mensaje de error si hay un problema durante el inicio de sesión
         if (errorMessage.isNotBlank()) {
             Text(text = errorMessage, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
         }
+        Box(modifier = Modifier.fillMaxSize()) {
+            FloatingActionButton(
+                onClick = {
+                    val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:$contactEmail")
+                        putExtra(Intent.EXTRA_SUBJECT, "Incidencia en la aplicación")
+                    }
+                    context.startActivity(emailIntent)
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(Icons.Filled.Email, contentDescription = "Contacto")
+            }
+        }
     }
 }
+
 
 /**
  * Obtiene el cliente de inicio de sesión de Google.

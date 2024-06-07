@@ -25,14 +25,14 @@ class CitaViewModel(
     private val empleadoRepository: EmpleadoRepository
 ) : BaseViewModel() {
 
-    private val _citas = MutableLiveData<List<Cita>>()
+    val _citas = MutableLiveData<List<Cita>>()
     val citas: LiveData<List<Cita>> get() = _citas
 
     init {
         fetchCitas()
     }
 
-    private fun fetchCitas() {
+    fun fetchCitas() {
         viewModelScope.launch {
             setLoading()
             try {

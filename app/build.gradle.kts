@@ -54,9 +54,9 @@ android {
 dependencies {
     // AndroidX Core y Lifecycle
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
     implementation("androidx.activity:activity-compose:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-android:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-android:2.8.1")
     implementation("androidx.compose.runtime:runtime-livedata:1.6.7")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
@@ -79,15 +79,24 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.7")
 
     // Firebase y Google Services
-    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
     implementation("com.google.firebase:firebase-database-ktx:21.0.0")
     implementation("com.google.android.gms:play-services-auth:21.2.0")
     implementation ("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-crashlytics:19.0.0")
+    implementation("com.google.firebase:firebase-crashlytics:19.0.1")
+    implementation("com.google.firebase:firebase-config-ktx")
 
-    // Facebook SDK
-    implementation("com.facebook.android:facebook-android-sdk:latest.release")
+
+   //Test y Pruebas
+    dependencies {
+        testImplementation ("junit:junit:4.13.2")
+        testImplementation ("org.mockito:mockito-core:3.11.2")
+        testImplementation ("org.mockito:mockito-inline:3.11.2")
+        testImplementation("androidx.arch.core:core-testing:2.2.0")
+        testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    }
+
 
     // Material
     implementation("com.google.android.material:material:1.12.0")
