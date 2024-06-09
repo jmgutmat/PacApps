@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -72,7 +76,7 @@ fun ClientItem(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Row(
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     ViewHistoryButton(cliente, navController)
@@ -186,7 +190,7 @@ fun AddClientDialog(
  * @param query La consulta de búsqueda.
  * @return La lista filtrada de clientes.
  */
-@Composable
+
 fun filterClientes(clientes: List<Cliente>, query: String): List<Cliente> {
     return if (query.isEmpty()) {
         clientes
@@ -213,8 +217,8 @@ fun ModifyClientButton(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    Button(onClick = { showDialog = true }) {
-        Text("Modificar")
+    IconButton(onClick = { showDialog = true }) {
+        Icon(Icons.Filled.Edit, contentDescription = "Modificar cliente")
     }
 
     if (showDialog) {
@@ -306,8 +310,8 @@ fun DeleteClientButton(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    Button(onClick = { showDialog = true }) {
-        Text("Eliminar")
+    IconButton(onClick = { showDialog = true }) {
+        Icon(Icons.Filled.Delete, contentDescription = "Eliminar cliente")
     }
 
     if (showDialog) {
@@ -370,7 +374,7 @@ fun ViewHistoryButton(
     cliente: Cliente,
     navController: NavController
 ) {
-    Button(
+    IconButton(
         onClick = {
             Log.d("ClientId", "ClienteId: ${cliente.id}")
 
@@ -381,6 +385,6 @@ fun ViewHistoryButton(
             }
         }
     ) {
-        Text("Ver Historial")
+        Icon(Icons.Filled.History, contentDescription = "Ver Historial")
     }
 }

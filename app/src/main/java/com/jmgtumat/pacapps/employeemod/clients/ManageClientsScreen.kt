@@ -1,6 +1,7 @@
 package com.jmgtumat.pacapps.employeemod.clients
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -34,25 +35,30 @@ fun ManageClientsScreen(navController: NavController) {
      * Diseño de la pantalla de administración de clientes.
      */
     EmpleadoDashboard(navController = navController) {
-        Column {
-            // Barra de búsqueda para filtrar clientes
-            SearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChange = { newQuery ->
-                    searchQuery = newQuery
-                }
-            )
+        LazyColumn {
+            item {
+                // Barra de búsqueda para filtrar clientes
+                SearchBar(
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { newQuery ->
+                        searchQuery = newQuery
+                    }
+                )
+            }
 
             // Filtrar clientes según la consulta de búsqueda
             val filteredClientes = filterClientes(clientes, searchQuery)
 
             // Botón para añadir un nuevo cliente
-            AddClientButton(navController, clienteViewModel)
+            item {
+                AddClientButton(navController, clienteViewModel)
+            }
 
             // Mostrar la lista de clientes filtrada
-            filteredClientes.forEach { cliente ->
+            items(filteredClientes) { cliente ->
                 ClientItem(cliente, clienteViewModel, navController)
             }
         }
     }
 }
+
