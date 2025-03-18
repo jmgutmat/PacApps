@@ -69,7 +69,7 @@ fun ServiceItem(
             ) {
                 Text(
                     text = servicio.nombre,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     text = "${servicio.precio}€",

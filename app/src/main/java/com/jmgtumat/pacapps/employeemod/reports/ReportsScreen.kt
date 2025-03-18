@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,12 +30,10 @@ import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
 fun ReportsScreen(navController: NavController) {
     val context = LocalContext.current
 
-    EmpleadoDashboard(navController = navController) { innerPadding ->
+    EmpleadoDashboard(navController = navController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
         ) {
             TopAppBar(
                 title = { Text("Informes y Estadísticas") },

@@ -68,6 +68,11 @@ class EmpleadoRepository {
         database.child(empleadoId).removeValue().await()
     }
 
+    suspend fun changeUserRoleToEmpleado(userId: String) {
+        val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+        userRef.child("role").setValue("empleado").await()
+    }
+
     /**
      * Obtiene los horarios de trabajo de un empleado.
      * @param empleadoId El ID del empleado.

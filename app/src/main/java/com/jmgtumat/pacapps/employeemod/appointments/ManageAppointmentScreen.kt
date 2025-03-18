@@ -59,7 +59,7 @@ fun ManageAppointmentsScreen(navController: NavController) {
         factory = CitaViewModelFactory(CitaRepository())
     )
     val empleadoViewModel: EmpleadoViewModel = viewModel(
-        factory = EmpleadoViewModelFactory(EmpleadoRepository())
+        factory = EmpleadoViewModelFactory(EmpleadoRepository(), ClienteRepository())
     )
     val clienteViewModel: ClienteViewModel = viewModel(
         factory = ClienteViewModelFactory(ClienteRepository())

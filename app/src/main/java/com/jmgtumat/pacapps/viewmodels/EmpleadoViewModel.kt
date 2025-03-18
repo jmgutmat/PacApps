@@ -9,13 +9,17 @@ import androidx.lifecycle.viewModelScope
 import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.Empleado
 import com.jmgtumat.pacapps.data.HorariosPorDia
+import com.jmgtumat.pacapps.repository.ClienteRepository
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel para manejar la lógica relacionada con los empleados.
  */
-class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : BaseViewModel() {
+class EmpleadoViewModel(
+    private val empleadoRepository: EmpleadoRepository,
+    private val clienteRepository: ClienteRepository
+) : BaseViewModel() {
 
     private val _empleados = MutableLiveData<List<Empleado>>()
     val empleados: LiveData<List<Empleado>> get() = _empleados
@@ -116,6 +120,27 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
         }
     }
 
+    fun changeUserRoleToEmpleado(userId: String) {
+        viewModelScope.launch {
+            try {
+                empleadoRepository.changeUserRoleToEmpleado(userId)
+            } catch (e: Exception) {
+                Log.e("EmpleadoViewModel", "Error al cambiar el rol del usuario: ${e.message}")
+            }
+        }
+    }
+
+    fun addEmpleadoAndDeleteCliente(empleado: Empleado, clienteId: String) {
+        viewModelScope.launch {
+            try {
+                empleadoRepository.addEmpleado(empleado)
+                clienteRepository.deleteCliente(clienteId)
+            } catch (e: Exception) {
+                Log.e("EmpleadoViewModel", "Error al agregar empleado y eliminar cliente: ${e.message}")
+            }
+        }
+    }
+
     /**
      * Recupera los horarios de trabajo de un empleado.
      * @param empleadoId ID del empleado.
@@ -155,10 +180,13 @@ class EmpleadoViewModel(private val empleadoRepository: EmpleadoRepository) : Ba
  * Factoría para crear instancias de EmpleadoViewModel.
  * @param empleadoRepository Repositorio de empleados.
  */
-class EmpleadoViewModelFactory(private val empleadoRepository: EmpleadoRepository) : ViewModelProvider.Factory {
+class EmpleadoViewModelFactory(
+    private val empleadoRepository: EmpleadoRepository,
+    private val clienteRepository: ClienteRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(EmpleadoViewModel::class.java)) {
-            return EmpleadoViewModel(empleadoRepository) as T
+            return EmpleadoViewModel(empleadoRepository, clienteRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

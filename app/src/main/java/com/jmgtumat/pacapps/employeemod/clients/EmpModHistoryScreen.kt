@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -54,11 +53,10 @@ fun EmpModHistoryScreen(clienteId: String, navController: NavController) {
     }
 
     // Diseño de la pantalla utilizando EmpleadoDashboard
-    EmpleadoDashboard(navController = navController) { innerPadding ->
+    EmpleadoDashboard(navController = navController) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+                .fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {

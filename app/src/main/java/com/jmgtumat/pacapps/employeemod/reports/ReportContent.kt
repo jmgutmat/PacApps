@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.jmgtumat.pacapps.repository.CitaRepository
+import com.jmgtumat.pacapps.repository.ClienteRepository
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import com.jmgtumat.pacapps.repository.ServicioRepository
 import com.jmgtumat.pacapps.util.DateSelector
@@ -62,6 +63,7 @@ fun ReportContent(
     val empleadoViewModel: EmpleadoViewModel = viewModel(
         factory = EmpleadoViewModelFactory(
             EmpleadoRepository(/* parámetros de configuración si los hay */),
+            ClienteRepository()
         )
     )
     val servicioViewModel: ServicioViewModel = viewModel(
@@ -123,7 +125,6 @@ fun ReportContent(
         }
     }
 }
-
 /**
  * @Composable que muestra el selector de fechas para filtrar los informes.
  *

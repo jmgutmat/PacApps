@@ -25,7 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.jmgtumat.pacapps.navigation.AppScreens
@@ -83,6 +86,10 @@ fun EmpleadoDashboard(
  */
 @Composable
 fun BottomNavigationBar(navController: NavController) {
+    val navigationBarTextStyle = TextStyle(
+        fontSize = 10.sp, // Tamaño de fuente más pequeño
+        fontWeight = FontWeight.Normal
+    )
     val items = listOf(
         EmpleadoScreen.Citas,
         EmpleadoScreen.Clientes,
@@ -95,7 +102,7 @@ fun BottomNavigationBar(navController: NavController) {
         items.forEach { screen ->
             NavigationBarItem(
                 icon = { Icon(screen.icon, contentDescription = null) },
-                label = { Text(screen.title) },
+                label = { Text(screen.title , style = navigationBarTextStyle) },
                 selected = navController.currentDestination?.route == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {

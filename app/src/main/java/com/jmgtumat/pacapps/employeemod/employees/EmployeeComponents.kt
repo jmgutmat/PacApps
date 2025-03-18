@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -40,9 +42,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.jmgtumat.pacapps.data.Cliente
 import com.jmgtumat.pacapps.data.Empleado
 import com.jmgtumat.pacapps.data.HorariosPorDia
 import com.jmgtumat.pacapps.employeemod.appointments.HorarioModulo
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
 import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
 
 /**
@@ -79,12 +83,12 @@ fun EmployeeItem(
                 // Nombre completo del empleado
                 Text(
                     text = "${empleado.nombre} ${empleado.apellidos}",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.titleMedium
                 )
                 // Número de teléfono del empleado
                 Text(
                     text = "Teléfono: ${empleado.telefono}",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
             if (expanded) {
@@ -118,13 +122,13 @@ fun EmployeeItem(
  * @param navController Controlador de navegación para manejar la navegación en la aplicación.
  * @param empleadoViewModel ViewModel para interactuar con los datos del empleado.
  */
-@Composable
+/*@Composable
 fun AddEmployeeButton(navController: NavController, empleadoViewModel: EmpleadoViewModel) {
     var showDialog by remember { mutableStateOf(false) }
 
-    /**
+    *//**
      * Botón flotante para agregar un nuevo empleado.
-     */
+     *//*
     FloatingActionButton(
         onClick = { showDialog = true },
         modifier = Modifier.padding(16.dp)
@@ -141,6 +145,123 @@ fun AddEmployeeButton(navController: NavController, empleadoViewModel: EmpleadoV
             showDialog = false
         }
     }
+}*/
+
+@Composable
+fun AddEmployeeButton(navController: NavController, empleadoViewModel: EmpleadoViewModel, clienteViewModel: ClienteViewModel) {
+    var showDialog by remember { mutableStateOf(false) }
+    var showSelectClientDialog by remember { mutableStateOf(false) }
+    var showAddEmployeeDialog by remember { mutableStateOf(false) }
+
+    FloatingActionButton(
+        onClick = { showDialog = true },
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = "Nuevo Empleado",
+            tint = MaterialTheme.colorScheme.onSurface
+        )
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Añadir Nuevo Empleado") },
+            text = {
+                Column {
+                    Button(onClick = {
+                        showDialog = false
+                        showSelectClientDialog = true
+                    }) {
+                        Text("Seleccionar Cliente Existente")
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = {
+                        showDialog = false
+                        showAddEmployeeDialog = true
+                    }) {
+                        Text("Crear Nuevo Empleado")
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    if (showSelectClientDialog) {
+        SelectClientDialog(empleadoViewModel = empleadoViewModel, clienteViewModel = clienteViewModel) {
+            showSelectClientDialog = false
+        }
+    }
+
+    if (showAddEmployeeDialog) {
+        AddEmployeeDialog(empleadoViewModel = empleadoViewModel) {
+            showAddEmployeeDialog = false
+        }
+    }
+}
+
+@Composable
+fun SelectClientDialog(
+    empleadoViewModel: EmpleadoViewModel,
+    clienteViewModel: ClienteViewModel,
+    onDismiss: () -> Unit
+) {
+    val clientes by clienteViewModel.clientes.observeAsState(emptyList())
+    var selectedClient by remember { mutableStateOf<Cliente?>(null) }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Seleccionar Cliente Existente") },
+        text = {
+            Column {
+                LazyColumn {
+                    items(clientes) { cliente ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { selectedClient = cliente }
+                                .padding(8.dp)
+                        ) {
+                            Text(text = "${cliente.nombre} ${cliente.apellidos}")
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    selectedClient?.let {
+                        val newEmployee = Empleado(
+                            nombre = it.nombre,
+                            apellidos = it.apellidos,
+                            telefono = it.telefono,
+                            correoElectronico = it.correoElectronico,
+                            horariosTrabajo = emptyMap(),
+                            citasAsignadas = emptyList()
+                        )
+                        empleadoViewModel.addEmpleadoAndDeleteCliente(newEmployee, it.id)
+                        empleadoViewModel.changeUserRoleToEmpleado(it.id)
+                    }
+                    onDismiss()
+                }
+            ) {
+                Text("Seleccionar")
+            }
+        },
+        dismissButton = {
+            Button(onClick = { onDismiss() }) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
 
 /**

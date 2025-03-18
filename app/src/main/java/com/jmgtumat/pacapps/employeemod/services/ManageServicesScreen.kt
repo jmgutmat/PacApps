@@ -1,11 +1,9 @@
 package com.jmgtumat.pacapps.employeemod.services
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
@@ -27,10 +25,8 @@ fun ManageServicesScreen(navController: NavController) {
     )
     val servicios by servicioViewModel.servicios.observeAsState(emptyList())
 
-    EmpleadoDashboard(navController = navController) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(innerPadding)
-        ) {
+    EmpleadoDashboard(navController = navController) {
+        Column{
             // Botón para añadir un nuevo servicio
             AddServiceButton(servicioViewModel)
 

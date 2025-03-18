@@ -63,11 +63,11 @@ fun ClientItem(
             ) {
                 Text(
                     text = "${cliente.nombre} ${cliente.apellidos}",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Text(
                     text = "Teléfono: ${cliente.telefono}",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
             if (expanded) {

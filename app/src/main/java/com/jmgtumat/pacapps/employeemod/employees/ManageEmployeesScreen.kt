@@ -2,7 +2,6 @@ package com.jmgtumat.pacapps.employeemod.employees
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -15,8 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
+import com.jmgtumat.pacapps.repository.ClienteRepository
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import com.jmgtumat.pacapps.util.SearchBar
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
 import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModelFactory
 
@@ -31,15 +33,17 @@ fun ManageEmployeesScreen(navController: NavController) {
     val empleadoViewModel: EmpleadoViewModel = viewModel(
         factory = EmpleadoViewModelFactory(
             EmpleadoRepository(/* parámetros de configuración si los hay */),
+            ClienteRepository()
         )
+    )
+    val clienteViewModel: ClienteViewModel = viewModel(
+        factory = ClienteViewModelFactory(ClienteRepository())
     )
     val empleados by empleadoViewModel.empleados.observeAsState(emptyList())
     var searchQuery by remember { mutableStateOf("") }
 
-    EmpleadoDashboard(navController = navController) { innerPadding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)) {
+    EmpleadoDashboard(navController = navController) {
+        Column(modifier = Modifier.fillMaxSize()) {
             SearchBar(
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it }
@@ -60,7 +64,7 @@ fun ManageEmployeesScreen(navController: NavController) {
             }
 
             // Botón para agregar un nuevo empleado
-            AddEmployeeButton(navController, empleadoViewModel)
+            AddEmployeeButton(navController, empleadoViewModel, clienteViewModel)
         }
     }
 }

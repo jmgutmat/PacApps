@@ -65,7 +65,7 @@ fun NewAppointmentScreen(navController: NavController) {
     // ViewModel para obtener información del cliente, citas, empleados y servicios
     val clienteViewModel: ClienteViewModel = viewModel(factory = ClienteViewModelFactory(ClienteRepository()))
     val citaViewModel: CitaViewModel = viewModel(factory = CitaViewModelFactory(CitaRepository()))
-    val empleadoViewModel: EmpleadoViewModel = viewModel(factory = EmpleadoViewModelFactory(EmpleadoRepository()))
+    val empleadoViewModel: EmpleadoViewModel = viewModel(factory = EmpleadoViewModelFactory(EmpleadoRepository(), ClienteRepository()))
     val servicioViewModel: ServicioViewModel = viewModel(factory = ServicioViewModelFactory(ServicioRepository()))
 
     // Estado del cliente y las listas de servicios, citas y empleados
