@@ -26,36 +26,45 @@ val jet = Color(0xFF3A3539)
 val raisinblack2 = Color(0xFF282931)
 val transparent = Color(0,0,0, 0)*/
 
+//
 
+val md_theme_light_primary = Color(0xFF1E2A3A) // Azul oscuro
+val md_theme_light_onPrimary = Color.White
+val md_theme_light_primaryContainer = Color(0xFFE9EDF1) // Gris muy claro para botones suaves
+val md_theme_light_onPrimaryContainer = Color(0xFF1E2A3A)
 
-val md_theme_light_primary = Color(0xFF8307F0)
-val md_theme_light_onPrimary = Color(0xFFFFFFFF)
-val md_theme_light_primaryContainer = Color(0xFFEEDCFF)
-val md_theme_light_onPrimaryContainer = Color(0xFF2A0054)
-val md_theme_light_secondary = Color(0xFF655A6F)
-val md_theme_light_onSecondary = Color(0xFFFFFFFF)
-val md_theme_light_secondaryContainer = Color(0xFFEBDDF7)
-val md_theme_light_onSecondaryContainer = Color(0xFF20182A)
-val md_theme_light_tertiary = Color(0xFF80525A)
-val md_theme_light_onTertiary = Color(0xFFFFFFFF)
-val md_theme_light_tertiaryContainer = Color(0xFFFFD9DE)
-val md_theme_light_onTertiaryContainer = Color(0xFF321018)
-val md_theme_light_error = Color(0xFFBA1A1A)
-val md_theme_light_errorContainer = Color(0xFFFFDAD6)
-val md_theme_light_onError = Color(0xFFFFFFFF)
-val md_theme_light_onErrorContainer = Color(0xFF410002)
-val md_theme_light_background = Color(0xFFFFFBFF)
-val md_theme_light_onBackground = Color(0xFF1D1B1E)
-val md_theme_light_surface = Color(0xFFFFFBFF)
-val md_theme_light_onSurface = Color(0xFF1D1B1E)
-val md_theme_light_surfaceVariant = Color(0xFFE8E0EB)
-val md_theme_light_onSurfaceVariant = Color(0xFF4A454E)
-val md_theme_light_outline = Color(0xFF7B757F)
-val md_theme_light_inverseOnSurface = Color(0xFFF5EFF4)
-val md_theme_light_inverseSurface = Color(0xFF1D1B1E)
-val md_theme_light_inversePrimary = Color(0xFFD9B9FF)
+val md_theme_light_secondary = Color(0xFF3A3F47) // Gris oscuro para acciones secundarias
+val md_theme_light_onSecondary = Color.White
+val md_theme_light_secondaryContainer = Color(0xFFF0F0F0)
+val md_theme_light_onSecondaryContainer = Color(0xFF1E2A3A)
+
+val md_theme_light_tertiary = Color(0xFF757575) // Texto y bordes sutiles
+val md_theme_light_onTertiary = Color.White
+val md_theme_light_tertiaryContainer = Color(0xFFE0E0E0)
+val md_theme_light_onTertiaryContainer = Color.Black
+
+val md_theme_light_error = Color(0xFFD32F2F)
+val md_theme_light_errorContainer = Color(0xFFFFCDD2)
+val md_theme_light_onError = Color.White
+val md_theme_light_onErrorContainer = Color(0xFFB71C1C)
+
+val md_theme_light_background = Color(0xFFFFFFFF) // Fondo blanco
+val md_theme_light_onBackground = Color(0xFF121212)
+
+val md_theme_light_surface = Color(0xFFFFFFFF)
+val md_theme_light_onSurface = Color(0xFF121212)
+
+val md_theme_light_surfaceVariant = Color(0xFFF2F2F2) // Para tarjetas y cajas
+val md_theme_light_onSurfaceVariant = Color(0xFF444444)
+
+val md_theme_light_outline = Color(0xFFBDBDBD)
+val md_theme_light_inverseOnSurface = Color(0xFFFFFFFF)
+val md_theme_light_inverseSurface = Color(0xFF1E2A3A)
+val md_theme_light_inversePrimary = Color(0xFF1E2A3A)
 val md_theme_light_shadow = Color(0xFF000000)
-val md_theme_light_surfaceTint = Color(0xFF8307F0)
+val md_theme_light_surfaceTint = Color(0xFF1E2A3A)
+
+
 
 val md_theme_dark_primary = Color(0xFFD9B9FF)
 val md_theme_dark_onPrimary = Color(0xFF450085)

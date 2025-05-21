@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "830223592180",
+    "firebase_url": "https://pacapp-peluqueros-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "pacapp-peluqueros",
+    "storage_bucket": "pacapp-peluqueros.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:830223592180:android:d5330b24d284f8f6c48ca1",
+        "android_client_info": {
+          "package_name": "com.jmgtumat.pacapps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "830223592180-dcoij54l8tu1gcd26892mg601322upqm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jmgtumat.pacapps",
+            "certificate_hash": "20380bd1ddfd28307ad993a56779d7477acb215b"
+          }
+        },
+        {
+          "client_id": "830223592180-l4kus87c93ees8vj7qvefp9inlr8ai4l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjK9d2Flig-UtKsOnmy1fjil0f4yQdzwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "830223592180-l4kus87c93ees8vj7qvefp9inlr8ai4l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

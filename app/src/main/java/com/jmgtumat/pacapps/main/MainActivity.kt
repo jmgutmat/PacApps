@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.jmgtumat.pacapps.navigation.AppNavigation
+import com.jmgtumat.pacapps.ui.theme.PacAppsTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -11,7 +12,9 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            AppNavigation()
+            PacAppsTheme {
+                AppNavigation()
+            }
         }
     }
 }

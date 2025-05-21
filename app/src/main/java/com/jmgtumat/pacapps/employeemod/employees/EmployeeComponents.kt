@@ -227,6 +227,7 @@ fun SelectClientDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { selectedClient = cliente }
+                                .background(if (selectedClient == cliente) Color.LightGray else Color.Transparent)
                                 .padding(8.dp)
                         ) {
                             Text(text = "${cliente.nombre} ${cliente.apellidos}")
@@ -239,12 +240,21 @@ fun SelectClientDialog(
             Button(
                 onClick = {
                     selectedClient?.let {
+                        val defaultHorarios = mapOf(
+                            "Lunes" to HorariosPorDia(),
+                            "Martes" to HorariosPorDia(),
+                            "Miércoles" to HorariosPorDia(),
+                            "Jueves" to HorariosPorDia(),
+                            "Viernes" to HorariosPorDia(),
+                            "Sábado" to HorariosPorDia()
+                        )
                         val newEmployee = Empleado(
+                            id = it.id,
                             nombre = it.nombre,
                             apellidos = it.apellidos,
                             telefono = it.telefono,
                             correoElectronico = it.correoElectronico,
-                            horariosTrabajo = emptyMap(),
+                            horariosTrabajo = defaultHorarios,
                             citasAsignadas = emptyList()
                         )
                         empleadoViewModel.addEmpleadoAndDeleteCliente(newEmployee, it.id)
@@ -263,6 +273,63 @@ fun SelectClientDialog(
         }
     )
 }
+
+//@Composable
+//fun SelectClientDialog(
+//    empleadoViewModel: EmpleadoViewModel,
+//    clienteViewModel: ClienteViewModel,
+//    onDismiss: () -> Unit
+//) {
+//    val clientes by clienteViewModel.clientes.observeAsState(emptyList())
+//    var selectedClient by remember { mutableStateOf<Cliente?>(null) }
+//
+//    AlertDialog(
+//        onDismissRequest = { onDismiss() },
+//        title = { Text("Seleccionar Cliente Existente") },
+//        text = {
+//            Column {
+//                LazyColumn {
+//                    items(clientes) { cliente ->
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .clickable { selectedClient = cliente }
+//                                .padding(8.dp)
+//                        ) {
+//                            Text(text = "${cliente.nombre} ${cliente.apellidos}")
+//                        }
+//                    }
+//                }
+//            }
+//        },
+//        confirmButton = {
+//            Button(
+//                onClick = {
+//                    selectedClient?.let {
+//                        val newEmployee = Empleado(
+//                            nombre = it.nombre,
+//                            apellidos = it.apellidos,
+//                            telefono = it.telefono,
+//                            correoElectronico = it.correoElectronico,
+//                            horariosTrabajo = emptyMap(),
+//                            citasAsignadas = emptyList()
+//                        )
+//                        empleadoViewModel.addEmpleadoAndDeleteCliente(newEmployee, it.id)
+//                        empleadoViewModel.changeUserRoleToEmpleado(it.id)
+//                    }
+//                    onDismiss()
+//                }
+//            ) {
+//                Text("Seleccionar")
+//            }
+//        },
+//        dismissButton = {
+//            Button(onClick = { onDismiss() }) {
+//                Text("Cancelar")
+//            }
+//        }
+//    )
+//}
 
 /**
  * Composable que muestra un diálogo para agregar un nuevo empleado.

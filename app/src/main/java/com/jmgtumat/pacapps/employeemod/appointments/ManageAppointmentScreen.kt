@@ -210,112 +210,118 @@ fun AppointmentCard(cita: Cita, citaViewModel: CitaViewModel, clienteViewModel: 
 }
 
 
+/*
 
-//package com.jmgtumat.pacapps.employeemod.appointments
-//
-//import androidx.compose.foundation.layout.Arrangement
-//import androidx.compose.foundation.layout.Column
-//import androidx.compose.foundation.layout.fillMaxSize
-//import androidx.compose.foundation.layout.padding
-//import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.LaunchedEffect
-//import androidx.compose.runtime.getValue
-//import androidx.compose.runtime.livedata.observeAsState
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.compose.runtime.remember
-//import androidx.compose.runtime.rememberCoroutineScope
-//import androidx.compose.runtime.setValue
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.unit.dp
-//import androidx.lifecycle.viewmodel.compose.viewModel
-//import androidx.navigation.NavController
-//import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
-//import com.jmgtumat.pacapps.repository.CitaRepository
-//import com.jmgtumat.pacapps.repository.EmpleadoRepository
-//import com.jmgtumat.pacapps.util.getCitasEnHorarioTrabajo
-//import com.jmgtumat.pacapps.util.getDayOfWeekString
-//import com.jmgtumat.pacapps.viewmodels.CitaViewModel
-//import com.jmgtumat.pacapps.viewmodels.CitaViewModelFactory
-//import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
-//import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModelFactory
-//import kotlinx.coroutines.launch
-//import java.util.Calendar
-//
-//@Composable
-//fun ManageAppointmentsScreen(navController: NavController) {
-//    val citaViewModel: CitaViewModel = viewModel(
-//        factory = CitaViewModelFactory(
-//            CitaRepository(/* parámetros de configuración si los hay */),
-//        )
-//    )
-//    val empleadoViewModel: EmpleadoViewModel = viewModel(
-//        factory = EmpleadoViewModelFactory(
-//            EmpleadoRepository(/* parámetros de configuración si los hay */),
-//        )
-//    )
-//    val citas by citaViewModel.citas.observeAsState(emptyList())
-//    val empleados by empleadoViewModel.empleados.observeAsState(emptyList())
-//    val empleado = empleados.firstOrNull() ?: return // Obtener el primer empleado
-//
-//    var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
-//    var horariosPorDia by remember {
-//        mutableStateOf(
-//            empleado.horariosTrabajo[selectedDate.getDayOfWeekString()] ?: defaultHorariosPorDia()
-//        )
-//    }
-//    val coroutineScope = rememberCoroutineScope()
-//
-//    LaunchedEffect(Unit) {
-//        coroutineScope.launch {
-//            citaViewModel.fetchCitasByDate(selectedDate.timeInMillis)
-//        }
-//    }
-//
-//    EmpleadoDashboard(navController = navController) { innerPadding ->
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(innerPadding)
-//                .padding(16.dp),
-//            verticalArrangement = Arrangement.Center
-//        )  {
-//            DatePicker(selectedDate) { date ->
-//                selectedDate = date
-//                horariosPorDia = empleado.horariosTrabajo[date.getDayOfWeekString()] ?: defaultHorariosPorDia()
-//                coroutineScope.launch {
-//                    citaViewModel.fetchCitasByDate(date.timeInMillis)
-//                }
-//            }
-//
-//            HorariosTrabajo(horariosPorDia) { updatedHorarios ->
-//                horariosPorDia = updatedHorarios
-//                val updatedHorariosTrabajo = empleado.horariosTrabajo.toMutableMap().apply {
-//                    put(selectedDate.getDayOfWeekString(), updatedHorarios)
-//                }
-//                empleadoViewModel.updateEmpleado(empleado.copy(horariosTrabajo = updatedHorariosTrabajo))
-//            }
-//
-//            AddAppointmentButton(navController)
-//
-//            val citasEnHorarioTrabajo = getCitasEnHorarioTrabajo(citas, empleado, selectedDate)
-//            HorarioCompletoConCitas(
-//                citas = citasEnHorarioTrabajo,
-//                onConfirmCita = { citaId ->
-//                    citaViewModel.confirmarCita(citaId)
-//                },
-//                onCancelCita = { citaId ->
-//                    citaViewModel.cancelarCita(citaId)
-//                }
-//            )
-//        }
-//    }
-//}
-//
-//@Composable
-//fun CitasList(citas: List<Cita>, citaViewModel: CitaViewModel, clienteViewModel: ClienteViewModel) {
-//    Column {
-//        for (cita in citas) {
-//            AppointmentCard(cita, citaViewModel, clienteViewModel)
-//        }
-//    }
-//}
+package com.jmgtumat.pacapps.employeemod.appointments
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.jmgtumat.pacapps.employeemod.EmpleadoDashboard
+import com.jmgtumat.pacapps.repository.CitaRepository
+import com.jmgtumat.pacapps.repository.EmpleadoRepository
+import com.jmgtumat.pacapps.util.getCitasEnHorarioTrabajo
+import com.jmgtumat.pacapps.util.getDayOfWeekString
+import com.jmgtumat.pacapps.viewmodels.CitaViewModel
+import com.jmgtumat.pacapps.viewmodels.CitaViewModelFactory
+import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
+import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModelFactory
+import kotlinx.coroutines.launch
+import java.util.Calendar
+
+@Composable
+fun ManageAppointmentsScreen(navController: NavController) {
+    val citaViewModel: CitaViewModel = viewModel(
+        factory = CitaViewModelFactory(
+            CitaRepository(*/
+/* parámetros de configuración si los hay *//*
+),
+        )
+    )
+    val empleadoViewModel: EmpleadoViewModel = viewModel(
+        factory = EmpleadoViewModelFactory(
+            EmpleadoRepository(*/
+/* parámetros de configuración si los hay *//*
+),
+            clienteRepository = TODO(),
+        )
+    )
+    val citas by citaViewModel.citas.observeAsState(emptyList())
+    val empleados by empleadoViewModel.empleados.observeAsState(emptyList())
+    val empleado = empleados.firstOrNull() ?: return // Obtener el primer empleado
+
+    var selectedDate by remember { mutableStateOf(Calendar.getInstance()) }
+    var horariosPorDia by remember {
+        mutableStateOf(
+            empleado.horariosTrabajo[selectedDate.getDayOfWeekString()] ?: defaultHorariosPorDia()
+        )
+    }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            citaViewModel.fetchCitasByDate(selectedDate.timeInMillis)
+        }
+    }
+
+    EmpleadoDashboard(navController = navController) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center
+        )  {
+            DatePicker(selectedDate) { date ->
+                selectedDate = date
+                horariosPorDia = empleado.horariosTrabajo[date.getDayOfWeekString()] ?: defaultHorariosPorDia()
+                coroutineScope.launch {
+                    citaViewModel.fetchCitasByDate(date.timeInMillis)
+                }
+            }
+
+            HorariosTrabajo(horariosPorDia) { updatedHorarios ->
+                horariosPorDia = updatedHorarios
+                val updatedHorariosTrabajo = empleado.horariosTrabajo.toMutableMap().apply {
+                    put(selectedDate.getDayOfWeekString(), updatedHorarios)
+                }
+                empleadoViewModel.updateEmpleado(empleado.copy(horariosTrabajo = updatedHorariosTrabajo))
+            }
+
+            AddAppointmentButton(navController)
+
+            val citasEnHorarioTrabajo = getCitasEnHorarioTrabajo(citas, empleado, selectedDate)
+            HorarioCompletoConCitas(
+                citas = citasEnHorarioTrabajo,
+                onConfirmCita = { citaId ->
+                    citaViewModel.confirmarCita(citaId)
+                },
+                onCancelCita = { citaId ->
+                    citaViewModel.cancelarCita(citaId)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun CitasList(citas: List<Cita>, citaViewModel: CitaViewModel, clienteViewModel: ClienteViewModel) {
+    Column {
+        for (cita in citas) {
+            AppointmentCard(cita, citaViewModel, clienteViewModel)
+        }
+    }
+}*/

@@ -205,21 +205,21 @@ fun HourBlock(intervalo: Intervalo, citas: List<Cita>, onCancelCita: (String) ->
     }
 }*/
 
-/*
-@Composable
-fun AddAppointmentButton(navController: NavController) {
-    FloatingActionButton(
-        onClick = { navController.navigate("new_appointment") },
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = "Nueva Cita",
-            tint = MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
 
+//@Composable
+//fun AddAppointmentButton(navController: NavController) {
+//    FloatingActionButton(
+//        onClick = { navController.navigate("new_appointment") },
+//        modifier = Modifier.padding(16.dp)
+//    ) {
+//        Icon(
+//            imageVector = Icons.Default.Add,
+//            contentDescription = "Nueva Cita",
+//            tint = MaterialTheme.colorScheme.onSurface
+//        )
+//    }
+//}
+/*
 @Composable
 fun HorarioCompletoConCitas(
     citas: List<Cita>,
