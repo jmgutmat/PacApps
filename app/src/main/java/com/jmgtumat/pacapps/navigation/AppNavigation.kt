@@ -8,9 +8,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.jmgtumat.pacapps.auth.EmailSignUpScreen
+import com.jmgtumat.pacapps.clientmod.AppointmentBookingScreen
 import com.jmgtumat.pacapps.clientmod.ClientHomeScreen
 import com.jmgtumat.pacapps.clientmod.ClientmodHistoryScreen
-import com.jmgtumat.pacapps.clientmod.NewAppointmentScreen
 import com.jmgtumat.pacapps.clientmod.ProfileScreen
 import com.jmgtumat.pacapps.employeemod.appointments.ManageAppointmentsScreen
 import com.jmgtumat.pacapps.employeemod.clients.EmpModHistoryScreen
@@ -43,9 +43,15 @@ fun AppNavigation() {
             ClientHomeScreen(navController)
         }
 
-        composable(AppScreens.NewAppointmentScreen.route) {
-            NewAppointmentScreen(navController)
+//        composable(AppScreens.NewAppointmentScreen.route) {
+//            NewAppointmentScreen(navController)
+//        }
+
+        composable(AppScreens.AppointmentBookingScreen.route + "/{clienteId}") { backStackEntry ->
+            val clienteId = backStackEntry.arguments?.getString("clienteId")
+            AppointmentBookingScreen(navController, clienteId)
         }
+
 
         composable(AppScreens.ClientModHistoryScreen.route) {
             ClientmodHistoryScreen(navController)
