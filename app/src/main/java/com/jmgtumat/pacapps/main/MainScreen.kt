@@ -47,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -55,6 +56,9 @@ import com.google.android.gms.common.api.ApiException
 import com.jmgtumat.pacapps.R
 import com.jmgtumat.pacapps.navigation.AppScreens
 import com.jmgtumat.pacapps.navigation.redirectToRoleBasedScreen
+import com.jmgtumat.pacapps.repository.ClienteRepository
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
 import com.jmgtumat.pacapps.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -69,6 +73,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(navController: NavController) {
     val viewModel = MainViewModel()
+    val clienteViewModel: ClienteViewModel = viewModel(
+        factory = ClienteViewModelFactory(
+            ClienteRepository(),
+        )
+    )
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -162,6 +171,7 @@ fun MainScreen(navController: NavController) {
                     val result = viewModel.signInWithEmailAndPassword(email, password)
                     if (result.isSuccess) {
                         val userId = result.getOrNull()
+//                        clienteViewModel.setClienteId(userId)
                         Log.d("MainScreen", "Email sign-in successful, userId: $userId")
                         userId?.let {
                             redirectToRoleBasedScreen(navController, it, viewModel::getUserType)

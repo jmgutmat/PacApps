@@ -27,7 +27,7 @@ class ServicioViewModel(private val servicioRepository: ServicioRepository) : Ba
     /**
      * Obtiene la lista de servicios desde el repositorio.
      */
-    private fun fetchServicios() {
+    fun fetchServicios() {
         viewModelScope.launch {
             setLoading()
             try {

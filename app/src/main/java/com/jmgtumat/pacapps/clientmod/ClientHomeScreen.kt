@@ -110,8 +110,11 @@ fun ClientHomeScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        navController.navigate("/new_appointments_screen")
-                    }
+                        clienteId?.let { id ->
+                            navController.navigate("/appointment_booking_screen/$id")
+                        }
+                    },
+                    enabled = clienteId != null
                 ) {
                     Text("Crear nueva cita")
                 }

@@ -9,10 +9,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.jmgtumat.pacapps" />
-                  <option name="mobileSdkAppId" value="1:830223592180:android:d5330b24d284f8f6c48ca1" />
-                  <option name="projectId" value="pacapp-peluqueros" />
-                  <option name="projectNumber" value="830223592180" />
+                  <option name="appId" value="com.jmgtumat.pacapps.dev" />
+                  <option name="mobileSdkAppId" value="1:861766734405:android:d7d094a0a953e6afb4892c" />
+                  <option name="projectId" value="pacapps-dev" />
+                  <option name="projectNumber" value="861766734405" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

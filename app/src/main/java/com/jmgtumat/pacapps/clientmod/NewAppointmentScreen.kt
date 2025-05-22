@@ -1,3 +1,4 @@
+/*
 package com.jmgtumat.pacapps.clientmod
 
 import android.app.DatePickerDialog
@@ -54,11 +55,13 @@ import com.jmgtumat.pacapps.viewmodels.ServicioViewModel
 import com.jmgtumat.pacapps.viewmodels.ServicioViewModelFactory
 import java.util.Calendar
 
+*/
 /**
  * Pantalla para programar una nueva cita.
  *
  * @param navController El controlador de navegación.
- */
+ *//*
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NewAppointmentScreen(navController: NavController) {
@@ -225,12 +228,14 @@ fun NewAppointmentScreen(navController: NavController) {
     }
 }
 
+*/
 /**
  * Composable para mostrar un selector de fecha.
  *
  * @param availableDates Lista de fechas disponibles para seleccionar.
  * @param onDateSelected Callback para manejar la selección de fecha.
- */
+ *//*
+
 @Composable
 fun DatePickerComposable(
     availableDates: List<Calendar>,
@@ -253,6 +258,7 @@ fun DatePickerComposable(
     }
 }
 
+*/
 /**
  * Composable para mostrar un diálogo de confirmación para confirmar una cita.
  *
@@ -260,7 +266,8 @@ fun DatePickerComposable(
  * @param servicio El servicio seleccionado para la cita.
  * @param onConfirm Callback para confirmar la cita.
  * @param onDismiss Callback para descartar el diálogo de confirmación.
- */
+ *//*
+
 @Composable
 fun ConfirmationDialog(slot: Calendar, servicio: Servicio, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
@@ -281,3 +288,4 @@ fun ConfirmationDialog(slot: Calendar, servicio: Servicio, onConfirm: () -> Unit
         }
     )
 }
+*/

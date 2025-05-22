@@ -92,7 +92,7 @@ class CitaViewModel(
      * @param cita Cita a insertar.
      * @param clienteId ID del cliente asociado a la cita.
      */
-    fun insertCita(cita: Cita, clienteId: String) {
+    fun insertCita(cita: Unit?, clienteId: String) {
         viewModelScope.launch {
             try {
                 Log.d("CitaViewModel", "Fecha de la cita: ${cita.fecha}")

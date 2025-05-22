@@ -69,6 +69,10 @@ class ClienteViewModel(
         return currentUser?.uid ?: throw IllegalStateException("Usuario no autenticado")
     }
 
+    fun setClienteId(id: String) {
+        _clienteId.value = id
+    }
+
     private fun fetchClientes() {
         viewModelScope.launch {
             setLoading()
