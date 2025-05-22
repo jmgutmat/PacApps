@@ -106,27 +106,28 @@ fun AppointmentSummaryScreen(
                     ?.toEpochMilli()
 
                 // Crear cita para cada servicio seleccionado
-                selectedServices.forEach { servicio ->
-                    val cita = fechaMillis?.let {
-                        if (horaInicioMillis != null) {
-                            Cita(
-                                clienteId = clienteId,
-                                empleadoId = "empleado_unico_francisco",
-                                servicioId = servicio.id,
-                                fecha = it,
-                                horaInicio = horaInicioMillis,
-                                duracion = servicio.duracion,
-                                estado = CitaEstado.PENDIENTE
-                            )
-                        }
+                if (fechaMillis != null && horaInicioMillis != null) {
+                    selectedServices.forEach { servicio ->
+                        val cita = Cita(
+                            clienteId = clienteId,
+                            empleadoId = "empleado_unico_francisco",
+                            servicioId = servicio.id,
+                            fecha = fechaMillis,
+                            horaInicio = horaInicioMillis,
+                            duracion = servicio.duracion,
+                            estado = CitaEstado.PENDIENTE
+                        )
+                        citaViewModel.insertCita(cita, clienteId)
                     }
-                    citaViewModel.insertCita(cita, clienteId)
+
+                    // Volver al home limpiando el backstack
+                    navController.navigate("/client_home_screen") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                } else {
+                    // Log o control de error si fuera necesario
                 }
 
-                // Volver al home limpiando el backstack
-                navController.navigate("/client_home_screen") {
-                    popUpTo(0) { inclusive = true }
-                }
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)

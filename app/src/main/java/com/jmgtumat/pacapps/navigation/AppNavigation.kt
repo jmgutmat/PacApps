@@ -2,11 +2,13 @@ package com.jmgtumat.pacapps.navigation
 
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.jmgtumat.pacapps.auth.EmailSignUpScreen
 import com.jmgtumat.pacapps.clientmod.AppointmentBookingScreen
 import com.jmgtumat.pacapps.clientmod.AppointmentSummaryScreen
@@ -26,6 +28,16 @@ import com.jmgtumat.pacapps.viewmodels.MainViewModel
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val isAuthenticated = FirebaseAuth.getInstance().currentUser != null
+
+    LaunchedEffect(Unit) {
+        if (!isAuthenticated) {
+            navController.navigate(AppScreens.MainScreen.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+
 
     NavHost(navController, startDestination = AppScreens.SplashScreen.route) {
         composable(AppScreens.SplashScreen.route) {

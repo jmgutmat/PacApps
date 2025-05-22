@@ -91,6 +91,7 @@ dependencies {
     implementation("androidx.test:monitor:1.7.2")
     implementation("androidx.test.ext:junit-ktx:1.2.1")
     implementation("androidx.room:room-ktx:2.7.1")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.8.2")
 

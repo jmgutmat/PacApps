@@ -10,8 +10,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jmgtumat.pacapps.R
 import com.jmgtumat.pacapps.navigation.AppScreens
+import com.jmgtumat.pacapps.navigation.redirectToRoleBasedScreen
 import com.jmgtumat.pacapps.ui.theme.PacAppsTheme
 import kotlinx.coroutines.delay
 
@@ -21,15 +24,33 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun SplashScreen(navController: NavController) {
-    LaunchedEffect(key1 = true){
-        // Retraso de 2 segundos antes de navegar a la pantalla principal.
-        delay(2000)
-        navController.popBackStack()
-        navController.navigate(AppScreens.MainScreen.route){
-            // Al navegar a la pantalla principal, se elimina la pantalla de presentación del back stack.
-            popUpTo(AppScreens.SplashScreen.route) { inclusive = true }
+    LaunchedEffect(Unit) {
+        delay(1500)
+
+        val user = FirebaseAuth.getInstance().currentUser
+
+        if (user == null) {
+            navController.navigate(AppScreens.MainScreen.route) {
+                popUpTo(AppScreens.SplashScreen.route) { inclusive = true }
+            }
+        } else {
+            // Ya autenticado → redirigir según el rol
+            redirectToRoleBasedScreen(
+                navController = navController,
+                userId = user.uid,
+                getUserType = { uid, onResult ->
+                    FirebaseFirestore.getInstance().collection("usuarios")
+                        .document(uid)
+                        .get()
+                        .addOnSuccessListener { document ->
+                            val tipoUsuario = document.getString("tipoUsuario") ?: "cliente"
+                            onResult(tipoUsuario)
+                        }
+                }
+            )
         }
     }
+
     Splash()
 }
 

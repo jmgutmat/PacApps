@@ -44,30 +44,33 @@ class ClienteViewModel(
     private val _historialCitas = MutableLiveData<List<Cita>>()
     val historialCitas: LiveData<List<Cita>> get() = _historialCitas
 
-    private val _clienteId = MutableLiveData<String>()
-    val clienteId: LiveData<String> get() = _clienteId
+    private val _clienteId = MutableLiveData<String?>()
+    val clienteId: MutableLiveData<String?> get() = _clienteId
 
     private val _citaPendiente = MutableLiveData<Cita?>()
     val citaPendiente: LiveData<Cita?> get() = _citaPendiente
 
     init {
-        fetchClientes()
-        fetchServicios()
-        fetchEmpleados()
-        _clienteId.value = getAuthenticatedClienteId()
-        fetchHistorialCitasClienteAutenticado()
-        fetchCitaPendienteClienteAutenticado()
+        _clienteId.value = getAuthenticatedClienteIdOrNull()
+        if (_clienteId.value != null) {
+            fetchClientes()
+            fetchServicios()
+            fetchEmpleados()
+            fetchHistorialCitasClienteAutenticado()
+            fetchCitaPendienteClienteAutenticado()
+        }
     }
+
 
     /**
      * Método para obtener el ID del cliente autenticado.
      * @return El ID del cliente autenticado.
      * @throws IllegalStateException Si el usuario no está autenticado.
      */
-    private fun getAuthenticatedClienteId(): String {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        return currentUser?.uid ?: throw IllegalStateException("Usuario no autenticado")
+    fun getAuthenticatedClienteIdOrNull(): String? {
+        return FirebaseAuth.getInstance().currentUser?.uid
     }
+
 
     fun setClienteId(id: String) {
         _clienteId.value = id
@@ -162,9 +165,9 @@ class ClienteViewModel(
         viewModelScope.launch {
             setLoading()
             try {
-                val clienteId = getAuthenticatedClienteId()
-                val historialCitas = getCitasFromHistorial(clienteId)
-                val citaPendiente = historialCitas.find { it.estado == CitaEstado.PENDIENTE }
+                val clienteId = getAuthenticatedClienteIdOrNull()
+                val historialCitas = clienteId?.let { getCitasFromHistorial(it) }
+                val citaPendiente = historialCitas?.find { it.estado == CitaEstado.PENDIENTE }
                 _citaPendiente.value = citaPendiente
                 setSuccess()
             } catch (e: Exception) {
@@ -177,9 +180,11 @@ class ClienteViewModel(
         viewModelScope.launch {
             setLoading()
             try {
-                val clienteId = getAuthenticatedClienteId()
-                val fetchedHistorialCitas = getCitasFromHistorial(clienteId)
-                _historialCitas.value = fetchedHistorialCitas.sortedByDescending { it.fecha }
+                val clienteId = getAuthenticatedClienteIdOrNull()
+                val fetchedHistorialCitas = clienteId?.let { getCitasFromHistorial(it) }
+                if (fetchedHistorialCitas != null) {
+                    _historialCitas.value = fetchedHistorialCitas.sortedByDescending { it.fecha }
+                }
                 setSuccess()
             } catch (e: Exception) {
                 setError(e.message)

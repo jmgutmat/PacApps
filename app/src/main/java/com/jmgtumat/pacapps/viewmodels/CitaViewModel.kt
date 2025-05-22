@@ -92,7 +92,7 @@ class CitaViewModel(
      * @param cita Cita a insertar.
      * @param clienteId ID del cliente asociado a la cita.
      */
-    fun insertCita(cita: Unit?, clienteId: String) {
+    fun insertCita(cita: Cita, clienteId: String) {
         viewModelScope.launch {
             try {
                 Log.d("CitaViewModel", "Fecha de la cita: ${cita.fecha}")
@@ -102,18 +102,19 @@ class CitaViewModel(
 
                 val historialCitas = clienteRepository.getHistorialCitas(clienteId).toMutableList()
                 historialCitas.add(cita)
-
                 clienteRepository.updateHistorialCitas(clienteId, historialCitas)
 
                 val empleadoId = cita.empleadoId
                 val citasAsignadas = empleadoRepository.getCitasAsignadas(empleadoId).map { it.id }.toMutableList()
                 citasAsignadas.add(cita.id)
                 empleadoRepository.updateCitasAsignadas(empleadoId, citasAsignadas)
+
             } catch (e: Exception) {
                 setError(e.message)
             }
         }
     }
+
 
     /**
      * Método para actualizar una cita existente.
