@@ -11,12 +11,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import com.jmgtumat.pacapps.R
 import com.jmgtumat.pacapps.navigation.AppScreens
-import com.jmgtumat.pacapps.navigation.redirectToRoleBasedScreen
 import com.jmgtumat.pacapps.ui.theme.PacAppsTheme
-import kotlinx.coroutines.delay
 
 /**
  * Pantalla de presentación que se muestra al inicio de la aplicación.
@@ -25,31 +23,53 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
-        delay(1500)
-
         val user = FirebaseAuth.getInstance().currentUser
-
         if (user == null) {
             navController.navigate(AppScreens.MainScreen.route) {
                 popUpTo(AppScreens.SplashScreen.route) { inclusive = true }
             }
         } else {
-            // Ya autenticado → redirigir según el rol
-            redirectToRoleBasedScreen(
-                navController = navController,
-                userId = user.uid,
-                getUserType = { uid, onResult ->
-                    FirebaseFirestore.getInstance().collection("usuarios")
-                        .document(uid)
-                        .get()
-                        .addOnSuccessListener { document ->
-                            val tipoUsuario = document.getString("tipoUsuario") ?: "cliente"
-                            onResult(tipoUsuario)
+            val uid = user.uid
+            val db = FirebaseDatabase.getInstance().reference
+
+            val clienteRef = db.child("clientes").child(uid)
+            val empleadoRef = db.child("empleados").child(uid)
+            val adminRef = db.child("administradores").child(uid)
+
+            clienteRef.get().addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    navController.navigate(AppScreens.ClientHomeScreen.route) {
+                        popUpTo(AppScreens.SplashScreen.route) { inclusive = true }
+                    }
+                } else {
+                    empleadoRef.get().addOnSuccessListener { snapshotEmp ->
+                        if (snapshotEmp.exists()) {
+                            navController.navigate(AppScreens.ManageAppointmentsScreen.route) {
+                                popUpTo(AppScreens.SplashScreen.route) { inclusive = true }
+                            }
+                        } else {
+                            adminRef.get().addOnSuccessListener { snapshotAdmin ->
+                                if (snapshotAdmin.exists()) {
+                                    navController.navigate(AppScreens.ReportsScreen.route) {
+                                        popUpTo(AppScreens.SplashScreen.route) { inclusive = true }
+                                    }
+                                } else {
+                                    navController.navigate(AppScreens.MainScreen.route) {
+                                        popUpTo(AppScreens.SplashScreen.route) { inclusive = true }
+                                    }
+                                }
+                            }
                         }
+                    }
                 }
-            )
+            }.addOnFailureListener {
+                navController.navigate(AppScreens.MainScreen.route) {
+                    popUpTo(AppScreens.SplashScreen.route) { inclusive = true }
+                }
+            }
         }
     }
+
 
     Splash()
 }
