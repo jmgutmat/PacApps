@@ -62,18 +62,18 @@ fun AppNavigation() {
 //        }
 
         composable(AppScreens.ServiceSelectionScreen.route) {
-            ServiceSelectionScreen(navController = navController)
+            ServiceSelectionScreen(navController)
         }
 
-        composable(AppScreens.AppointmentBookingScreen.route + "/{clienteId}") { backStackEntry ->
-            val clienteId = backStackEntry.arguments?.getString("clienteId")
-            AppointmentBookingScreen(navController, clienteId)
+        composable(AppScreens.AppointmentBookingScreen.route) {
+            AppointmentBookingScreen(navController)
         }
 
         composable(AppScreens.AppointmentSummaryScreen.route + "/{clienteId}") { backStackEntry ->
             val clienteId = backStackEntry.arguments?.getString("clienteId") ?: return@composable
             AppointmentSummaryScreen(navController, clienteId = clienteId)
         }
+
 
         composable(AppScreens.ClientModHistoryScreen.route) {
             ClientmodHistoryScreen(navController)

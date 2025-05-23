@@ -96,8 +96,7 @@ fun ServiceSelectionScreen(navController: NavController) {
 
                 Button(
                     onClick = {
-                        val ids = selectedIds.joinToString(",")
-                        navController.navigate(AppScreens.AppointmentBookingScreen.route + "/$ids")
+                        navController.navigate(AppScreens.AppointmentBookingScreen.route)
                     },
                     enabled = selectedIds.isNotEmpty(),
                     modifier = Modifier.fillMaxWidth(),
@@ -105,6 +104,7 @@ fun ServiceSelectionScreen(navController: NavController) {
                 ) {
                     Text("Continuar")
                 }
+
             }
         }
     }

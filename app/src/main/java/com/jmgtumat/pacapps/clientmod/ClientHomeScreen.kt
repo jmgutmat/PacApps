@@ -111,7 +111,7 @@ fun ClientHomeScreen(navController: NavController) {
                 Button(
                     onClick = {
                         clienteId?.let { id ->
-                            navController.navigate("/appointment_booking_screen/$id")
+                            navController.navigate("/service_selection_screen")
                         }
                     },
                     enabled = clienteId != null
