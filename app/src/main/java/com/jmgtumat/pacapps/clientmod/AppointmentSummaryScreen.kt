@@ -48,91 +48,123 @@ fun AppointmentSummaryScreen(
     val totalPrice = selectedServices.sumOf { it.precio }
     val totalDuration = selectedServices.sumOf { it.duracion }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text("Resumen de la Cita", style = MaterialTheme.typography.headlineMedium)
-
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(selectedServices) { servicio ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp)
-                ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(servicio.nombre, style = MaterialTheme.typography.titleMedium)
-                        Text("Duración: ${servicio.duracion} min", style = MaterialTheme.typography.bodySmall)
-                        Text("Precio: ${"%.2f".format(servicio.precio)} €", style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-            }
-        }
-
-        Divider()
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.CalendarToday, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-            if (selectedDate != null) {
-                Text("Fecha: ${selectedDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))}")
-            }
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.AccessTime, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-            Text("Hora: $selectedTime")
-        }
-
-        Divider()
-
-        Text("Duración total: $totalDuration min", style = MaterialTheme.typography.bodyMedium)
-        Text("Precio total: ${"%.2f".format(totalPrice)} €", style = MaterialTheme.typography.bodyMedium)
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = {
-                // Calcular horaInicio como LocalDateTime combinando fecha y hora
-                val partesHora = selectedTime?.split(":")
-                val fechaHora = partesHora?.get(0)?.let {
-                    partesHora[1]
-                        .let { it1 -> selectedDate?.atTime(it.toInt(), it1.toInt()) }
-                }
-                val horaInicioMillis = fechaHora?.atZone(ZoneId.systemDefault())?.toInstant()
-                    ?.toEpochMilli()
-                val fechaMillis = selectedDate?.atStartOfDay()?.atZone(ZoneId.systemDefault())
-                    ?.toInstant()
-                    ?.toEpochMilli()
-
-                // Crear cita para cada servicio seleccionado
-                if (fechaMillis != null && horaInicioMillis != null) {
-                    selectedServices.forEach { servicio ->
-                        val cita = Cita(
-                            clienteId = clienteId,
-                            empleadoId = "empleado_unico_francisco",
-                            servicioId = servicio.id,
-                            fecha = fechaMillis,
-                            horaInicio = horaInicioMillis,
-                            duracion = servicio.duracion,
-                            estado = CitaEstado.PENDIENTE
-                        )
-                        citaViewModel.insertCita(cita, clienteId)
-                    }
-
-                    // Volver al home limpiando el backstack
-                    navController.navigate("/client_home_screen") {
-                        popUpTo(0) { inclusive = true }
-                    }
-                } else {
-                    // Log o control de error si fuera necesario
-                }
-
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+    ClienteDashboard(navController = navController) { innerPadding ->
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
         ) {
-            Text("Confirmar Cita")
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text("Resumen de la Cita", style = MaterialTheme.typography.headlineMedium)
+
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(selectedServices) { servicio ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(servicio.nombre, style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    "Duración: ${servicio.duracion} min",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    "Precio: ${"%.2f".format(servicio.precio)} €",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Divider()
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.CalendarToday,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    if (selectedDate != null) {
+                        Text("Fecha: ${selectedDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))}")
+                    }
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.AccessTime,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Hora: $selectedTime")
+                }
+
+                Divider()
+
+                Text(
+                    "Duración total: $totalDuration min",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    "Precio total: ${"%.2f".format(totalPrice)} €",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Button(
+                    onClick = {
+                        // Calcular horaInicio como LocalDateTime combinando fecha y hora
+                        val partesHora = selectedTime?.split(":")
+                        val fechaHora = partesHora?.get(0)?.let {
+                            partesHora[1]
+                                .let { it1 -> selectedDate?.atTime(it.toInt(), it1.toInt()) }
+                        }
+                        val horaInicioMillis =
+                            fechaHora?.atZone(ZoneId.systemDefault())?.toInstant()
+                                ?.toEpochMilli()
+                        val fechaMillis =
+                            selectedDate?.atStartOfDay()?.atZone(ZoneId.systemDefault())
+                                ?.toInstant()
+                                ?.toEpochMilli()
+
+                        // Crear cita para cada servicio seleccionado
+                        if (fechaMillis != null && horaInicioMillis != null) {
+                            selectedServices.forEach { servicio ->
+                                val cita = Cita(
+                                    clienteId = clienteId,
+                                    empleadoId = "empleado_unico_francisco",
+                                    servicioId = servicio.id,
+                                    fecha = fechaMillis,
+                                    horaInicio = horaInicioMillis,
+                                    duracion = servicio.duracion,
+                                    estado = CitaEstado.PENDIENTE
+                                )
+                                citaViewModel.insertCita(cita, clienteId)
+                            }
+
+                            // Volver al home limpiando el backstack
+                            navController.navigate("/client_home_screen") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        } else {
+                            // Log o control de error si fuera necesario
+                        }
+
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Confirmar Cita")
+                }
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import com.jmgtumat.pacapps.clientmod.AppointmentSummaryScreen
 import com.jmgtumat.pacapps.clientmod.ClientHomeScreen
 import com.jmgtumat.pacapps.clientmod.ClientmodHistoryScreen
 import com.jmgtumat.pacapps.clientmod.ProfileScreen
+import com.jmgtumat.pacapps.clientmod.ServiceSelectionScreen
 import com.jmgtumat.pacapps.employeemod.appointments.ManageAppointmentsScreen
 import com.jmgtumat.pacapps.employeemod.clients.EmpModHistoryScreen
 import com.jmgtumat.pacapps.employeemod.clients.ManageClientsScreen
@@ -59,6 +60,10 @@ fun AppNavigation() {
 //        composable(AppScreens.NewAppointmentScreen.route) {
 //            NewAppointmentScreen(navController)
 //        }
+
+        composable(AppScreens.ServiceSelectionScreen.route) {
+            ServiceSelectionScreen(navController = navController)
+        }
 
         composable(AppScreens.AppointmentBookingScreen.route + "/{clienteId}") { backStackEntry ->
             val clienteId = backStackEntry.arguments?.getString("clienteId")

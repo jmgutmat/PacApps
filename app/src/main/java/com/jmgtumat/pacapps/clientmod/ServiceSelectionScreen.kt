@@ -40,53 +40,72 @@ fun ServiceSelectionScreen(navController: NavController) {
     val servicios by servicioViewModel.servicios.observeAsState(emptyList())
     var selectedIds by remember { mutableStateOf(setOf<String>()) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text("Selecciona los servicios", style = MaterialTheme.typography.headlineSmall)
+    ClienteDashboard(navController = navController) { innerPadding ->
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text("Selecciona los servicios", style = MaterialTheme.typography.headlineSmall)
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(servicios) { servicio ->
-                val isSelected = selectedIds.contains(servicio.id)
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            selectedIds = if (isSelected) {
-                                selectedIds - servicio.id
-                            } else {
-                                selectedIds + servicio.id
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(servicios) { servicio ->
+                        val isSelected = selectedIds.contains(servicio.id)
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedIds = if (isSelected) {
+                                        selectedIds - servicio.id
+                                    } else {
+                                        selectedIds + servicio.id
+                                    }
+                                }
+                                .border(
+                                    width = if (isSelected) 2.dp else 0.dp,
+                                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                                ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(servicio.nombre, style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    "Duración: ${servicio.duracion} min",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    "Precio: ${servicio.precio} €",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    servicio.descripcion,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
                             }
                         }
-                        .border(
-                            width = if (isSelected) 2.dp else 0.dp,
-                            color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-                        ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(servicio.nombre, style = MaterialTheme.typography.titleMedium)
-                        Text("Duración: ${servicio.duracion} min", style = MaterialTheme.typography.bodyMedium)
-                        Text("Precio: ${servicio.precio} €", style = MaterialTheme.typography.bodyMedium)
-                        Text(servicio.descripcion, style = MaterialTheme.typography.bodySmall)
                     }
                 }
-            }
-        }
 
-        Button(
-            onClick = {
-                val ids = selectedIds.joinToString(",")
-                navController.navigate(AppScreens.AppointmentBookingScreen.route + "/$ids")
-            },
-            enabled = selectedIds.isNotEmpty(),
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            Text("Continuar")
+                Button(
+                    onClick = {
+                        val ids = selectedIds.joinToString(",")
+                        navController.navigate(AppScreens.AppointmentBookingScreen.route + "/$ids")
+                    },
+                    enabled = selectedIds.isNotEmpty(),
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    Text("Continuar")
+                }
+            }
         }
     }
 }

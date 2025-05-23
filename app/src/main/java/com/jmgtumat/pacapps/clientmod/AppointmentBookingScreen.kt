@@ -38,57 +38,67 @@ fun AppointmentBookingScreen(
     val horasDisponibles = listOf("10:00", "10:30", "11:00", "11:30", "12:00")
     var horaSeleccionada by remember { mutableStateOf(horasDisponibles.first()) }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text("Selecciona el día", style = MaterialTheme.typography.titleLarge)
-        LazyRow {
-            items(diasDisponibles) { dia ->
-                val formato = dia.format(DateTimeFormatter.ofPattern("dd MMM"))
-                Button(
-                    onClick = { diaSeleccionado = dia },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (dia == diaSeleccionado)
-                            MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.surface
-                    ),
-                    modifier = Modifier.padding(end = 8.dp)
-                ) {
-                    Text(formato)
-                }
-            }
-        }
-
-        Text("Selecciona la hora", style = MaterialTheme.typography.titleLarge)
-        LazyRow {
-            items(horasDisponibles) { hora ->
-                Button(
-                    onClick = { horaSeleccionada = hora },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (hora == horaSeleccionada)
-                            MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.surface
-                    ),
-                    modifier = Modifier.padding(end = 8.dp)
-                ) {
-                    Text(hora)
-                }
-            }
-        }
-
-        Button(
-            onClick = {
-                viewModel.setSelectedDate(diaSeleccionado)
-                viewModel.setSelectedTime(horaSeleccionada)
-                navController.navigate(AppScreens.AppointmentSummaryScreen.route + "/$clienteId")
-
-            },
-            modifier = Modifier.padding(top = 24.dp)
+    ClienteDashboard(navController = navController) { innerPadding ->
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
         ) {
-            Text("Continuar")
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Text("Selecciona el día", style = MaterialTheme.typography.titleLarge)
+                LazyRow {
+                    items(diasDisponibles) { dia ->
+                        val formato = dia.format(DateTimeFormatter.ofPattern("dd MMM"))
+                        Button(
+                            onClick = { diaSeleccionado = dia },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (dia == diaSeleccionado)
+                                    MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.surface
+                            ),
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Text(formato)
+                        }
+                    }
+                }
+
+                Text("Selecciona la hora", style = MaterialTheme.typography.titleLarge)
+                LazyRow {
+                    items(horasDisponibles) { hora ->
+                        Button(
+                            onClick = { horaSeleccionada = hora },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (hora == horaSeleccionada)
+                                    MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.surface
+                            ),
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Text(hora)
+                        }
+                    }
+                }
+
+                Button(
+                    onClick = {
+                        viewModel.setSelectedDate(diaSeleccionado)
+                        viewModel.setSelectedTime(horaSeleccionada)
+                        navController.navigate(AppScreens.AppointmentSummaryScreen.route + "/$clienteId")
+
+                    },
+                    modifier = Modifier.padding(top = 24.dp)
+                ) {
+                    Text("Continuar")
+                }
+            }
         }
     }
 }
