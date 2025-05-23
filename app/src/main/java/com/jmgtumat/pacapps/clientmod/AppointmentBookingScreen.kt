@@ -25,10 +25,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun AppointmentBookingScreen(
-    navController: NavController,
-    clienteId: String?
-) {
+fun AppointmentBookingScreen(navController: NavController) {
     val viewModel: AppointmentSummaryViewModel = viewModel()
     val selectedServices = viewModel.selectedServices
 
@@ -91,7 +88,11 @@ fun AppointmentBookingScreen(
                     onClick = {
                         viewModel.setSelectedDate(diaSeleccionado)
                         viewModel.setSelectedTime(horaSeleccionada)
-                        navController.navigate(AppScreens.AppointmentSummaryScreen.route + "/$clienteId")
+                        navController.navigate(AppScreens.AppointmentSummaryScreen.route) {
+                            popUpTo(AppScreens.ServiceSelectionScreen.route) {
+                                inclusive = true
+                            }
+                        }
 
                     },
                     modifier = Modifier.padding(top = 24.dp)
