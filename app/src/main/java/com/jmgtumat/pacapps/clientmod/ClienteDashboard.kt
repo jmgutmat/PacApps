@@ -82,7 +82,7 @@ fun BottomNavigationBar(navController: NavController) {
                 onClick = {
                     if (clienteId != null) {
                         val destino = when (screen) {
-                            is ClienteScreen.NewAppointment -> "/appointment_booking_screen/$clienteId"
+                            is ClienteScreen.NewAppointment -> "//service_selection_screen/$clienteId"
                             else -> screen.route
                         }
 
@@ -113,7 +113,7 @@ fun BottomNavigationBar(navController: NavController) {
 sealed class ClienteScreen(val route: String, val title: String, val icon: ImageVector) {
     object Profile : ClienteScreen("/profile_screen", "Perfil", Icons.Default.Person)
     object History : ClienteScreen("/clientmod_history_screen", "Historial", Icons.Default.History)
-    object NewAppointment : ClienteScreen("/appointment_booking_screen", "Nueva Cita", Icons.Default.Add)
+    object NewAppointment : ClienteScreen("/service_selection_screen", "Nueva Cita", Icons.Default.Add)
 //    object NewAppointment : ClienteScreen("/new_appointments_screen", "Nueva Cita", Icons.Default.Add)
     object Home : ClienteScreen("/client_home_screen", "Inicio", Icons.Default.Home)
 }
