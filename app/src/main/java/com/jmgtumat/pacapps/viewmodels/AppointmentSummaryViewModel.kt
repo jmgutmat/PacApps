@@ -26,15 +26,7 @@ class AppointmentSummaryViewModel(
     var selectedDate: LocalDate? = null
     var selectedTime: String? = null
 
-    private val empleadoIdDefault = "-OL_6myd8kEiS60lWykm" // Francisco Reina Gil (lo actualizaremos más adelante)
-
-    fun setSelectedDate(date: LocalDate) {
-        selectedDate = date
-    }
-
-    fun setSelectedTime(time: String) {
-        selectedTime = time
-    }
+    private val empleadoIdDefault = "-OL_6myd8kEiS60lWykm" // Francisco Reina Gil
 
     fun calcularHorasDisponibles() {
         if (selectedDate == null) return
@@ -42,7 +34,8 @@ class AppointmentSummaryViewModel(
         viewModelScope.launch {
             try {
                 Log.d("AppointmentVM", "Calculando horas disponibles para: $selectedDate")
-                val empleado: Empleado? = empleadoRepository.getEmpleadoById(empleadoIdDefault)
+                val empleados = empleadoRepository.getEmpleados()
+                val empleado: Empleado? = empleados.find { it.id == empleadoIdDefault }
                 Log.d("AppointmentVM", "Empleado obtenido: ${empleado?.nombre}")
 
                 if (empleado == null || empleado.horariosTrabajo.isEmpty()) {
@@ -58,17 +51,18 @@ class AppointmentSummaryViewModel(
                     return@launch
                 }
 
-                val citasDia: List<Cita> = citaRepository.getCitasByEmpleadoIdAndDate(empleadoIdDefault, selectedDate.toString())
+                val citasDia: List<Cita> = citaRepository.getCitasByEmpleadoIdAndDate(
+                    empleadoIdDefault,
+                    selectedDate!!.toEpochDay()
+                )
                 Log.d("AppointmentVM", "Citas del día: ${citasDia.size}")
 
-                // Calcular duración total en minutos de los servicios seleccionados
                 val duracionTotal = selectedServices.sumOf { it.toIntOrNull() ?: 0 }
                 Log.d("AppointmentVM", "Duración total de los servicios: $duracionTotal min")
 
                 val horasDisponibles = mutableListOf<String>()
                 val formato = DateTimeFormatter.ofPattern("HH:mm")
 
-                // Intervalos mañana/tarde
                 listOfNotNull(horarios.manana, horarios.tarde).forEach { intervalo ->
                     if (!intervalo.disponible) return@forEach
 
@@ -76,10 +70,9 @@ class AppointmentSummaryViewModel(
                     val horaFin = LocalTime.parse(intervalo.horaFin, formato)
 
                     while (horaActual.plusMinutes(duracionTotal.toLong()) <= horaFin) {
-                        // Comprobar solapamientos con citas existentes
                         val choque = citasDia.any { cita ->
-                            val citaInicio = LocalTime.parse(cita.horaInicio, formato)
-                            val citaFin = LocalTime.parse(cita.horaFin, formato)
+                            val citaInicio = LocalTime.ofSecondOfDay(cita.horaInicio)
+                            val citaFin = citaInicio.plusMinutes(cita.duracion.toLong())
                             val nuevaCitaFin = horaActual.plusMinutes(duracionTotal.toLong())
 
                             (horaActual < citaFin && nuevaCitaFin > citaInicio)
@@ -88,7 +81,7 @@ class AppointmentSummaryViewModel(
                             horasDisponibles.add(horaActual.format(formato))
                         }
 
-                        horaActual = horaActual.plusMinutes(30) // Incrementar cada 30 minutos
+                        horaActual = horaActual.plusMinutes(30)
                     }
                 }
 
