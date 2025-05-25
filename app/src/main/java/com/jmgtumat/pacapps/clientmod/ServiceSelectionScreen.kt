@@ -104,7 +104,7 @@ fun ServiceSelectionScreen(navController: NavController) {
                     )
                     Button(
                         onClick = {
-                            appointmentSummaryViewModel.setSelectedServices(selectedServices)
+                            appointmentSummaryViewModel.selectedServices = selectedServices
                             navController.navigate(AppScreens.AppointmentBookingScreen.route)
                         },
                         modifier = Modifier.fillMaxWidth()

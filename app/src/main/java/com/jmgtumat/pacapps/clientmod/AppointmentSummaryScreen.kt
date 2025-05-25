@@ -1,22 +1,32 @@
 package com.jmgtumat.pacapps.clientmod
 
 import android.util.Log
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.jmgtumat.pacapps.data.Cita
-import com.jmgtumat.pacapps.data.Servicio
-import com.jmgtumat.pacapps.navigation.AppScreens
 import com.jmgtumat.pacapps.viewmodels.AppointmentSummaryViewModel
 import com.jmgtumat.pacapps.viewmodels.CitaViewModel
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun AppointmentSummaryScreen(navController: NavController) {
+fun AppointmentSummaryScreen(
+    navController: NavController,
+    clienteId: String // 👈 Añadido el parámetro que faltaba
+) {
     val viewModel: AppointmentSummaryViewModel = viewModel()
     val citaViewModel: CitaViewModel = viewModel()
 
@@ -27,9 +37,6 @@ fun AppointmentSummaryScreen(navController: NavController) {
     val totalPrecio = selectedServices.sumOf { it.precio }
     val totalDuracion = selectedServices.sumOf { it.duracion }
 
-    // TODO: Obtener el clienteId real (puede ser desde un ViewModel, sesión, etc.)
-    val clienteId = "yr38u4tTcrcLvKlcHZTUJKSCRk53" // ¡Ejemplo hardcodeado!
-
     ClienteDashboard(navController = navController) { innerPadding ->
         Column(
             modifier = Modifier
@@ -39,7 +46,6 @@ fun AppointmentSummaryScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text("Resumen de la cita", style = MaterialTheme.typography.headlineSmall)
-
             Text("Fecha: ${selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: "No seleccionada"}")
             Text("Hora: ${selectedTime ?: "No seleccionada"}")
             Text("Duración total: $totalDuracion min")
@@ -71,7 +77,7 @@ fun AppointmentSummaryScreen(navController: NavController) {
                         if (selectedDate != null && selectedTime != null) {
                             val cita = Cita(
                                 clienteId = clienteId,
-                                empleadoId = "-OL_6myd8kEiS60lWykm", // Francisco Reina Gil por defecto
+                                empleadoId = "-OL_6myd8kEiS60lWykm",
                                 servicioId = selectedServices.joinToString(",") { it.id },
                                 fecha = selectedDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(),
                                 horaInicio = selectedTime.let { timeStr ->
@@ -82,13 +88,9 @@ fun AppointmentSummaryScreen(navController: NavController) {
                                 duracion = totalDuracion
                             )
 
-                            citaViewModel.insertCita(
-                                cita,
-                                clienteId = clienteId
-                            )
-
-                            navController.navigate(AppScreens.ClientHomeScreen.route) {
-                                popUpTo(AppScreens.ClientHomeScreen.route) { inclusive = true }
+                            citaViewModel.insertCita(cita, clienteId)
+                            navController.navigate(com.jmgtumat.pacapps.navigation.AppScreens.ClientHomeScreen.route) {
+                                popUpTo(com.jmgtumat.pacapps.navigation.AppScreens.ClientHomeScreen.route) { inclusive = true }
                             }
                         } else {
                             Log.e("AppointmentSummary", "Faltan datos para crear la cita")
@@ -102,8 +104,8 @@ fun AppointmentSummaryScreen(navController: NavController) {
 
                 Button(
                     onClick = {
-                        navController.navigate(AppScreens.ClientHomeScreen.route) {
-                            popUpTo(AppScreens.ClientHomeScreen.route) { inclusive = true }
+                        navController.navigate(com.jmgtumat.pacapps.navigation.AppScreens.ClientHomeScreen.route) {
+                            popUpTo(com.jmgtumat.pacapps.navigation.AppScreens.ClientHomeScreen.route) { inclusive = true }
                         }
                     },
                     modifier = Modifier.weight(1f),

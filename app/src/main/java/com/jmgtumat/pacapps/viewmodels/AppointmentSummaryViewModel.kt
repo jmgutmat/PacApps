@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jmgtumat.pacapps.data.Cita
 import com.jmgtumat.pacapps.data.Empleado
+import com.jmgtumat.pacapps.data.Servicio
 import com.jmgtumat.pacapps.repository.CitaRepository
 import com.jmgtumat.pacapps.repository.EmpleadoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,11 +23,12 @@ class AppointmentSummaryViewModel(
     private val _horasDisponibles = MutableStateFlow<List<String>>(emptyList())
     val horasDisponibles: StateFlow<List<String>> = _horasDisponibles
 
-    var selectedServices: List<String> = emptyList()
+    var selectedServices: List<Servicio> = emptyList()
     var selectedDate: LocalDate? = null
     var selectedTime: String? = null
 
-    private val empleadoIdDefault = "-OL_6myd8kEiS60lWykm" // Francisco Reina Gil
+    private val empleadoIdDefault = "tfD2pxzZpddHklnx7d1Dbq7xYlp1" // Francisco Reina Gil
+
 
     fun calcularHorasDisponibles() {
         if (selectedDate == null) return
@@ -57,7 +59,7 @@ class AppointmentSummaryViewModel(
                 )
                 Log.d("AppointmentVM", "Citas del día: ${citasDia.size}")
 
-                val duracionTotal = selectedServices.sumOf { it.toIntOrNull() ?: 0 }
+                val duracionTotal = selectedServices.sumOf { it.duracion }
                 Log.d("AppointmentVM", "Duración total de los servicios: $duracionTotal min")
 
                 val horasDisponibles = mutableListOf<String>()
