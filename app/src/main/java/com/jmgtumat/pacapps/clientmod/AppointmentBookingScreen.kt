@@ -1,275 +1,311 @@
 package com.jmgtumat.pacapps.clientmod
 
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import com.jmgtumat.pacapps.data.Cita
+import com.jmgtumat.pacapps.data.Servicio
 import com.jmgtumat.pacapps.navigation.AppScreens
+import com.jmgtumat.pacapps.repository.CitaRepository
+import com.jmgtumat.pacapps.repository.ClienteRepository
+import com.jmgtumat.pacapps.repository.EmpleadoRepository
+import com.jmgtumat.pacapps.ui.theme.Dimens
 import com.jmgtumat.pacapps.viewmodels.AppointmentSummaryViewModel
+import com.jmgtumat.pacapps.viewmodels.CitaViewModel
+import com.jmgtumat.pacapps.viewmodels.CitaViewModelFactory
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModel
+import com.jmgtumat.pacapps.viewmodels.ClienteViewModelFactory
+import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModel
+import com.jmgtumat.pacapps.viewmodels.EmpleadoViewModelFactory
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun AppointmentBookingScreen(navController: NavController) {
-    val viewModel: AppointmentSummaryViewModel = viewModel()
-    val horasDisponibles by viewModel.horasDisponibles.collectAsState()
+    // 🆕 Obtenemos el back stack entry de la ruta actual
+    val currentBackStackEntry = remember(navController.currentBackStackEntry) {
+        navController.currentBackStackEntry
+    }
+
+    // 🆕 Creamos una instancia de CitaViewModel asociada al back stack entry actual
+    val citaViewModel: CitaViewModel = viewModel(
+        viewModelStoreOwner = currentBackStackEntry!!, // Aseguramos que el ViewModel esté atado al ciclo de vida de esta ruta
+        factory = CitaViewModelFactory(CitaRepository())
+    )
+
+    val parentEntryState = remember { mutableStateOf<NavBackStackEntry?>(null) }
+
+    LaunchedEffect(Unit) {
+        parentEntryState.value = navController.getBackStackEntry(AppScreens.ServiceSelectionScreen.route)
+    }
+
+    val appointmentSummaryViewModel: AppointmentSummaryViewModel? = parentEntryState.value?.let {
+        viewModel(it)
+    }
+
+    if (appointmentSummaryViewModel == null) {
+        Text("Cargando...")
+        return
+    }
+
+    val empleadoViewModel: EmpleadoViewModel = viewModel(factory = EmpleadoViewModelFactory(EmpleadoRepository(),
+        ClienteRepository()))
+    val empleados by empleadoViewModel.empleados.observeAsState(emptyList())
+    val clienteViewModel: ClienteViewModel = viewModel(factory = ClienteViewModelFactory(ClienteRepository()))
+
+    val horasDisponibles by appointmentSummaryViewModel.horasDisponibles.collectAsState()
+
     val hoy = LocalDate.now()
     val diasDisponibles = (0..60).map { hoy.plusDays(it.toLong()) }
 
+    val selectedServicesState = appointmentSummaryViewModel.selectedServices.collectAsState()
+    val selectedServices = selectedServicesState.value
+
     var diaSeleccionado by remember { mutableStateOf(diasDisponibles.first()) }
     var horaSeleccionada by remember { mutableStateOf("") }
+    var especialistaSeleccionado by remember { mutableStateOf("") }
+
+    // Inicializamos el especialista seleccionado por defecto con el primero si está vacío
+    LaunchedEffect(empleados) {
+        if (empleados.isNotEmpty() && especialistaSeleccionado.isEmpty()) {
+            especialistaSeleccionado = empleados.first().nombre
+        }
+    }
 
     LaunchedEffect(diaSeleccionado) {
-        viewModel.selectedDate = diaSeleccionado
-        viewModel.calcularHorasDisponibles()
+        appointmentSummaryViewModel.selectedDate = diaSeleccionado
+        appointmentSummaryViewModel.calcularHorasDisponibles()
     }
 
     ClienteDashboard(navController = navController) { innerPadding ->
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.CardSpacing),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(Dimens.ScreenPadding)
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            Text("Selecciona el día", style = MaterialTheme.typography.titleLarge)
-            LazyRow {
+            // Botón "Atrás" como icono
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Volver atrás",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            // Resumen de servicios seleccionados
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(Dimens.CardCornerRadius),
+                elevation = CardDefaults.cardElevation(Dimens.CardElevation),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(modifier = Modifier.padding(Dimens.ScreenPadding)) {
+                    Text(
+                        text = "Servicios seleccionados",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (selectedServices.isEmpty()) {
+                        Text(
+                            text = "No se han seleccionado servicios.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        selectedServices.forEach { servicio: Servicio ->
+                            Text(
+                                "- ${servicio.nombre} (${servicio.duracion} min, ${"%.2f".format(servicio.precio)}€)",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Selección de día
+            Text(
+                text = "Selecciona el día",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(diasDisponibles) { dia ->
                     val formato = dia.format(DateTimeFormatter.ofPattern("dd MMM"))
-                    Button(
-                        onClick = {
-                            diaSeleccionado = dia
-                            Log.d("AppointmentScreen", "Día seleccionado: $diaSeleccionado")
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (dia == diaSeleccionado)
-                                MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surface
-                        ),
-                        modifier = Modifier.padding(end = 8.dp)
+                    val isSelected = dia == diaSeleccionado
+                    val backgroundColor by animateColorAsState(
+                        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                    )
+                    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(Dimens.CardCornerRadius))
+                            .background(backgroundColor)
+                            .clickable { diaSeleccionado = dia }
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
-                        Text(formato)
+                        Text(
+                            text = formato,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = textColor
+                        )
                     }
                 }
             }
 
-            Text("Selecciona la hora", style = MaterialTheme.typography.titleLarge)
-            LazyRow {
+            // Selección de especialista
+            if (empleados.isNotEmpty()) {
+                Text(
+                    text = "Selecciona especialista",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(empleados) { empleado ->
+                        val isSelected = empleado.nombre == especialistaSeleccionado
+                        val backgroundColor by animateColorAsState(
+                            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                        val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(Dimens.CardCornerRadius))
+                                .background(backgroundColor)
+                                .clickable { especialistaSeleccionado = empleado.nombre }
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                        ) {
+                            Text(
+                                text = empleado.nombre,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = textColor
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Selección de hora
+            Text(
+                text = "Selecciona la hora",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(horasDisponibles) { hora ->
-                    Button(
-                        onClick = {
-                            horaSeleccionada = hora
-                            Log.d("AppointmentScreen", "Hora seleccionada: $horaSeleccionada")
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (hora == horaSeleccionada)
-                                MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surface
-                        ),
-                        modifier = Modifier.padding(end = 8.dp)
+                    val isSelected = hora == horaSeleccionada
+                    val backgroundColor by animateColorAsState(
+                        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                    )
+                    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(Dimens.CardCornerRadius))
+                            .background(backgroundColor)
+                            .clickable { horaSeleccionada = hora }
+                            .padding(horizontal = 20.dp, vertical = 12.dp)
                     ) {
-                        Text(hora)
+                        Text(
+                            text = hora,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = textColor
+                        )
                     }
                 }
             }
 
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Botón para continuar
             Button(
                 onClick = {
-                    viewModel.selectedTime = horaSeleccionada
-                    navController.navigate(AppScreens.AppointmentSummaryScreen.route) {
-                        popUpTo(AppScreens.ServiceSelectionScreen.route) { inclusive = true }
+                    appointmentSummaryViewModel.selectedDate = diaSeleccionado
+                    appointmentSummaryViewModel.selectedTime = horaSeleccionada
+                    // Podrías también guardar el especialista si lo necesitas
+                    // ✅ Obtenemos el clienteId del cliente autenticado
+                    val clienteId = clienteViewModel.getAuthenticatedClienteIdOrNull()
+                    if (!clienteId.isNullOrEmpty()) {
+                        // 🆕 Creamos la cita temporal y la guardamos en el ViewModel
+                        val citaTemporal = Cita(
+                            clienteId = clienteId,
+                            empleadoId = "tfD2pxzZpddHklnx7d1Dbq7xYlp1", // Asigna aquí el empleadoId real
+                            servicioId = selectedServices.joinToString(",") { it.id },
+                            fecha = diaSeleccionado.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(),
+                            horaInicio = horaSeleccionada.let { timeStr ->
+                                val time = java.time.LocalTime.parse(timeStr)
+                                val dateTime = diaSeleccionado.atTime(time)
+                                dateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+                            },
+                            duracion = selectedServices.sumOf { it.duracion }
+                        )
+                        // 🟩 LOG para ver qué estamos guardando
+                        Log.d("BookingScreen", "Cita temporal creada: $citaTemporal")
+
+                        // Guarda la cita temporal en el ViewModel que está atado a la ruta actual
+                        citaViewModel.citaActual.value = citaTemporal
+
+                        Log.d("BookingScreen", "Cita guardada en ViewModel: ${citaViewModel.citaActual.value}")
+
+
+                        // Navega
+                        navController.navigate(AppScreens.AppointmentSummaryScreen.route + "/$clienteId")
                     }
                 },
                 enabled = horaSeleccionada.isNotEmpty(),
-                modifier = Modifier.padding(top = 24.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimens.ButtonHeight),
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Continuar")
-            }
-        }
-    }
-}
-
-
-
-/*
-package com.jmgtumat.pacapps.clientmod
-
-import android.util.Log
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.jmgtumat.pacapps.data.Cita
-import com.jmgtumat.pacapps.data.Servicio
-import com.jmgtumat.pacapps.repository.CitaRepository
-import com.jmgtumat.pacapps.repository.ServicioRepository
-import com.jmgtumat.pacapps.viewmodels.CitaViewModel
-import com.jmgtumat.pacapps.viewmodels.CitaViewModelFactory
-import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-
-@Composable
-fun AppointmentBookingScreen(
-    navController: NavController,
-    clienteId: String?
-) {
-    val viewModel: CitaViewModel = viewModel(
-        factory = CitaViewModelFactory(CitaRepository())
-    )
-    val scope = rememberCoroutineScope()
-    val servicioRepository = remember { ServicioRepository() }
-
-    // Estado para servicios
-    var servicios by remember { mutableStateOf<List<Servicio>>(emptyList()) }
-    var servicioSeleccionado by remember { mutableStateOf<Servicio?>(null) }
-
-    // Cargar servicios desde Firebase
-    LaunchedEffect(Unit) {
-        servicios = servicioRepository.getServicios()
-        if (servicios.isNotEmpty()) {
-            servicioSeleccionado = servicios.first()
-        }
-    }
-
-    // Fechas y horas
-    val hoy = LocalDate.now()
-    val diasDisponibles = (0..60).map { hoy.plusDays(it.toLong()) } // 2 meses
-    var diaSeleccionado by remember { mutableStateOf(diasDisponibles.first()) }
-    val horasDisponibles = listOf("10:00", "10:30", "11:00", "11:30", "12:00")
-    var horaSeleccionada by remember { mutableStateOf(horasDisponibles.first()) }
-
-    val empleadoId = "empleado_unico_francisco"
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Selecciona un servicio", style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(8.dp))
-        servicios.forEach { servicio ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                RadioButton(
-                    selected = servicioSeleccionado == servicio,
-                    onClick = { servicioSeleccionado = servicio }
+                Text(
+                    text = "Continuar",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
-                Text(servicio.nombre, style = MaterialTheme.typography.bodyLarge)
             }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Selecciona el día", style = MaterialTheme.typography.titleLarge)
-        LazyRow(modifier = Modifier.fillMaxWidth()) {
-            items(diasDisponibles) { dia ->
-                val formato = dia.format(DateTimeFormatter.ofPattern("dd MMM"))
-                Button(
-                    onClick = { diaSeleccionado = dia },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (dia == diaSeleccionado)
-                            MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.surface
-                    ),
-                    modifier = Modifier.padding(4.dp)
-                ) {
-                    Text(formato)
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Selecciona la hora", style = MaterialTheme.typography.titleLarge)
-        LazyRow(modifier = Modifier.fillMaxWidth()) {
-            items(horasDisponibles) { hora ->
-                Button(
-                    onClick = { horaSeleccionada = hora },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (hora == horaSeleccionada)
-                            MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.surface
-                    ),
-                    modifier = Modifier.padding(4.dp)
-                ) {
-                    Text(hora)
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-        Button(
-            onClick = {
-                scope.launch {
-                    try {
-                        servicioSeleccionado?.let { servicio ->
-                            // Convertir fecha y hora a timestamps
-                            val fechaMillis = diaSeleccionado.atStartOfDay()
-                                .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
-                            val partes = horaSeleccionada.split(":")
-                            val horaInicio = diaSeleccionado.atTime(partes[0].toInt(), partes[1].toInt())
-                                .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
-                            val cita = Cita(
-                                clienteId = clienteId ?: "cliente_autenticado",
-                                empleadoId = empleadoId,
-                                servicioId = servicio.id,
-                                fecha = fechaMillis,
-                                horaInicio = horaInicio,
-                                duracion = servicio.duracion
-                            )
-
-                            viewModel.insertCita(cita, clienteId ?: "cliente_autenticado")
-                            navController.popBackStack()
-                        }
-                    } catch (e: Exception) {
-                        Log.e("AppointmentBookingScreen", "Error al crear cita", e)
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = servicioSeleccionado != null
-        ) {
-            Text("Confirmar Cita")
         }
     }
 }
-*/

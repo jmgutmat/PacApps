@@ -28,6 +28,9 @@ class CitaViewModel(
     val _citas = MutableLiveData<List<Cita>>()
     val citas: LiveData<List<Cita>> get() = _citas
 
+    val citaActual = MutableLiveData<Cita?>()
+
+
     init {
         fetchCitas()
     }

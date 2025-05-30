@@ -2,31 +2,6 @@ package com.jmgtumat.pacapps.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-/*
-val verde = Color(0xFF008000)
-val amarillo = Color(0xFFFFFF00)
-val azul = Color(0xFF0000FF)
-val rojo = Color(0xFFFF6347)
-
-val crema = Color(0.89f, 0.84f, 0.77f)
-val black = Color(0xFF000000)
-val white = Color(0xFFFFFBFE)
-val alabaster = Color(0xFFE8E2D9)
-val vandike = Color(0xFF3B3233)
-val wenge = Color(0xFF6F605D)
-val raisinblack = Color(0xFF23242C)
-val khaki = Color(0xFFA99C90)
-val darkpurple = Color(0xFF400F2F)
-val dun = Color(0xFFC9BDB2)
-val cinereous = Color(0xFF998B80)
-val night = Color(0xFF0E0F12)
-val dimgray = Color(0xFF7E706A)
-val taupegray = Color(0xFF877C78)
-val jet = Color(0xFF3A3539)
-val raisinblack2 = Color(0xFF282931)
-val transparent = Color(0,0,0, 0)*/
-
-//
 
 val md_theme_light_primary = Color(0xFF1E2A3A) // Azul oscuro
 val md_theme_light_onPrimary = Color.White
